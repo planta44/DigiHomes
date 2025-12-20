@@ -1,0 +1,274 @@
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Bed, 
+  Bath, 
+  Home,
+  Phone,
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  Calendar
+} from 'lucide-react';
+import PublicLayout from '../components/layout/PublicLayout';
+import api from '../config/api';
+
+const HouseDetailsPage = () => {
+  const { id } = useParams();
+  const [house, setHouse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    fetchHouse();
+  }, [id]);
+
+  const fetchHouse = async () => {
+    try {
+      const response = await api.get(`/houses/${id}`);
+      setHouse(response.data);
+    } catch (error) {
+      console.error('Error fetching house:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-KE', {
+      style: 'currency',
+      currency: 'KES',
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getImageUrl = (image) => {
+    if (!image) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop&q=60';
+    return `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${image.image_url}`;
+  };
+
+  const nextImage = () => {
+    if (house?.images?.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % house.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (house?.images?.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + house.images.length) % house.images.length);
+    }
+  };
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="flex justify-center items-center py-32">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  if (!house) {
+    return (
+      <PublicLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">House Not Found</h2>
+          <p className="text-gray-600 mb-6">The house you're looking for doesn't exist or has been removed.</p>
+          <Link to="/houses" className="btn-primary">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Houses
+          </Link>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  const images = house.images?.length > 0 ? house.images : [null];
+
+  return (
+    <PublicLayout>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <Link 
+          to="/houses" 
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Houses
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Images & Description */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Image Gallery */}
+            <div className="relative rounded-2xl overflow-hidden bg-gray-100">
+              <img
+                src={getImageUrl(images[currentImageIndex])}
+                alt={house.title}
+                className="w-full h-[400px] md:h-[500px] object-cover"
+              />
+              
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-colors ${
+                          index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Status Badge */}
+              <div className="absolute top-4 left-4 flex gap-2">
+                <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
+                  {house.vacancy_status === 'available' ? 'Available' : 'Occupied'}
+                </span>
+                {house.featured && (
+                  <span className="badge bg-yellow-100 text-yellow-800">Featured</span>
+                )}
+              </div>
+            </div>
+
+            {/* Thumbnail Gallery */}
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                      index === currentImageIndex ? 'border-primary-600' : 'border-transparent'
+                    }`}
+                  >
+                    <img
+                      src={getImageUrl(image)}
+                      alt={`${house.title} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                {house.description || 'No description available for this property.'}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column - Details */}
+          <div className="space-y-6">
+            {/* Main Info Card */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-primary-600">
+                  {formatPrice(house.rent_price)}
+                </span>
+                <span className="text-gray-500">/month</span>
+              </div>
+
+              <h1 className="text-2xl font-bold text-gray-900 mb-3">{house.title}</h1>
+
+              <div className="flex items-center text-gray-600 mb-4">
+                <MapPin className="w-5 h-5 mr-2 text-primary-600" />
+                {house.location}, Kenya
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-100">
+                <div className="text-center">
+                  <Bed className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                  <div className="font-semibold text-gray-900">{house.bedrooms}</div>
+                  <div className="text-xs text-gray-500">Bedroom{house.bedrooms > 1 ? 's' : ''}</div>
+                </div>
+                <div className="text-center">
+                  <Bath className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                  <div className="font-semibold text-gray-900">{house.bathrooms}</div>
+                  <div className="text-xs text-gray-500">Bathroom{house.bathrooms > 1 ? 's' : ''}</div>
+                </div>
+                <div className="text-center">
+                  <Home className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                  <div className="font-semibold text-gray-900 text-sm">{house.house_type}</div>
+                  <div className="text-xs text-gray-500">Type</div>
+                </div>
+              </div>
+
+              <div className="flex items-center text-sm text-gray-500 mt-4">
+                <Calendar className="w-4 h-4 mr-2" />
+                Listed on {formatDate(house.created_at)}
+              </div>
+            </div>
+
+            {/* Contact Card */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">Interested in this property?</h3>
+              <div className="space-y-3">
+                <a
+                  href="tel:+254700000000"
+                  className="btn-primary w-full"
+                >
+                  <Phone className="w-5 h-5" />
+                  Call Now
+                </a>
+                <a
+                  href={`https://wa.me/254700000000?text=Hi, I'm interested in the property: ${house.title} (${formatPrice(house.rent_price)}/month) in ${house.location}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary w-full bg-green-500 hover:bg-green-600 text-white"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+
+            {/* Agency Info */}
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Your trusted housing agency in Nakuru and Nyahururu, Kenya.
+              </p>
+              <div className="text-sm text-gray-500 space-y-1">
+                <p>📧 info@digihomes.co.ke</p>
+                <p>📞 +254 700 000 000</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </PublicLayout>
+  );
+};
+
+export default HouseDetailsPage;
