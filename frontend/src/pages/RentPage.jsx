@@ -15,8 +15,8 @@ const RentPage = () => {
   const [locations, setLocations] = useState([]);
   const [houseTypes, setHouseTypes] = useState([]);
   const { colors } = useTheme();
-  const [heroRef, heroVisible] = useScrollAnimation(0.1, true);
-  const [housesRef, housesVisible] = useScrollAnimation(0.1, true);
+  const [heroRef, heroVisible] = useScrollAnimation(0.05, true);
+  const [housesRef, housesVisible] = useScrollAnimation(0.01, true);
 
   useEffect(() => {
     window.scrollTo(0, 0);

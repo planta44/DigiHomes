@@ -96,9 +96,21 @@ const HomePage = () => {
     }
   };
 
-  // Only show stats and features if configured by admin
-  const stats = settings?.hero_stats || [];
-  const features = settings?.features || [];
+  // Default stats and features if not configured by admin
+  const defaultStats = [
+    { value: '100+', label: 'Happy Tenants' },
+    { value: '50+', label: 'Properties' },
+    { value: '2', label: 'Locations' },
+    { value: '5+', label: 'Years Experience' }
+  ];
+  const defaultFeatures = [
+    { icon: 'Building', title: 'Quality Homes', description: 'Carefully selected properties that meet our high standards for comfort and safety.' },
+    { icon: 'MapPin', title: 'Prime Locations', description: 'Properties in Nakuru and Nyahururu with easy access to amenities and transport.' },
+    { icon: 'Shield', title: 'Trusted Agency', description: 'Years of experience helping families find their perfect homes in Kenya.' },
+    { icon: 'Clock', title: 'Quick Process', description: 'Streamlined rental process to get you into your new home faster.' }
+  ];
+  const stats = settings?.hero_stats?.length > 0 ? settings.hero_stats : defaultStats;
+  const features = settings?.features?.length > 0 ? settings.features : defaultFeatures;
   const companyInfo = settings?.company_info || {};
   const animSettings = settings?.animation_settings || { duration: 700, staggerDelay: 100 };
   // Helper to convert hex to rgba
@@ -130,8 +142,8 @@ const HomePage = () => {
 
   // Compute stats ribbon background with proper opacity
   const statsRibbonBg = hexToRgba(heroContent.statsRibbonColor, heroContent.statsRibbonOpacity);
-  const featuresSection = settings?.features_section || { title: '', subtitle: '' };
-  const housesSection = settings?.houses_section || { title: '', subtitle: '' };
+  const featuresSection = settings?.features_section || { title: 'Why Choose DIGIHOMES?', subtitle: "We're committed to making your house-hunting experience smooth and successful." };
+  const housesSection = settings?.houses_section || { title: 'Available Houses', subtitle: 'Explore our selection of quality rental properties' };
   const locationsSection = settings?.locations_section || {
     title: '',
     subtitle: '',
@@ -169,17 +181,7 @@ const HomePage = () => {
     }
   }, [digiPosts.posts.length]);
 
-  // Show loading spinner while fetching data
-  if (loading) {
-    return (
-      <PublicLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
+  
   return (
     <PublicLayout>
       {/* Hero Section */}
@@ -240,64 +242,57 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Stats Section - Only show if stats are configured */}
-      {stats.length > 0 && (
-        <section 
-          ref={statsRef} 
-          className="py-8 md:py-12 backdrop-blur-md"
-          style={{ backgroundColor: statsRibbonBg }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-              {stats.map((stat, index) => (
-                <StatItem 
-                  key={index} 
-                  value={stat.value} 
-                  label={stat.label} 
-                  isVisible={statsVisible}
-                  index={index}
-                  duration={animSettings.duration}
-                  labelColor={heroContent.statsLabelColor}
-                />
-              ))}
-            </div>
+      {/* Stats Section */}
+      <section 
+        ref={statsRef} 
+        className="py-8 md:py-12 backdrop-blur-md relative"
+        style={{ 
+          backgroundColor: statsRibbonBg,
+          boxShadow: 'inset 0 0 0 2000px ' + statsRibbonBg
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+            {stats.map((stat, index) => (
+              <StatItem 
+                key={index} 
+                value={stat.value} 
+                label={stat.label} 
+                isVisible={statsVisible}
+                index={index}
+                duration={animSettings.duration}
+                labelColor={heroContent.statsLabelColor}
+              />
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* Features Section - Only show if features are configured */}
-      {features.length > 0 && (
-        <section ref={featuresRef} className="py-16 md:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {(featuresSection.title || featuresSection.subtitle) && (
-              <div className={`text-center mb-12 transition-all duration-700 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                {featuresSection.title && (
-                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {featuresSection.title}
-                  </h2>
-                )}
-                {featuresSection.subtitle && (
-                  <p className="text-gray-600 max-w-2xl mx-auto">
-                    {featuresSection.subtitle}
-                  </p>
-                )}
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-              {features.map((feature, index) => (
-                <FeatureCard 
-                  key={index} 
-                  feature={feature} 
-                  index={index}
-                  isVisible={featuresVisible}
-                  animSettings={animSettings}
-                />
-              ))}
-            </div>
+      {/* Features Section */}
+      <section ref={featuresRef} className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className={`text-center mb-12 transition-all duration-700 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {featuresSection.title}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-left md:text-center">
+              {featuresSection.subtitle}
+            </p>
           </div>
-        </section>
-      )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+            {features.map((feature, index) => (
+              <FeatureCard 
+                key={index} 
+                feature={feature} 
+                index={index}
+                isVisible={featuresVisible}
+                animSettings={animSettings}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Featured Houses */}
       <section ref={housesRef} className="py-16 md:py-24 bg-gray-50">
@@ -414,7 +409,7 @@ const HomePage = () => {
               </p>
             )}
             {aboutSection.content && (
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line text-left">
                 {aboutSection.content}
               </p>
             )}

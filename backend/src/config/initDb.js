@@ -105,6 +105,7 @@ const initDatabase = async () => {
         ALTER TABLE houses ADD COLUMN IF NOT EXISTS property_type VARCHAR(20) DEFAULT 'house';
         ALTER TABLE houses ADD COLUMN IF NOT EXISTS listing_type VARCHAR(20) DEFAULT 'rent';
         ALTER TABLE houses ADD COLUMN IF NOT EXISTS size_acres DECIMAL(10, 2);
+        ALTER TABLE houses ADD COLUMN IF NOT EXISTS dimensions VARCHAR(50);
       `);
       console.log('✅ Property columns migration complete');
     } catch (err) {

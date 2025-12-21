@@ -412,20 +412,38 @@ const SiteSettings = () => {
                   <p className="text-xs text-gray-500 mt-2">Set opacity to 0 for fully transparent (blur only). The ribbon will blur against the hero background image.</p>
                 </div>
 
-                {/* Hamburger Menu Text Color */}
+                {/* Hamburger Menu Text Colors */}
                 <div className="border-t pt-4">
-                  <h4 className="font-medium text-sm mb-3">Mobile Menu Text Color</h4>
-                  <div className="flex gap-2">
-                    <input type="color" value={settings.brand_settings.hamburgerMenuTextColor || '#374151'} 
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuTextColor: e.target.value }
-                      }))} className="w-10 h-10 rounded cursor-pointer border" />
-                    <input type="text" value={settings.brand_settings.hamburgerMenuTextColor || '#374151'} 
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuTextColor: e.target.value }
-                      }))} className="input-field flex-1 text-sm" placeholder="#374151" />
+                  <h4 className="font-medium text-sm mb-3">Mobile Menu Text Colors</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Link Text Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.brand_settings.hamburgerMenuTextColor || '#374151'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuTextColor: e.target.value }
+                          }))} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.brand_settings.hamburgerMenuTextColor || '#374151'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuTextColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" placeholder="#374151" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Active Page Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.brand_settings.hamburgerMenuActiveColor || '#2563eb'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuActiveColor: e.target.value }
+                          }))} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.brand_settings.hamburgerMenuActiveColor || '#2563eb'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuActiveColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" placeholder="#2563eb" />
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">Color of navigation links in the mobile hamburger menu.</p>
+                  <p className="text-xs text-gray-500 mt-2">Colors for navigation links in the mobile hamburger menu. Active page shows current page color.</p>
                 </div>
 
                 <button onClick={() => handleSave('brand_settings', settings.brand_settings)} disabled={saving} className="btn-primary w-full sm:w-auto">

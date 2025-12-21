@@ -10,7 +10,9 @@ const Navbar = () => {
     primaryColor: '#2563eb',
     secondaryColor: '#dc2626',
     hamburgerMenuBg: 'rgba(255,255,255,0.7)',
-    hamburgerMenuOpacity: 0.7
+    hamburgerMenuOpacity: 0.7,
+    hamburgerMenuTextColor: '#374151',
+    hamburgerMenuActiveColor: '#2563eb'
   });
   const [logo, setLogo] = useState('');
   const location = useLocation();
@@ -184,7 +186,7 @@ const Navbar = () => {
                   transitionDelay: isOpen ? `${150 + index * 75}ms` : '0ms',
                   transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(-20px) scale(0.95)',
                   opacity: isOpen ? 1 : 0,
-                  color: isActive(link.path) ? brandSettings.primaryColor : (brandSettings.hamburgerMenuTextColor || '#374151')
+                  color: isActive(link.path) ? (brandSettings.hamburgerMenuActiveColor || brandSettings.primaryColor) : (brandSettings.hamburgerMenuTextColor || '#374151')
                 }}
               >
                 <div className={`p-2 rounded-lg transition-colors ${isActive(link.path) ? 'bg-primary-100' : 'bg-white/70'}`}>

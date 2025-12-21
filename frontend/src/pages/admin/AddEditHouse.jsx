@@ -34,6 +34,7 @@ const AddEditHouse = () => {
     bedrooms: 1,
     bathrooms: 1,
     size_acres: '',
+    dimensions: '',
     rent_price: '',
     vacancy_status: 'available',
     featured: false
@@ -87,6 +88,7 @@ const AddEditHouse = () => {
         bedrooms: house.bedrooms,
         bathrooms: house.bathrooms,
         size_acres: house.size_acres || '',
+        dimensions: house.dimensions || '',
         rent_price: house.rent_price,
         vacancy_status: house.vacancy_status,
         featured: house.featured
@@ -381,7 +383,7 @@ const AddEditHouse = () => {
 
               {/* Land-specific fields */}
               {formData.property_type === 'land' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Size (Acres)
@@ -396,6 +398,21 @@ const AddEditHouse = () => {
                       step="0.01"
                       className="input-field"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Dimensions
+                    </label>
+                    <input
+                      type="text"
+                      name="dimensions"
+                      value={formData.dimensions}
+                      onChange={handleChange}
+                      placeholder="e.g., 50 x 100"
+                      className="input-field"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Plot dimensions (e.g., 50 by 100)</p>
                   </div>
 
                   <div>
