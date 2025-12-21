@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Building, Phone } from 'lucide-react';
+import { Menu, X, Home, Building, Phone, Briefcase, ShoppingBag, Key } from 'lucide-react';
 import api from '../../config/api';
 
 const Navbar = () => {
@@ -19,7 +19,6 @@ const Navbar = () => {
         const response = await api.get('/settings');
         if (response.data?.brand_settings) {
           setBrandSettings(prev => ({ ...prev, ...response.data.brand_settings }));
-          // Use logo from brand_settings first, fallback to company_info
           if (response.data.brand_settings.logo) {
             setLogo(response.data.brand_settings.logo);
           } else if (response.data?.company_info?.logo) {
@@ -33,9 +32,27 @@ const Navbar = () => {
     fetchSettings();
   }, []);
 
+  // Close menu when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
   const navLinks = [
     { path: '/', label: 'Home', icon: Home },
     { path: '/houses', label: 'Houses', icon: Building },
+    { path: '/services', label: 'Services', icon: Briefcase },
+    { path: '/buy', label: 'Buy', icon: ShoppingBag },
+    { path: '/rent', label: 'Rent', icon: Key },
     { path: '/contact', label: 'Contact', icon: Phone },
   ];
 
@@ -90,33 +107,89 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 z-50"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
+      </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden py-4 border-t">
-            {navLinks.map((link) => (
+      {/* Full Screen Mobile Navigation */}
+      <div 
+        className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+        
+        {/* Menu Panel */}
+        <div 
+          className={`absolute inset-x-0 top-0 bg-white shadow-2xl transition-transform duration-300 ease-out ${
+            isOpen ? 'translate-y-0' : '-translate-y-full'
+          }`}
+          style={{ maxHeight: '100vh', overflowY: 'auto' }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b">
+            <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
+              {logo && (
+                <img src={logo} alt={brandName} className="h-10 w-auto object-contain max-w-[120px]" />
+              )}
+              <div className="flex items-center">
+                <span style={{ color: brandSettings.primaryColor }} className="font-bold text-xl">
+                  {firstPart}
+                </span>
+                <span style={{ color: brandSettings.secondaryColor }} className="font-bold text-xl">
+                  {secondPart}
+                </span>
+              </div>
+            </Link>
+            <button
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="p-4">
+            {navLinks.map((link, index) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg ${
+                className={`flex items-center gap-4 px-4 py-4 rounded-xl mb-2 transition-all duration-300 ${
                   isActive(link.path)
-                    ? 'bg-primary-50 text-primary-600'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-primary-50 text-primary-600 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-50'
                 }`}
+                style={{ 
+                  transitionDelay: isOpen ? `${index * 50}ms` : '0ms',
+                  transform: isOpen ? 'translateX(0)' : 'translateX(-20px)',
+                  opacity: isOpen ? 1 : 0
+                }}
               >
-                <link.icon className="w-5 h-5" />
-                {link.label}
+                <div className={`p-2 rounded-lg ${isActive(link.path) ? 'bg-primary-100' : 'bg-gray-100'}`}>
+                  <link.icon className="w-5 h-5" />
+                </div>
+                <span className="text-lg">{link.label}</span>
               </Link>
             ))}
+          </nav>
+
+          {/* Footer */}
+          <div className="p-4 border-t bg-gray-50">
+            <p className="text-center text-sm text-gray-500">
+              © {new Date().getFullYear()} {brandName}
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

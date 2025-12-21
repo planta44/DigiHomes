@@ -19,7 +19,9 @@ const Footer = () => {
   });
   const [footerContent, setFooterContent] = useState({
     tagline: 'WE CARE ALWAYS',
-    description: 'Your trusted housing agency in Nakuru and Nyahururu, Kenya. Finding you the perfect home.'
+    description: 'Your trusted housing agency in Nakuru and Nyahururu, Kenya. Finding you the perfect home.',
+    backgroundColor: '#111827',
+    textColor: '#d1d5db'
   });
 
   useEffect(() => {
@@ -40,7 +42,7 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer style={{ backgroundColor: footerContent.backgroundColor || '#111827', color: footerContent.textColor || '#d1d5db' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}

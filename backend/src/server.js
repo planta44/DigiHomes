@@ -8,8 +8,13 @@ const houseRoutes = require('./routes/house.routes');
 const newsletterRoutes = require('./routes/newsletter.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const settingsRoutes = require('./routes/settings.routes');
+const pagesRoutes = require('./routes/pages.routes');
+const initDatabase = require('./config/initDb');
 
 const app = express();
+
+// Initialize database tables on startup
+initDatabase();
 
 // Middleware
 app.use(cors({
@@ -28,6 +33,7 @@ app.use('/api/houses', houseRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/pages', pagesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

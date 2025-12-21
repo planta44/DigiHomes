@@ -394,10 +394,67 @@ const SiteSettings = () => {
                     ...prev, hero_content: { ...prev.hero_content, description: e.target.value }
                   }))} rows={3} className="input-field resize-none" />
                 </div>
-                <ImageUploadField label="Background Image" value={settings.hero_content.backgroundImage}
-                  onChange={(url) => setSettings(prev => ({ ...prev, hero_content: { ...prev.hero_content, backgroundImage: url } }))} />
-                <button onClick={() => handleSave('hero_content', settings.hero_content)} disabled={saving} className="btn-primary">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+
+                {/* Background Images */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Background Images</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ImageUploadField label="Desktop Background" value={settings.hero_content.backgroundImage}
+                      onChange={(url) => setSettings(prev => ({ ...prev, hero_content: { ...prev.hero_content, backgroundImage: url } }))} />
+                    <ImageUploadField label="Mobile Background" value={settings.hero_content.backgroundImageMobile || ''}
+                      onChange={(url) => setSettings(prev => ({ ...prev, hero_content: { ...prev.hero_content, backgroundImageMobile: url } }))} />
+                  </div>
+                </div>
+
+                {/* Overlay Settings */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Overlay Settings (Desktop)</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Overlay Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.hero_content.overlayColor || '#000000'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, overlayColor: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.hero_content.overlayColor || '#000000'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, overlayColor: e.target.value }
+                        }))} className="input-field flex-1" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Overlay Opacity ({Math.round((settings.hero_content.overlayOpacity ?? 0.5) * 100)}%)</label>
+                      <input type="range" min="0" max="1" step="0.05" value={settings.hero_content.overlayOpacity ?? 0.5} onChange={(e) => setSettings(prev => ({
+                        ...prev, hero_content: { ...prev.hero_content, overlayOpacity: parseFloat(e.target.value) }
+                      }))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Overlay Settings (Mobile)</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Overlay Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.hero_content.overlayColorMobile || settings.hero_content.overlayColor || '#000000'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, overlayColorMobile: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.hero_content.overlayColorMobile || settings.hero_content.overlayColor || '#000000'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, overlayColorMobile: e.target.value }
+                        }))} className="input-field flex-1" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Overlay Opacity ({Math.round((settings.hero_content.overlayOpacityMobile ?? settings.hero_content.overlayOpacity ?? 0.6) * 100)}%)</label>
+                      <input type="range" min="0" max="1" step="0.05" value={settings.hero_content.overlayOpacityMobile ?? settings.hero_content.overlayOpacity ?? 0.6} onChange={(e) => setSettings(prev => ({
+                        ...prev, hero_content: { ...prev.hero_content, overlayOpacityMobile: parseFloat(e.target.value) }
+                      }))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={() => handleSave('hero_content', settings.hero_content)} disabled={saving} className="btn-primary mt-4">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Hero Settings
                 </button>
               </div>
             )}
@@ -787,6 +844,35 @@ const SiteSettings = () => {
                       <input type="email" value={settings.footer_content.contactEmail || ''} onChange={(e) => setSettings(prev => ({
                         ...prev, footer_content: { ...prev.footer_content, contactEmail: e.target.value }
                       }))} placeholder="info@digihomes.co.ke" className="input-field text-sm" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Colors */}
+                <div className="border-t pt-4">
+                  <h4 className="font-medium text-sm mb-3">Footer Colors</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.footer_content.backgroundColor || '#111827'} onChange={(e) => setSettings(prev => ({
+                          ...prev, footer_content: { ...prev.footer_content, backgroundColor: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.footer_content.backgroundColor || '#111827'} onChange={(e) => setSettings(prev => ({
+                          ...prev, footer_content: { ...prev.footer_content, backgroundColor: e.target.value }
+                        }))} className="input-field flex-1 text-sm" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Text Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.footer_content.textColor || '#d1d5db'} onChange={(e) => setSettings(prev => ({
+                          ...prev, footer_content: { ...prev.footer_content, textColor: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.footer_content.textColor || '#d1d5db'} onChange={(e) => setSettings(prev => ({
+                          ...prev, footer_content: { ...prev.footer_content, textColor: e.target.value }
+                        }))} className="input-field flex-1 text-sm" />
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -9,6 +9,9 @@ import HousesPage from './pages/HousesPage';
 import HouseDetailsPage from './pages/HouseDetailsPage';
 import ContactPage from './pages/ContactPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import ServicesPage from './pages/ServicesPage';
+import BuyPage from './pages/BuyPage';
+import RentPage from './pages/RentPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -40,6 +43,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/houses" element={<HousesPage />} />
           <Route path="/houses/:id" element={<HouseDetailsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/buy" element={<BuyPage />} />
+          <Route path="/rent" element={<RentPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
 

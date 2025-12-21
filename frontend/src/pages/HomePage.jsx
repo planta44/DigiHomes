@@ -113,11 +113,16 @@ const HomePage = () => {
   const features = settings?.features || defaultFeatures;
   const companyInfo = settings?.company_info || {};
   const animSettings = settings?.animation_settings || { duration: 700, staggerDelay: 100 };
-  const heroContent = settings?.hero_content || {
-    title: 'Find Your Perfect Home in',
-    highlight: 'Nakuru & Nyahururu',
-    description: 'DIGI Homes Agencies is your trusted partner in finding quality rental properties. From cozy bedsitters to spacious family homes, we have something for everyone.',
-    backgroundImage: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60'
+  const heroContent = {
+    title: settings?.hero_content?.title || 'Find Your Perfect Home in',
+    highlight: settings?.hero_content?.highlight || 'Nakuru & Nyahururu',
+    description: settings?.hero_content?.description || 'DIGI Homes Agencies is your trusted partner in finding quality rental properties. From cozy bedsitters to spacious family homes, we have something for everyone.',
+    backgroundImage: settings?.hero_content?.backgroundImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60',
+    backgroundImageMobile: settings?.hero_content?.backgroundImageMobile || settings?.hero_content?.backgroundImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60',
+    overlayColor: settings?.hero_content?.overlayColor || '#000000',
+    overlayColorMobile: settings?.hero_content?.overlayColorMobile || settings?.hero_content?.overlayColor || '#000000',
+    overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
+    overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6
   };
   const featuresSection = settings?.features_section || {
     title: 'Why Choose DIGIHOMES?',
@@ -169,9 +174,25 @@ const HomePage = () => {
         className="relative text-white overflow-hidden"
         style={{ background: `linear-gradient(to bottom right, ${colors[600]}, ${colors[700]}, ${colors[800]})` }}
       >
+        {/* Desktop Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${heroContent.backgroundImage}')`, opacity: 0.15 }}
+          className="absolute inset-0 bg-cover bg-center hidden md:block"
+          style={{ backgroundImage: `url('${heroContent.backgroundImage}')` }}
+        ></div>
+        {/* Mobile Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center md:hidden"
+          style={{ backgroundImage: `url('${heroContent.backgroundImageMobile}')` }}
+        ></div>
+        {/* Desktop Overlay */}
+        <div 
+          className="absolute inset-0 hidden md:block"
+          style={{ backgroundColor: heroContent.overlayColor, opacity: heroContent.overlayOpacity }}
+        ></div>
+        {/* Mobile Overlay */}
+        <div 
+          className="absolute inset-0 md:hidden"
+          style={{ backgroundColor: heroContent.overlayColorMobile, opacity: heroContent.overlayOpacityMobile }}
         ></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
           <div className="max-w-3xl">
@@ -237,7 +258,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <FeatureCard 
                 key={index} 
