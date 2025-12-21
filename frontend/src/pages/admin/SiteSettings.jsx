@@ -83,7 +83,7 @@ const SiteSettings = () => {
   const [activeTab, setActiveTab] = useState('brand');
   
   const [settings, setSettings] = useState({
-    brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb' },
+    brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
     animation_settings: { duration: 700, staggerDelay: 100 },
     hero_stats: [{ value: '100+', label: 'Happy Tenants' }],
     features: [],
@@ -92,9 +92,10 @@ const SiteSettings = () => {
     features_section: { title: '', subtitle: '' },
     houses_section: { title: '', subtitle: '' },
     locations_section: { title: '', subtitle: '', locations: [] },
+    about_section: { title: '', subtitle: '', content: '' },
     footer_content: { tagline: '', description: '', quickLinks: [], contactLocations: [], contactPhones: [], contactEmail: '' },
     contact_page: { title: '', subtitle: '', workingHours: [], offices: [], faqs: [] },
-    digi_posts: { title: 'Digi Posts', subtitle: '', posts: [] }
+    digi_posts: { title: '', subtitle: '', posts: [] }
   });
 
   const [locations, setLocations] = useState([]);
@@ -123,6 +124,7 @@ const SiteSettings = () => {
         features_section: { ...prev.features_section, ...data.features_section },
         houses_section: { ...prev.houses_section, ...data.houses_section },
         locations_section: { ...prev.locations_section, ...data.locations_section },
+        about_section: { ...prev.about_section, ...data.about_section },
         footer_content: { ...prev.footer_content, ...data.footer_content },
         contact_page: { ...prev.contact_page, ...data.contact_page },
         digi_posts: { ...prev.digi_posts, ...data.digi_posts }
@@ -192,6 +194,7 @@ const SiteSettings = () => {
     { id: 'features', label: 'Features', icon: Star },
     { id: 'houses', label: 'Houses', icon: Home },
     { id: 'locations_display', label: 'Locations', icon: Globe },
+    { id: 'about', label: 'About', icon: FileText },
     { id: 'digi_posts', label: 'Digi Posts', icon: Image },
     { id: 'company', label: 'Company', icon: Building },
     { id: 'footer', label: 'Footer', icon: FileText },
@@ -388,39 +391,41 @@ const SiteSettings = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Background Color</label>
                       <div className="flex gap-2">
-                        <input type="color" value="#000000" 
-                          onChange={(e) => {
-                            const opacity = settings.hero_content.statsRibbonOpacity || 0.3;
-                            const hex = e.target.value;
-                            const r = parseInt(hex.slice(1, 3), 16);
-                            const g = parseInt(hex.slice(3, 5), 16);
-                            const b = parseInt(hex.slice(5, 7), 16);
-                            setSettings(prev => ({
-                              ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: `rgba(${r},${g},${b},${opacity})` }
-                            }));
-                          }} className="w-10 h-10 rounded cursor-pointer border" />
-                        <input type="text" value={settings.hero_content.statsRibbonColor || 'rgba(0,0,0,0.3)'} 
+                        <input type="color" value={settings.hero_content.statsRibbonColor || '#000000'} 
                           onChange={(e) => setSettings(prev => ({
                             ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: e.target.value }
-                          }))} className="input-field flex-1 text-sm" placeholder="rgba(0,0,0,0.3)" />
+                          }))} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.hero_content.statsRibbonColor || '#000000'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" placeholder="#000000" />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Opacity: {(settings.hero_content.statsRibbonOpacity || 0.3).toFixed(1)}</label>
-                      <input type="range" min="0" max="1" step="0.1" value={settings.hero_content.statsRibbonOpacity || 0.3}
-                        onChange={(e) => {
-                          const opacity = parseFloat(e.target.value);
-                          const currentBg = settings.hero_content.statsRibbonColor || 'rgba(0,0,0,0.3)';
-                          const match = currentBg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-                          if (match) {
-                            setSettings(prev => ({
-                              ...prev, hero_content: { ...prev.hero_content, statsRibbonOpacity: opacity, statsRibbonColor: `rgba(${match[1]},${match[2]},${match[3]},${opacity})` }
-                            }));
-                          }
-                        }} className="w-full mt-2" />
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Opacity: {(settings.hero_content.statsRibbonOpacity ?? 0.3).toFixed(1)}</label>
+                      <input type="range" min="0" max="1" step="0.1" value={settings.hero_content.statsRibbonOpacity ?? 0.3}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, statsRibbonOpacity: parseFloat(e.target.value) }
+                        }))} className="w-full mt-2" />
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">Set opacity to 0 for fully transparent (blur only). The ribbon will blur against the hero background image.</p>
+                </div>
+
+                {/* Hamburger Menu Text Color */}
+                <div className="border-t pt-4">
+                  <h4 className="font-medium text-sm mb-3">Mobile Menu Text Color</h4>
+                  <div className="flex gap-2">
+                    <input type="color" value={settings.brand_settings.hamburgerMenuTextColor || '#374151'} 
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuTextColor: e.target.value }
+                      }))} className="w-10 h-10 rounded cursor-pointer border" />
+                    <input type="text" value={settings.brand_settings.hamburgerMenuTextColor || '#374151'} 
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuTextColor: e.target.value }
+                      }))} className="input-field flex-1 text-sm" placeholder="#374151" />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Color of navigation links in the mobile hamburger menu.</p>
                 </div>
 
                 <button onClick={() => handleSave('brand_settings', settings.brand_settings)} disabled={saving} className="btn-primary w-full sm:w-auto">
@@ -754,6 +759,41 @@ const SiteSettings = () => {
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* About Section */}
+            {activeTab === 'about' && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">About Section</h3>
+                <p className="text-sm text-gray-600">This section appears after Our Locations on the homepage. It's a text-only section for company information.</p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <input type="text" value={settings.about_section?.title || ''} onChange={(e) => setSettings(prev => ({
+                    ...prev, about_section: { ...prev.about_section, title: e.target.value }
+                  }))} className="input-field" placeholder="About Us" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                  <input type="text" value={settings.about_section?.subtitle || ''} onChange={(e) => setSettings(prev => ({
+                    ...prev, about_section: { ...prev.about_section, subtitle: e.target.value }
+                  }))} className="input-field" placeholder="Your trusted property partner" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                  <textarea 
+                    value={settings.about_section?.content || ''} 
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev, about_section: { ...prev.about_section, content: e.target.value }
+                    }))} 
+                    className="input-field min-h-[150px]" 
+                    placeholder="Write about your company, mission, values, etc."
+                    rows={6}
+                  />
+                </div>
+                <button onClick={() => handleSave('about_section', settings.about_section)} disabled={saving} className="btn-primary">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+                </button>
               </div>
             )}
 

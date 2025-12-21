@@ -95,12 +95,12 @@ const ManageHouses = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Manage Houses</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Manage Properties</h1>
             <p className="text-gray-600">Add, edit, or remove property listings</p>
           </div>
           <Link to="/admin/houses/new" className="btn-primary">
             <Plus className="w-5 h-5" />
-            Add New House
+            Add New Property
           </Link>
         </div>
 

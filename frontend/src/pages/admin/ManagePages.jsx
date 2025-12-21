@@ -108,14 +108,19 @@ const ManagePages = () => {
 
   const updatePageContent = (pageSlug, path, value) => {
     setPages(prev => {
-      const newPages = { ...prev };
+      const newPages = JSON.parse(JSON.stringify(prev)); // Deep clone to avoid mutation issues
       const keys = path.split('.');
       let obj = newPages[pageSlug].content;
+      
+      // Navigate to the parent object, creating intermediate objects if needed
       for (let i = 0; i < keys.length - 1; i++) {
         if (keys[i].includes('[')) {
           const [key, idx] = keys[i].replace(']', '').split('[');
+          if (!obj[key]) obj[key] = [];
+          if (!obj[key][parseInt(idx)]) obj[key][parseInt(idx)] = {};
           obj = obj[key][parseInt(idx)];
         } else {
+          if (!obj[keys[i]]) obj[keys[i]] = {};
           obj = obj[keys[i]];
         }
       }

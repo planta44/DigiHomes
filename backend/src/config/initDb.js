@@ -14,15 +14,18 @@ const initDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- Houses table
+      -- Properties table (houses and land)
       CREATE TABLE IF NOT EXISTS houses (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         description TEXT,
         location VARCHAR(100) NOT NULL,
         house_type VARCHAR(100) NOT NULL,
+        property_type VARCHAR(20) DEFAULT 'house',
+        listing_type VARCHAR(20) DEFAULT 'rent',
         bedrooms INTEGER DEFAULT 1,
         bathrooms INTEGER DEFAULT 1,
+        size_acres DECIMAL(10, 2),
         rent_price DECIMAL(10, 2) NOT NULL,
         vacancy_status VARCHAR(20) DEFAULT 'available',
         featured BOOLEAN DEFAULT false,
@@ -90,9 +93,23 @@ const initDatabase = async () => {
       CREATE INDEX IF NOT EXISTS idx_houses_type ON houses(house_type);
       CREATE INDEX IF NOT EXISTS idx_house_images_house_id ON house_images(house_id);
       CREATE INDEX IF NOT EXISTS idx_pages_slug ON pages(slug);
+      CREATE INDEX IF NOT EXISTS idx_houses_property_type ON houses(property_type);
+      CREATE INDEX IF NOT EXISTS idx_houses_listing_type ON houses(listing_type);
     `);
 
     console.log('✅ Database tables initialized');
+
+    // Add new columns if they don't exist (migration for existing databases)
+    try {
+      await db.query(`
+        ALTER TABLE houses ADD COLUMN IF NOT EXISTS property_type VARCHAR(20) DEFAULT 'house';
+        ALTER TABLE houses ADD COLUMN IF NOT EXISTS listing_type VARCHAR(20) DEFAULT 'rent';
+        ALTER TABLE houses ADD COLUMN IF NOT EXISTS size_acres DECIMAL(10, 2);
+      `);
+      console.log('✅ Property columns migration complete');
+    } catch (err) {
+      // Columns may already exist
+    }
 
     // Create default admin if not exists
     const bcrypt = require('bcryptjs');

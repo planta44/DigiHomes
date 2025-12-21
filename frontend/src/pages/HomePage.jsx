@@ -96,59 +96,55 @@ const HomePage = () => {
     }
   };
 
-  const defaultStats = [
-    { value: '100+', label: 'Happy Tenants' },
-    { value: '50+', label: 'Properties' },
-    { value: '2', label: 'Locations' },
-    { value: '5+', label: 'Years Experience' }
-  ];
-
-  const defaultFeatures = [
-    { icon: 'Building', title: 'Quality Homes', description: 'Carefully selected properties that meet our high standards for comfort and safety.' },
-    { icon: 'MapPin', title: 'Prime Locations', description: 'Properties in Nakuru and Nyahururu with easy access to amenities and transport.' },
-    { icon: 'Shield', title: 'Trusted Agency', description: 'Years of experience helping families find their perfect homes in Kenya.' },
-    { icon: 'Clock', title: 'Quick Process', description: 'Streamlined rental process to get you into your new home faster.' }
-  ];
-
-  const stats = settings?.hero_stats || defaultStats;
-  const features = settings?.features || defaultFeatures;
+  // Only show stats and features if configured by admin
+  const stats = settings?.hero_stats || [];
+  const features = settings?.features || [];
   const companyInfo = settings?.company_info || {};
   const animSettings = settings?.animation_settings || { duration: 700, staggerDelay: 100 };
+  // Helper to convert hex to rgba
+  const hexToRgba = (hex, alpha) => {
+    if (!hex) return `rgba(0,0,0,${alpha})`;
+    if (hex.startsWith('rgba') || hex.startsWith('rgb')) return hex;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  };
+
   const heroContent = {
-    title: settings?.hero_content?.title || 'Find Your Perfect Home in',
-    highlight: settings?.hero_content?.highlight || 'Nakuru & Nyahururu',
+    title: settings?.hero_content?.title || '',
+    highlight: settings?.hero_content?.highlight || '',
     highlightColor: settings?.hero_content?.highlightColor || colors[200],
     descriptionHighlightColor: settings?.hero_content?.descriptionHighlightColor || colors[200],
-    description: settings?.hero_content?.description || 'DIGI Homes Agencies is your trusted partner in finding quality rental properties. From cozy bedsitters to spacious family homes, we have something for everyone.',
-    backgroundImage: settings?.hero_content?.backgroundImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60',
-    backgroundImageMobile: settings?.hero_content?.backgroundImageMobile || settings?.hero_content?.backgroundImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60',
+    description: settings?.hero_content?.description || '',
+    backgroundImage: settings?.hero_content?.backgroundImage || '',
+    backgroundImageMobile: settings?.hero_content?.backgroundImageMobile || settings?.hero_content?.backgroundImage || '',
     overlayColor: settings?.hero_content?.overlayColor || '#000000',
     overlayColorMobile: settings?.hero_content?.overlayColorMobile || settings?.hero_content?.overlayColor || '#000000',
     overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
     overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6,
     statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe',
-    statsRibbonColor: settings?.hero_content?.statsRibbonColor || 'rgba(0,0,0,0.3)',
+    statsRibbonColor: settings?.hero_content?.statsRibbonColor || '#000000',
     statsRibbonOpacity: settings?.hero_content?.statsRibbonOpacity ?? 0.3
   };
-  const featuresSection = settings?.features_section || {
-    title: 'Why Choose DIGIHOMES?',
-    subtitle: "We're committed to making your house-hunting experience smooth and successful."
-  };
-  const housesSection = settings?.houses_section || {
-    title: 'Available Houses',
-    subtitle: 'Explore our selection of quality rental properties'
-  };
+
+  // Compute stats ribbon background with proper opacity
+  const statsRibbonBg = hexToRgba(heroContent.statsRibbonColor, heroContent.statsRibbonOpacity);
+  const featuresSection = settings?.features_section || { title: '', subtitle: '' };
+  const housesSection = settings?.houses_section || { title: '', subtitle: '' };
   const locationsSection = settings?.locations_section || {
-    title: 'Our Locations',
-    subtitle: "We operate in two beautiful towns in Kenya's Rift Valley region",
-    locations: [
-      { name: 'Nakuru', description: "Kenya's fourth-largest city with vibrant urban amenities", image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop&q=60' },
-      { name: 'Nyahururu', description: "Cool climate town known for Thomson's Falls", image: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60' }
-    ]
+    title: '',
+    subtitle: '',
+    locations: []
+  };
+  const aboutSection = {
+    title: settings?.about_section?.title || '',
+    subtitle: settings?.about_section?.subtitle || '',
+    content: settings?.about_section?.content || ''
   };
   const digiPosts = {
-    title: settings?.digi_posts?.title || 'Digi Posts',
-    subtitle: settings?.digi_posts?.subtitle || 'Stay updated with our latest news and announcements',
+    title: settings?.digi_posts?.title || '',
+    subtitle: settings?.digi_posts?.subtitle || '',
     posts: settings?.digi_posts?.posts || []
   };
 
@@ -172,6 +168,17 @@ const HomePage = () => {
       return () => clearInterval(interval);
     }
   }, [digiPosts.posts.length]);
+
+  // Show loading spinner while fetching data
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+        </div>
+      </PublicLayout>
+    );
+  }
 
   return (
     <PublicLayout>
@@ -233,54 +240,64 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Stats Section - Blur against hero background with admin-configurable color */}
-      <section 
-        ref={statsRef} 
-        className="py-8 md:py-12 backdrop-blur-md"
-        style={{ backgroundColor: heroContent.statsRibbonColor }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-            {stats.map((stat, index) => (
-              <StatItem 
-                key={index} 
-                value={stat.value} 
-                label={stat.label} 
-                isVisible={statsVisible}
-                index={index}
-                duration={animSettings.duration}
-                labelColor={heroContent.statsLabelColor}
-              />
-            ))}
+      {/* Stats Section - Only show if stats are configured */}
+      {stats.length > 0 && (
+        <section 
+          ref={statsRef} 
+          className="py-8 md:py-12 backdrop-blur-md"
+          style={{ backgroundColor: statsRibbonBg }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+              {stats.map((stat, index) => (
+                <StatItem 
+                  key={index} 
+                  value={stat.value} 
+                  label={stat.label} 
+                  isVisible={statsVisible}
+                  index={index}
+                  duration={animSettings.duration}
+                  labelColor={heroContent.statsLabelColor}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Features Section */}
-      <section ref={featuresRef} className="py-16 md:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`text-center mb-12 transition-all duration-700 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              {featuresSection.title}
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              {featuresSection.subtitle}
-            </p>
-          </div>
+      {/* Features Section - Only show if features are configured */}
+      {features.length > 0 && (
+        <section ref={featuresRef} className="py-16 md:py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {(featuresSection.title || featuresSection.subtitle) && (
+              <div className={`text-center mb-12 transition-all duration-700 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                {featuresSection.title && (
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    {featuresSection.title}
+                  </h2>
+                )}
+                {featuresSection.subtitle && (
+                  <p className="text-gray-600 max-w-2xl mx-auto">
+                    {featuresSection.subtitle}
+                  </p>
+                )}
+              </div>
+            )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {features.map((feature, index) => (
-              <FeatureCard 
-                key={index} 
-                feature={feature} 
-                index={index}
-                isVisible={featuresVisible}
-                animSettings={animSettings}
-              />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+              {features.map((feature, index) => (
+                <FeatureCard 
+                  key={index} 
+                  feature={feature} 
+                  index={index}
+                  isVisible={featuresVisible}
+                  animSettings={animSettings}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Houses */}
       <section ref={housesRef} className="py-16 md:py-24 bg-gray-50">
@@ -382,18 +399,47 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* About Section */}
+      {(aboutSection.title || aboutSection.content) && (
+        <section className="py-16 md:py-24 bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            {aboutSection.title && (
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                {aboutSection.title}
+              </h2>
+            )}
+            {aboutSection.subtitle && (
+              <p className="text-lg text-primary-600 font-medium mb-6">
+                {aboutSection.subtitle}
+              </p>
+            )}
+            {aboutSection.content && (
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                {aboutSection.content}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Digi Posts Section */}
       {digiPosts?.posts?.length > 0 && (
-        <section ref={postsRef} className="py-16 md:py-24 bg-gray-50">
+        <section ref={postsRef} className="py-16 md:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`text-center mb-12 transition-all ${postsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms` }}>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                {digiPosts.title}
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                {digiPosts.subtitle}
-              </p>
-            </div>
+            {(digiPosts.title || digiPosts.subtitle) && (
+              <div className={`text-center mb-12 transition-all ${postsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms` }}>
+                {digiPosts.title && (
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    {digiPosts.title}
+                  </h2>
+                )}
+                {digiPosts.subtitle && (
+                  <p className="text-gray-600 max-w-2xl mx-auto">
+                    {digiPosts.subtitle}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Slideshow Container */}
             <div className={`relative transition-all ${postsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms`, transitionDelay: '200ms' }}>
@@ -409,22 +455,24 @@ const HomePage = () => {
                     ? post.image 
                     : post.image?.startsWith('/uploads') 
                       ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${post.image}`
-                      : post.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800';
+                      : post.image;
+                  if (!imageUrl) return null;
                   return (
                   <div 
                     key={index}
                     className="flex-shrink-0 snap-start w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.75rem)]"
                   >
-                    <div className="relative rounded-xl overflow-hidden shadow-lg group bg-white h-full">
-                      <img 
-                        src={imageUrl} 
-                        alt={post.caption || `Post ${index + 1}`}
-                        className="w-full h-52 sm:h-60 md:h-72 object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800'; }}
-                      />
+                    <div className="rounded-xl overflow-hidden shadow-lg group bg-white h-full flex flex-col">
+                      <div className="overflow-hidden">
+                        <img 
+                          src={imageUrl} 
+                          alt={post.caption || `Post ${index + 1}`}
+                          className="w-full h-52 sm:h-60 md:h-72 object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
                       {post.caption && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                          <p className="text-white text-sm font-medium">{post.caption}</p>
+                        <div className="p-4 bg-white">
+                          <p className="text-gray-700 text-sm font-medium">{post.caption}</p>
                         </div>
                       )}
                     </div>

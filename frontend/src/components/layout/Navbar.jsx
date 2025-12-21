@@ -174,8 +174,8 @@ const Navbar = () => {
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center gap-4 px-4 py-4 rounded-xl mb-2 transition-all duration-500 ${
                   isActive(link.path)
-                    ? 'bg-primary-500/20 text-primary-600 font-semibold'
-                    : 'text-gray-700 hover:bg-white/50'
+                    ? 'bg-primary-500/20 font-semibold'
+                    : 'hover:bg-white/50'
                 }`}
                 style={{ 
                   transitionProperty: 'transform, opacity',
@@ -183,7 +183,8 @@ const Navbar = () => {
                   transitionTimingFunction: 'ease-out',
                   transitionDelay: isOpen ? `${150 + index * 75}ms` : '0ms',
                   transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(-20px) scale(0.95)',
-                  opacity: isOpen ? 1 : 0
+                  opacity: isOpen ? 1 : 0,
+                  color: isActive(link.path) ? brandSettings.primaryColor : (brandSettings.hamburgerMenuTextColor || '#374151')
                 }}
               >
                 <div className={`p-2 rounded-lg transition-colors ${isActive(link.path) ? 'bg-primary-100' : 'bg-white/70'}`}>
@@ -194,18 +195,19 @@ const Navbar = () => {
             ))}
           </nav>
 
-          {/* Footer */}
+          {/* Footer - same background as menu panel */}
           <div 
-            className="p-4 border-t border-white/20 bg-white/50"
+            className="p-4 border-t border-white/20"
             style={{ 
               transitionProperty: 'opacity',
               transitionDuration: '500ms',
               transitionTimingFunction: 'ease-out',
               transitionDelay: isOpen ? '600ms' : '0ms',
-              opacity: isOpen ? 1 : 0
+              opacity: isOpen ? 1 : 0,
+              backgroundColor: brandSettings.hamburgerMenuBg || 'rgba(255,255,255,0.7)'
             }}
           >
-            <p className="text-center text-sm text-gray-500">
+            <p className="text-center text-sm" style={{ color: brandSettings.hamburgerMenuTextColor || '#6b7280' }}>
               © {new Date().getFullYear()} {brandName}
             </p>
           </div>

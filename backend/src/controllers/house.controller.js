@@ -3,7 +3,7 @@ const db = require('../config/database');
 // Get all houses (public)
 const getAllHouses = async (req, res) => {
   try {
-    const { location, house_type, status, search } = req.query;
+    const { location, house_type, status, search, property_type, listing_type } = req.query;
     
     let query = `
       SELECT h.*, 
@@ -37,6 +37,18 @@ const getAllHouses = async (req, res) => {
       paramCount++;
       query += ` AND h.vacancy_status = $${paramCount}`;
       params.push(status);
+    }
+
+    if (property_type) {
+      paramCount++;
+      query += ` AND h.property_type = $${paramCount}`;
+      params.push(property_type);
+    }
+
+    if (listing_type) {
+      paramCount++;
+      query += ` AND h.listing_type = $${paramCount}`;
+      params.push(listing_type);
     }
 
     if (search) {
@@ -90,19 +102,17 @@ const getHouseById = async (req, res) => {
 // Create house (admin only)
 const createHouse = async (req, res) => {
   try {
-    const { title, description, location, house_type, bedrooms, bathrooms, rent_price, vacancy_status, featured } = req.body;
+    const { title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, rent_price, vacancy_status, featured } = req.body;
 
-    if (!title || !location || !house_type || !rent_price) {
-      return res.status(400).json({ error: 'Title, location, house type, and rent price are required' });
+    if (!title || !location || !rent_price) {
+      return res.status(400).json({ error: 'Title, location, and price are required' });
     }
 
-    // Location validation removed - now uses dynamic locations from settings
-
     const result = await db.query(
-      `INSERT INTO houses (title, description, location, house_type, bedrooms, bathrooms, rent_price, vacancy_status, featured)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO houses (title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, rent_price, vacancy_status, featured)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
-      [title, description, location, house_type, bedrooms || 1, bathrooms || 1, rent_price, vacancy_status || 'available', featured || false]
+      [title, description, location, house_type || '', property_type || 'house', listing_type || 'rent', bedrooms || 1, bathrooms || 1, size_acres || null, rent_price, vacancy_status || 'available', featured || false]
     );
 
     res.status(201).json(result.rows[0]);
@@ -116,14 +126,12 @@ const createHouse = async (req, res) => {
 const updateHouse = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, location, house_type, bedrooms, bathrooms, rent_price, vacancy_status, featured } = req.body;
+    const { title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, rent_price, vacancy_status, featured } = req.body;
 
     const existingHouse = await db.query('SELECT * FROM houses WHERE id = $1', [id]);
     if (existingHouse.rows.length === 0) {
-      return res.status(404).json({ error: 'House not found' });
+      return res.status(404).json({ error: 'Property not found' });
     }
-
-    // Location validation removed - now uses dynamic locations from settings
 
     const result = await db.query(
       `UPDATE houses 
@@ -131,15 +139,18 @@ const updateHouse = async (req, res) => {
            description = COALESCE($2, description),
            location = COALESCE($3, location),
            house_type = COALESCE($4, house_type),
-           bedrooms = COALESCE($5, bedrooms),
-           bathrooms = COALESCE($6, bathrooms),
-           rent_price = COALESCE($7, rent_price),
-           vacancy_status = COALESCE($8, vacancy_status),
-           featured = COALESCE($9, featured),
+           property_type = COALESCE($5, property_type),
+           listing_type = COALESCE($6, listing_type),
+           bedrooms = COALESCE($7, bedrooms),
+           bathrooms = COALESCE($8, bathrooms),
+           size_acres = $9,
+           rent_price = COALESCE($10, rent_price),
+           vacancy_status = COALESCE($11, vacancy_status),
+           featured = COALESCE($12, featured),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $10
+       WHERE id = $13
        RETURNING *`,
-      [title, description, location, house_type, bedrooms, bathrooms, rent_price, vacancy_status, featured, id]
+      [title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, rent_price, vacancy_status, featured, id]
     );
 
     res.json(result.rows[0]);

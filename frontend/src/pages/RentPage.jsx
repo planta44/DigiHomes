@@ -29,9 +29,12 @@ const RentPage = () => {
           api.get('/settings/house-types').catch(() => ({ data: [] }))
         ]);
         setPageData(pageRes.data);
-        // Filter to only show available rental properties
+        // Filter to only show available rental/lease properties (not buy)
         const allHouses = housesRes.data || [];
-        setHouses(allHouses.filter(h => h.vacancy_status === 'available'));
+        setHouses(allHouses.filter(h => 
+          h.vacancy_status === 'available' && 
+          (h.listing_type === 'rent' || h.listing_type === 'lease' || !h.listing_type)
+        ));
         setLocations(locationsRes.data);
         setHouseTypes(typesRes.data);
       } catch (error) {

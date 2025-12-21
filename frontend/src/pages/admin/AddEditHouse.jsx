@@ -28,9 +28,12 @@ const AddEditHouse = () => {
     title: '',
     description: '',
     location: '',
+    property_type: 'house',
+    listing_type: 'rent',
     house_type: '',
     bedrooms: 1,
     bathrooms: 1,
+    size_acres: '',
     rent_price: '',
     vacancy_status: 'available',
     featured: false
@@ -78,9 +81,12 @@ const AddEditHouse = () => {
         title: house.title,
         description: house.description || '',
         location: house.location,
-        house_type: house.house_type,
+        property_type: house.property_type || 'house',
+        listing_type: house.listing_type || 'rent',
+        house_type: house.house_type || '',
         bedrooms: house.bedrooms,
         bathrooms: house.bathrooms,
+        size_acres: house.size_acres || '',
         rent_price: house.rent_price,
         vacancy_status: house.vacancy_status,
         featured: house.featured
@@ -212,7 +218,7 @@ const AddEditHouse = () => {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? 'Edit House' : 'Add New House'}
+              {isEditing ? 'Edit Property' : 'Add New Property'}
             </h1>
             <p className="text-gray-600">
               {isEditing ? 'Update property details' : 'Create a new property listing'}
@@ -255,6 +261,43 @@ const AddEditHouse = () => {
                 />
               </div>
 
+              {/* Property Type and Listing Type */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-primary-50 rounded-lg">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Property Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="property_type"
+                    value={formData.property_type}
+                    onChange={handleChange}
+                    className="input-field"
+                  >
+                    <option value="house">House</option>
+                    <option value="land">Land/Property</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Listing Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="listing_type"
+                    value={formData.listing_type}
+                    onChange={handleChange}
+                    className="input-field"
+                  >
+                    <option value="rent">For Rent</option>
+                    <option value="lease">For Lease</option>
+                    <option value="buy">For Sale</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.listing_type === 'buy' ? 'Will appear on Buy page' : 'Will appear on Rent page'}
+                  </p>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -270,66 +313,108 @@ const AddEditHouse = () => {
                   <p className="text-xs text-gray-500 mt-1">Choose from list or type a custom location</p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    House Type <span className="text-red-500">*</span>
-                  </label>
-                  <ComboInput
-                    name="house_type"
-                    value={formData.house_type}
-                    onChange={handleChange}
-                    options={houseTypes}
-                    placeholder="Select or type house type..."
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Choose from list or type a custom type</p>
-                </div>
+                {formData.property_type === 'house' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Property Type (House)
+                    </label>
+                    <ComboInput
+                      name="house_type"
+                      value={formData.house_type}
+                      onChange={handleChange}
+                      options={houseTypes}
+                      placeholder="Select or type house type..."
+                    />
+                    <p className="text-xs text-gray-500 mt-1">e.g., 1 Bedroom, 2 Bedroom, Apartment</p>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bedrooms
-                  </label>
-                  <input
-                    type="number"
-                    name="bedrooms"
-                    value={formData.bedrooms}
-                    onChange={handleChange}
-                    min="0"
-                    className="input-field"
-                  />
-                </div>
+              {/* House-specific fields */}
+              {formData.property_type === 'house' && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bedrooms
+                    </label>
+                    <input
+                      type="number"
+                      name="bedrooms"
+                      value={formData.bedrooms}
+                      onChange={handleChange}
+                      min="0"
+                      className="input-field"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bathrooms
-                  </label>
-                  <input
-                    type="number"
-                    name="bathrooms"
-                    value={formData.bathrooms}
-                    onChange={handleChange}
-                    min="0"
-                    className="input-field"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bathrooms
+                    </label>
+                    <input
+                      type="number"
+                      name="bathrooms"
+                      value={formData.bathrooms}
+                      onChange={handleChange}
+                      min="0"
+                      className="input-field"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Rent Price (KES) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="rent_price"
-                    value={formData.rent_price}
-                    onChange={handleChange}
-                    placeholder="15000"
-                    min="0"
-                    className="input-field"
-                    required
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {formData.listing_type === 'buy' ? 'Price (KES)' : 'Rent/Month (KES)'} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="rent_price"
+                      value={formData.rent_price}
+                      onChange={handleChange}
+                      placeholder={formData.listing_type === 'buy' ? '5000000' : '15000'}
+                      min="0"
+                      className="input-field"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Land-specific fields */}
+              {formData.property_type === 'land' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Size (Acres)
+                    </label>
+                    <input
+                      type="number"
+                      name="size_acres"
+                      value={formData.size_acres}
+                      onChange={handleChange}
+                      placeholder="0.5"
+                      min="0"
+                      step="0.01"
+                      className="input-field"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {formData.listing_type === 'buy' ? 'Price (KES)' : 'Rent/Month (KES)'} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="rent_price"
+                      value={formData.rent_price}
+                      onChange={handleChange}
+                      placeholder={formData.listing_type === 'buy' ? '2000000' : '10000'}
+                      min="0"
+                      className="input-field"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
