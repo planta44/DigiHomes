@@ -63,18 +63,20 @@ const HousesPage = () => {
 
   return (
     <PublicLayout>
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 mb-2">
+      {/* Hero Section with Background Image */}
+      <section className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60')` }}></div>
+        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <Building className="w-8 h-8" />
             <h1 className="text-3xl md:text-4xl font-bold">Available Houses</h1>
           </div>
-          <p className="text-primary-100">
+          <p className="text-white/80 max-w-2xl mx-auto">
             Browse our selection of quality rental properties in Nakuru and Nyahururu
           </p>
         </div>
-      </div>
+      </section>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

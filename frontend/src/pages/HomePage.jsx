@@ -126,7 +126,9 @@ const HomePage = () => {
     overlayColorMobile: settings?.hero_content?.overlayColorMobile || settings?.hero_content?.overlayColor || '#000000',
     overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
     overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6,
-    statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe'
+    statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe',
+    statsRibbonColor: settings?.hero_content?.statsRibbonColor || 'rgba(0,0,0,0.3)',
+    statsRibbonOpacity: settings?.hero_content?.statsRibbonOpacity ?? 0.3
   };
   const featuresSection = settings?.features_section || {
     title: 'Why Choose DIGIHOMES?',
@@ -231,10 +233,11 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Stats Section - Separate from Hero for scroll animation */}
+      {/* Stats Section - Blur against hero background with admin-configurable color */}
       <section 
         ref={statsRef} 
-        className="py-8 md:py-12 bg-black/30 backdrop-blur-sm"
+        className="py-8 md:py-12 backdrop-blur-md"
+        style={{ backgroundColor: heroContent.statsRibbonColor }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">

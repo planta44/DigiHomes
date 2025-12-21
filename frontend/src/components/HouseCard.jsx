@@ -3,8 +3,11 @@ import { MapPin, Bed, Bath, ArrowRight } from 'lucide-react';
 
 const HouseCard = ({ house }) => {
   const primaryImage = house.images?.find(img => img.is_primary) || house.images?.[0];
+  // Handle both Cloudinary (full URL) and local uploads (relative path)
   const imageUrl = primaryImage?.image_url 
-    ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${primaryImage.image_url}`
+    ? (primaryImage.image_url.startsWith('http') 
+        ? primaryImage.image_url 
+        : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${primaryImage.image_url}`)
     : 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop&q=60';
 
   const formatPrice = (price) => {

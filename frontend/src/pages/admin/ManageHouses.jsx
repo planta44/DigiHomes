@@ -82,6 +82,10 @@ const ManageHouses = () => {
   const getImageUrl = (house) => {
     const primaryImage = house.images?.find(img => img.is_primary) || house.images?.[0];
     if (!primaryImage) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200&auto=format&fit=crop&q=60';
+    // Handle both Cloudinary (full URL) and local uploads (relative path)
+    if (primaryImage.image_url?.startsWith('http')) {
+      return primaryImage.image_url;
+    }
     return `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${primaryImage.image_url}`;
   };
 

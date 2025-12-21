@@ -8,7 +8,9 @@ const Navbar = () => {
   const [brandSettings, setBrandSettings] = useState({
     name: 'DIGIHOMES',
     primaryColor: '#2563eb',
-    secondaryColor: '#dc2626'
+    secondaryColor: '#dc2626',
+    hamburgerMenuBg: 'rgba(255,255,255,0.7)',
+    hamburgerMenuOpacity: 0.7
   });
   const [logo, setLogo] = useState('');
   const location = useLocation();
@@ -129,12 +131,16 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         />
         
-        {/* Menu Panel - More transparent background */}
+        {/* Menu Panel - Admin-configurable background */}
         <div 
-          className={`absolute inset-x-0 top-0 bg-white/70 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-out ${
+          className={`absolute inset-x-0 top-0 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-out ${
             isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
           }`}
-          style={{ maxHeight: '100vh', overflowY: 'auto' }}
+          style={{ 
+            maxHeight: '100vh', 
+            overflowY: 'auto',
+            backgroundColor: brandSettings.hamburgerMenuBg || 'rgba(255,255,255,0.7)'
+          }}
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/20">
@@ -172,6 +178,9 @@ const Navbar = () => {
                     : 'text-gray-700 hover:bg-white/50'
                 }`}
                 style={{ 
+                  transitionProperty: 'transform, opacity',
+                  transitionDuration: '500ms',
+                  transitionTimingFunction: 'ease-out',
                   transitionDelay: isOpen ? `${150 + index * 75}ms` : '0ms',
                   transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(-20px) scale(0.95)',
                   opacity: isOpen ? 1 : 0
@@ -189,9 +198,11 @@ const Navbar = () => {
           <div 
             className="p-4 border-t border-white/20 bg-white/50"
             style={{ 
+              transitionProperty: 'opacity',
+              transitionDuration: '500ms',
+              transitionTimingFunction: 'ease-out',
               transitionDelay: isOpen ? '600ms' : '0ms',
-              opacity: isOpen ? 1 : 0,
-              transition: 'opacity 500ms ease-out'
+              opacity: isOpen ? 1 : 0
             }}
           >
             <p className="text-center text-sm text-gray-500">

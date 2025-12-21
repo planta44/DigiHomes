@@ -340,6 +340,89 @@ const SiteSettings = () => {
                   </div>
                 </div>
 
+                {/* Hamburger Menu Settings */}
+                <div className="border-t pt-4">
+                  <h4 className="font-medium text-sm mb-3">Mobile Menu (Hamburger) Settings</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Menu Background Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.brand_settings.hamburgerMenuBg?.replace(/rgba?\([^)]+\)/, '#ffffff') || '#ffffff'} 
+                          onChange={(e) => {
+                            const opacity = settings.brand_settings.hamburgerMenuOpacity || 0.7;
+                            const hex = e.target.value;
+                            const r = parseInt(hex.slice(1, 3), 16);
+                            const g = parseInt(hex.slice(3, 5), 16);
+                            const b = parseInt(hex.slice(5, 7), 16);
+                            setSettings(prev => ({
+                              ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuBg: `rgba(${r},${g},${b},${opacity})` }
+                            }));
+                          }} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.brand_settings.hamburgerMenuBg || 'rgba(255,255,255,0.7)'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuBg: e.target.value }
+                          }))} className="input-field flex-1 text-sm" placeholder="rgba(255,255,255,0.7)" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Menu Opacity: {(settings.brand_settings.hamburgerMenuOpacity || 0.7).toFixed(1)}</label>
+                      <input type="range" min="0.1" max="1" step="0.1" value={settings.brand_settings.hamburgerMenuOpacity || 0.7}
+                        onChange={(e) => {
+                          const opacity = parseFloat(e.target.value);
+                          const currentBg = settings.brand_settings.hamburgerMenuBg || 'rgba(255,255,255,0.7)';
+                          const match = currentBg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                          if (match) {
+                            setSettings(prev => ({
+                              ...prev, brand_settings: { ...prev.brand_settings, hamburgerMenuOpacity: opacity, hamburgerMenuBg: `rgba(${match[1]},${match[2]},${match[3]},${opacity})` }
+                            }));
+                          }
+                        }} className="w-full mt-2" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stats Ribbon Settings */}
+                <div className="border-t pt-4">
+                  <h4 className="font-medium text-sm mb-3">Stats Ribbon Settings (Homepage)</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Background Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value="#000000" 
+                          onChange={(e) => {
+                            const opacity = settings.hero_content.statsRibbonOpacity || 0.3;
+                            const hex = e.target.value;
+                            const r = parseInt(hex.slice(1, 3), 16);
+                            const g = parseInt(hex.slice(3, 5), 16);
+                            const b = parseInt(hex.slice(5, 7), 16);
+                            setSettings(prev => ({
+                              ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: `rgba(${r},${g},${b},${opacity})` }
+                            }));
+                          }} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.hero_content.statsRibbonColor || 'rgba(0,0,0,0.3)'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" placeholder="rgba(0,0,0,0.3)" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Opacity: {(settings.hero_content.statsRibbonOpacity || 0.3).toFixed(1)}</label>
+                      <input type="range" min="0" max="1" step="0.1" value={settings.hero_content.statsRibbonOpacity || 0.3}
+                        onChange={(e) => {
+                          const opacity = parseFloat(e.target.value);
+                          const currentBg = settings.hero_content.statsRibbonColor || 'rgba(0,0,0,0.3)';
+                          const match = currentBg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                          if (match) {
+                            setSettings(prev => ({
+                              ...prev, hero_content: { ...prev.hero_content, statsRibbonOpacity: opacity, statsRibbonColor: `rgba(${match[1]},${match[2]},${match[3]},${opacity})` }
+                            }));
+                          }
+                        }} className="w-full mt-2" />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Set opacity to 0 for fully transparent (blur only). The ribbon will blur against the hero background image.</p>
+                </div>
+
                 <button onClick={() => handleSave('brand_settings', settings.brand_settings)} disabled={saving} className="btn-primary w-full sm:w-auto">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Brand Settings
                 </button>
@@ -948,6 +1031,13 @@ const SiteSettings = () => {
                       }))} className="input-field" />
                     </div>
                   </div>
+                  <ImageUploadField 
+                    label="Background Image" 
+                    value={settings.contact_page.backgroundImage || ''} 
+                    onChange={(url) => setSettings(prev => ({
+                      ...prev, contact_page: { ...prev.contact_page, backgroundImage: url }
+                    }))} 
+                  />
                 </div>
 
                 <div className="border-t pt-4">

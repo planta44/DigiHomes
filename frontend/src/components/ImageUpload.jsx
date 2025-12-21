@@ -20,9 +20,10 @@ const ImageUpload = ({ value, onChange, label = 'Image' }) => {
       const response = await api.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      // Construct full URL - api baseURL includes /api, so we need the base without /api
-      const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
-      const imageUrl = `${baseUrl}${response.data.url}`;
+      // Handle both Cloudinary (full URL) and local uploads (relative path)
+      const imageUrl = response.data.url.startsWith('http') 
+        ? response.data.url 
+        : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${response.data.url}`;
       onChange(imageUrl);
     } catch (error) {
       console.error('Upload failed:', error);

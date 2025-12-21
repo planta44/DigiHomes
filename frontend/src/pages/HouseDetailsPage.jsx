@@ -55,6 +55,10 @@ const HouseDetailsPage = () => {
 
   const getImageUrl = (image) => {
     if (!image) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop&q=60';
+    // Handle both Cloudinary (full URL) and local uploads (relative path)
+    if (image.image_url?.startsWith('http')) {
+      return image.image_url;
+    }
     return `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${image.image_url}`;
   };
 

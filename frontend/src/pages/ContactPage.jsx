@@ -44,15 +44,26 @@ const ContactPage = () => {
 
   return (
     <PublicLayout>
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Hero Section with Background Image */}
+      <section className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
+        {contact_page.backgroundImage ? (
+          <>
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${contact_page.backgroundImage}')` }}></div>
+            <div className="absolute inset-0 bg-black/50"></div>
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&auto=format&fit=crop&q=60')` }}></div>
+            <div className="absolute inset-0 bg-black/50"></div>
+          </>
+        )}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{contact_page.title}</h1>
-          <p className="text-primary-100 max-w-2xl mx-auto">
+          <p className="text-white/80 max-w-2xl mx-auto">
             {contact_page.subtitle}
           </p>
         </div>
-      </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Contact Info Cards */}

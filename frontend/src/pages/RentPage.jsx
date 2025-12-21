@@ -24,12 +24,14 @@ const RentPage = () => {
       try {
         const [pageRes, housesRes, locationsRes, typesRes] = await Promise.all([
           api.get('/pages/rent').catch(() => ({ data: null })),
-          api.get('/houses?status=available'),
+          api.get('/houses').catch(() => ({ data: [] })),
           api.get('/settings/locations').catch(() => ({ data: [] })),
           api.get('/settings/house-types').catch(() => ({ data: [] }))
         ]);
         setPageData(pageRes.data);
-        setHouses(housesRes.data);
+        // Filter to only show available rental properties
+        const allHouses = housesRes.data || [];
+        setHouses(allHouses.filter(h => h.vacancy_status === 'available'));
         setLocations(locationsRes.data);
         setHouseTypes(typesRes.data);
       } catch (error) {
