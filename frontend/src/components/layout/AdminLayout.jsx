@@ -9,7 +9,8 @@ import {
   X,
   ChevronRight,
   Home,
-  Settings
+  Settings,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -22,6 +23,7 @@ const AdminLayout = ({ children }) => {
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/houses', label: 'Manage Houses', icon: Building },
+    { path: '/admin/pages', label: 'Manage Pages', icon: FileText },
     { path: '/admin/subscribers', label: 'Subscribers', icon: Users },
     { path: '/admin/settings', label: 'Site Settings', icon: Settings },
   ];

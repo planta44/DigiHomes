@@ -19,6 +19,7 @@ const RentPage = () => {
   const [housesRef, housesVisible] = useScrollAnimation(0.1, true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchData = async () => {
       try {
         const [pageRes, housesRes, locationsRes, typesRes] = await Promise.all([

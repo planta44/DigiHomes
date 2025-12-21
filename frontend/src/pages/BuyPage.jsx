@@ -5,44 +5,49 @@ import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
+const defaultContent = {
+  hero: { 
+    title: 'Buy Your Dream Home', 
+    subtitle: 'Explore properties available for purchase in Nakuru & Nyahururu', 
+    backgroundImage: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=60' 
+  },
+  sections: [
+    { 
+      title: 'Why Buy With Us?', 
+      description: 'We offer comprehensive support throughout your home buying journey. Our experienced team ensures a smooth and secure property purchase process.', 
+      items: ['Verified property listings with clear titles', 'Complete legal documentation support', 'Flexible payment options available', 'Professional property inspection assistance', 'Negotiation support for best prices', 'After-sale support and guidance'] 
+    },
+    { 
+      title: 'Our Buying Process', 
+      description: 'We make buying property simple and straightforward with our step-by-step approach.', 
+      items: ['Initial consultation to understand your needs', 'Property search and shortlisting', 'Site visits and inspections', 'Price negotiation and agreement', 'Legal verification and documentation', 'Handover and after-sale support'] 
+    }
+  ],
+  callToAction: { title: 'Ready to find your dream home?', description: 'Contact us today to explore available properties and start your home ownership journey.', buttonText: 'Contact Us', buttonLink: '/contact' }
+};
+
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
   const [heroRef, heroVisible] = useScrollAnimation(0.1, true);
   const [contentRef, contentVisible] = useScrollAnimation(0.1, true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchPage = async () => {
       try {
         const response = await api.get('/pages/buy');
-        setPageData(response.data);
+        if (response.data?.content) {
+          setPageData(response.data);
+        }
       } catch (error) {
-        console.error('Error fetching buy page:', error);
-      } finally {
-        setLoading(false);
+        // Use default content
       }
     };
     fetchPage();
   }, []);
 
-  const content = pageData?.content || {
-    hero: { title: 'Buy Your Dream Home', subtitle: 'Explore properties available for purchase in Nakuru & Nyahururu', backgroundImage: '' },
-    sections: [
-      { title: 'Why Buy With Us?', description: 'We offer comprehensive support throughout your home buying journey', items: ['Verified property listings', 'Legal documentation support', 'Flexible payment options', 'Property inspection assistance'] }
-    ],
-    callToAction: { title: 'Ready to find your dream home?', description: 'Contact us today to explore available properties', buttonText: 'Contact Us', buttonLink: '/contact' }
-  };
-
-  if (loading) {
-    return (
-      <PublicLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-        </div>
-      </PublicLayout>
-    );
-  }
+  const content = pageData?.content || defaultContent;
 
   return (
     <PublicLayout>

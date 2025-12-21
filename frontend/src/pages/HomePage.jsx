@@ -24,15 +24,15 @@ const iconMap = {
   Building, MapPin, Shield, Clock, Star, Users, Home, CheckCircle
 };
 
-const StatItem = ({ value, label, isVisible, index, duration }) => {
+const StatItem = ({ value, label, isVisible, index, duration, labelColor }) => {
   const animatedValue = useCountUp(value, duration || 2000, isVisible);
   return (
     <div 
       className={`transition-all ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-      style={{ transitionDuration: `${duration || 700}ms`, transitionDelay: `${index * 100}ms` }}
+      style={{ transitionDuration: `${duration || 700}ms`, transitionDelay: `${index * 150}ms` }}
     >
       <div className="text-3xl md:text-4xl font-bold">{animatedValue}</div>
-      <div className="text-primary-200 text-sm">{label}</div>
+      <div className="text-sm" style={{ color: labelColor || '#bfdbfe' }}>{label}</div>
     </div>
   );
 };
@@ -116,13 +116,16 @@ const HomePage = () => {
   const heroContent = {
     title: settings?.hero_content?.title || 'Find Your Perfect Home in',
     highlight: settings?.hero_content?.highlight || 'Nakuru & Nyahururu',
+    highlightColor: settings?.hero_content?.highlightColor || colors[200],
+    descriptionHighlightColor: settings?.hero_content?.descriptionHighlightColor || colors[200],
     description: settings?.hero_content?.description || 'DIGI Homes Agencies is your trusted partner in finding quality rental properties. From cozy bedsitters to spacious family homes, we have something for everyone.',
     backgroundImage: settings?.hero_content?.backgroundImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60',
     backgroundImageMobile: settings?.hero_content?.backgroundImageMobile || settings?.hero_content?.backgroundImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60',
     overlayColor: settings?.hero_content?.overlayColor || '#000000',
     overlayColorMobile: settings?.hero_content?.overlayColorMobile || settings?.hero_content?.overlayColor || '#000000',
     overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
-    overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6
+    overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6,
+    statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe'
   };
   const featuresSection = settings?.features_section || {
     title: 'Why Choose DIGIHOMES?',
@@ -198,10 +201,10 @@ const HomePage = () => {
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               {heroContent.title}{' '}
-              <span style={{ color: colors[200] }}>{heroContent.highlight}</span>
+              <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-2xl" style={{ color: colors[100] }}>
-              <span style={{ color: colors[200], fontWeight: '600' }}>Nakuru &amp; Nyahururu</span>
+              <span style={{ color: heroContent.descriptionHighlightColor, fontWeight: '600' }}>Nakuru &amp; Nyahururu</span>
               {' '}{heroContent.description?.replace(/^Nakuru\s*&\s*Nyahururu\s*/i, '') || heroContent.description}
             </p>
             <div className="flex flex-wrap gap-4">
@@ -226,22 +229,27 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        
-        {/* Stats */}
-        <div ref={statsRef} className="relative bg-white/10 backdrop-blur-sm border-t border-white/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {stats.map((stat, index) => (
-                <StatItem 
-                  key={index} 
-                  value={stat.value} 
-                  label={stat.label} 
-                  isVisible={statsVisible}
-                  index={index}
-                  duration={animSettings.duration}
-                />
-              ))}
-            </div>
+      </section>
+
+      {/* Stats Section - Separate from Hero for scroll animation */}
+      <section 
+        ref={statsRef} 
+        className="py-8 md:py-12"
+        style={{ background: `linear-gradient(to right, ${colors[600]}, ${colors[700]})` }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+            {stats.map((stat, index) => (
+              <StatItem 
+                key={index} 
+                value={stat.value} 
+                label={stat.label} 
+                isVisible={statsVisible}
+                index={index}
+                duration={animSettings.duration}
+                labelColor={heroContent.statsLabelColor}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -334,16 +342,24 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {(locationsSection.locations || []).map((loc, index) => (
+            {(locationsSection.locations || []).map((loc, index) => {
+              // Handle both relative and absolute image URLs
+              const imageUrl = loc.image?.startsWith('http') 
+                ? loc.image 
+                : loc.image?.startsWith('/uploads') 
+                  ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${loc.image}`
+                  : loc.image || 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800';
+              return (
               <div 
-                key={loc.name}
+                key={loc.name || index}
                 className={`relative rounded-2xl overflow-hidden group transition-all ${locationsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDuration: `${animSettings.duration}ms`, transitionDelay: `${index * animSettings.staggerDelay}ms` }}
               >
                 <img 
-                  src={loc.image} 
+                  src={imageUrl} 
                   alt={loc.name} 
                   className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800'; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -358,7 +374,8 @@ const HomePage = () => {
                   </Link>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -454,19 +471,22 @@ const HomePage = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <Link 
               to="/houses" 
-              className="font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
+              className="font-medium py-2.5 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 hover:scale-105 animate-pulse-subtle"
               style={{ color: colors[600] }}
             >
               Browse Houses
+              <ArrowRight className="w-5 h-5 animate-bounce-x" />
             </Link>
             <a 
               href={`https://wa.me/${companyInfo.whatsapp || '254700000000'}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-white"
+              className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 hover:bg-white hover:scale-105 animate-pulse-subtle"
+              style={{ animationDelay: '0.5s' }}
               onMouseEnter={(e) => e.currentTarget.style.color = colors[600]}
               onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
             >
+              <Phone className="w-5 h-5" />
               WhatsApp Us
             </a>
           </div>

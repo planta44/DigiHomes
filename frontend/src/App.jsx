@@ -19,6 +19,7 @@ import ManageHouses from './pages/admin/ManageHouses';
 import AddEditHouse from './pages/admin/AddEditHouse';
 import Subscribers from './pages/admin/Subscribers';
 import SiteSettings from './pages/admin/SiteSettings';
+import ManagePages from './pages/admin/ManagePages';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -78,6 +79,11 @@ function App() {
           <Route path="/admin/settings" element={
             <ProtectedRoute>
               <SiteSettings />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/pages" element={
+            <ProtectedRoute>
+              <ManagePages />
             </ProtectedRoute>
           } />
         </Routes>

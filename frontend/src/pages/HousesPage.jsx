@@ -20,6 +20,7 @@ const HousesPage = () => {
   });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchOptions();
   }, []);
 

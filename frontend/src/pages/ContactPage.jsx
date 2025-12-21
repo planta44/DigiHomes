@@ -22,6 +22,7 @@ const ContactPage = () => {
   const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchSettings = async () => {
       try {
         const response = await api.get('/settings');

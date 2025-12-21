@@ -117,25 +117,27 @@ const Navbar = () => {
 
       {/* Full Screen Mobile Navigation */}
       <div 
-        className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-50 md:hidden transition-all duration-500 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        {/* Backdrop */}
+        {/* Backdrop - Transparent with blur */}
         <div 
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className={`absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-500 ${
+            isOpen ? 'opacity-100' : 'opacity-0'
+          }`}
           onClick={() => setIsOpen(false)}
         />
         
-        {/* Menu Panel */}
+        {/* Menu Panel - Transparent background */}
         <div 
-          className={`absolute inset-x-0 top-0 bg-white shadow-2xl transition-transform duration-300 ease-out ${
-            isOpen ? 'translate-y-0' : '-translate-y-full'
+          className={`absolute inset-x-0 top-0 bg-white/90 backdrop-blur-lg shadow-2xl transition-all duration-500 ease-out ${
+            isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
           }`}
           style={{ maxHeight: '100vh', overflowY: 'auto' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-4 border-b border-white/20">
             <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
               {logo && (
                 <img src={logo} alt={brandName} className="h-10 w-auto object-contain max-w-[120px]" />
@@ -150,7 +152,7 @@ const Navbar = () => {
               </div>
             </Link>
             <button
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-white/50 transition-colors"
               onClick={() => setIsOpen(false)}
             >
               <X className="w-6 h-6" />
@@ -164,18 +166,18 @@ const Navbar = () => {
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-4 px-4 py-4 rounded-xl mb-2 transition-all duration-300 ${
+                className={`flex items-center gap-4 px-4 py-4 rounded-xl mb-2 transition-all duration-500 ${
                   isActive(link.path)
-                    ? 'bg-primary-50 text-primary-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-primary-500/20 text-primary-600 font-semibold'
+                    : 'text-gray-700 hover:bg-white/50'
                 }`}
                 style={{ 
-                  transitionDelay: isOpen ? `${index * 50}ms` : '0ms',
-                  transform: isOpen ? 'translateX(0)' : 'translateX(-20px)',
+                  transitionDelay: isOpen ? `${150 + index * 75}ms` : '0ms',
+                  transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(-20px) scale(0.95)',
                   opacity: isOpen ? 1 : 0
                 }}
               >
-                <div className={`p-2 rounded-lg ${isActive(link.path) ? 'bg-primary-100' : 'bg-gray-100'}`}>
+                <div className={`p-2 rounded-lg transition-colors ${isActive(link.path) ? 'bg-primary-100' : 'bg-white/70'}`}>
                   <link.icon className="w-5 h-5" />
                 </div>
                 <span className="text-lg">{link.label}</span>
@@ -184,7 +186,14 @@ const Navbar = () => {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-gray-50">
+          <div 
+            className="p-4 border-t border-white/20 bg-white/50"
+            style={{ 
+              transitionDelay: isOpen ? '600ms' : '0ms',
+              opacity: isOpen ? 1 : 0,
+              transition: 'opacity 500ms ease-out'
+            }}
+          >
             <p className="text-center text-sm text-gray-500">
               © {new Date().getFullYear()} {brandName}
             </p>

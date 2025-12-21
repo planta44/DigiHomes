@@ -453,6 +453,49 @@ const SiteSettings = () => {
                   </div>
                 </div>
 
+                {/* Text Colors */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Text Colors</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Title Highlight Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.hero_content.highlightColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, highlightColor: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.hero_content.highlightColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, highlightColor: e.target.value }
+                        }))} className="input-field flex-1 text-sm" />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Color of "Nakuru & Nyahururu" in title</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description Highlight Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.hero_content.descriptionHighlightColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, descriptionHighlightColor: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.hero_content.descriptionHighlightColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, descriptionHighlightColor: e.target.value }
+                        }))} className="input-field flex-1 text-sm" />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Color of "Nakuru & Nyahururu" in description</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Stats Label Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.hero_content.statsLabelColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
+                        }))} className="w-12 h-10 rounded cursor-pointer" />
+                        <input type="text" value={settings.hero_content.statsLabelColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
+                        }))} className="input-field flex-1 text-sm" />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Color of stats labels (Happy Tenants, etc.)</p>
+                    </div>
+                  </div>
+                </div>
+
                 <button onClick={() => handleSave('hero_content', settings.hero_content)} disabled={saving} className="btn-primary mt-4">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Hero Settings
                 </button>

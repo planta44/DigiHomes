@@ -7,6 +7,19 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
+const defaultContent = {
+  hero: { 
+    title: 'Our Services', 
+    subtitle: 'Professional property services tailored to your needs', 
+    backgroundImage: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60' 
+  },
+  sections: [
+    { title: 'Property Management', description: 'Complete property management services for landlords. We handle everything from tenant screening to maintenance.', icon: 'Building', items: ['Tenant screening & background checks', 'Rent collection & accounting', 'Property maintenance coordination', 'Regular property inspections'] },
+    { title: 'Rental Services', description: 'Find your perfect rental home with our expert guidance and personalized service.', icon: 'Home', items: ['Property viewing arrangements', 'Lease negotiation assistance', 'Move-in coordination', 'Tenant support services'] },
+    { title: 'Property Consultation', description: 'Expert advice on property investment, market trends, and management strategies.', icon: 'Users', items: ['Market analysis & valuation', 'Investment strategy advice', 'Legal compliance guidance', 'Portfolio management'] }
+  ]
+};
+
 const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,12 +28,15 @@ const ServicesPage = () => {
   const [sectionsRef, sectionsVisible] = useScrollAnimation(0.1, true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchPage = async () => {
       try {
         const response = await api.get('/pages/services');
-        setPageData(response.data);
+        if (response.data?.content) {
+          setPageData(response.data);
+        }
       } catch (error) {
-        console.error('Error fetching services page:', error);
+        // Use default content
       } finally {
         setLoading(false);
       }
@@ -28,24 +44,7 @@ const ServicesPage = () => {
     fetchPage();
   }, []);
 
-  const content = pageData?.content || {
-    hero: { title: 'Our Services', subtitle: 'Professional property services tailored to your needs', backgroundImage: '' },
-    sections: [
-      { title: 'Property Management', description: 'Complete property management services for landlords', icon: 'Building', items: ['Tenant screening', 'Rent collection', 'Maintenance coordination'] },
-      { title: 'Rental Services', description: 'Find your perfect rental home with our expert guidance', icon: 'Home', items: ['Property viewing', 'Lease negotiation', 'Move-in assistance'] },
-      { title: 'Consultation', description: 'Expert advice on property investment and management', icon: 'Users', items: ['Market analysis', 'Investment advice', 'Legal guidance'] }
-    ]
-  };
-
-  if (loading) {
-    return (
-      <PublicLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-        </div>
-      </PublicLayout>
-    );
-  }
+  const content = pageData?.content || defaultContent;
 
   return (
     <PublicLayout>
