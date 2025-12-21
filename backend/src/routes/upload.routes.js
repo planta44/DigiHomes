@@ -6,36 +6,46 @@ const { v4: uuidv4 } = require('uuid');
 const { uploadImages, deleteImage, setPrimaryImage } = require('../controllers/upload.controller');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 
-// Configure multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
+// Check if Cloudinary is configured
+const useCloudinary = process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET;
 
-// File filter
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, WebP and SVG are allowed.'), false);
-  }
-};
+let upload;
+let uploadToCloudinary;
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  }
-});
+if (useCloudinary) {
+  // Use Cloudinary storage
+  const cloudinaryConfig = require('../config/cloudinary');
+  uploadToCloudinary = cloudinaryConfig.uploadToCloudinary;
+  upload = uploadToCloudinary;
+} else {
+  // Fallback to local storage
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, path.join(__dirname, '../../uploads'));
+    },
+    filename: (req, file, cb) => {
+      const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
+    }
+  });
 
-// General single image upload (admin only) - for logos, etc.
+  const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, WebP and SVG are allowed.'), false);
+    }
+  };
+
+  upload = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }
+  });
+}
+
+// General single image upload (admin only) - for logos, backgrounds, etc.
 router.post(
   '/',
   authMiddleware,
@@ -45,8 +55,9 @@ router.post(
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
     }
-    const imageUrl = `/uploads/${req.file.filename}`;
-    res.json({ url: imageUrl, filename: req.file.filename });
+    // Cloudinary returns path in req.file.path, local storage needs /uploads/ prefix
+    const imageUrl = useCloudinary ? req.file.path : `/uploads/${req.file.filename}`;
+    res.json({ url: imageUrl, filename: req.file.filename || req.file.public_id });
   }
 );
 

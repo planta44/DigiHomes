@@ -129,9 +129,9 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         />
         
-        {/* Menu Panel - Transparent background */}
+        {/* Menu Panel - More transparent background */}
         <div 
-          className={`absolute inset-x-0 top-0 bg-white/90 backdrop-blur-lg shadow-2xl transition-all duration-500 ease-out ${
+          className={`absolute inset-x-0 top-0 bg-white/70 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-out ${
             isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
           }`}
           style={{ maxHeight: '100vh', overflowY: 'auto' }}

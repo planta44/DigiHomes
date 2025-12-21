@@ -63,11 +63,12 @@ const HomePage = () => {
   const [featuredHouses, setFeaturedHouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState(null);
-  const [statsRef, statsVisible] = useScrollAnimation(0.3, true);
+  const [statsRef, statsVisible] = useScrollAnimation(0.8, true);
   const [featuresRef, featuresVisible] = useScrollAnimation(0.2, true);
   const [housesRef, housesVisible] = useScrollAnimation(0.1, true);
   const [locationsRef, locationsVisible] = useScrollAnimation(0.2, true);
   const [postsRef, postsVisible] = useScrollAnimation(0.2, true);
+  const [ctaRef, ctaVisible] = useScrollAnimation(0.3, true);
   const { colors } = useTheme();
   const [currentSlide, setCurrentSlide] = useState(0);
   const slideRef = useRef(null);
@@ -203,9 +204,8 @@ const HomePage = () => {
               {heroContent.title}{' '}
               <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
             </h1>
-            <p className="text-lg md:text-xl mb-8 max-w-2xl" style={{ color: colors[100] }}>
-              <span style={{ color: heroContent.descriptionHighlightColor, fontWeight: '600' }}>Nakuru &amp; Nyahururu</span>
-              {' '}{heroContent.description?.replace(/^Nakuru\s*&\s*Nyahururu\s*/i, '') || heroContent.description}
+            <p className="text-lg md:text-xl mb-8 max-w-2xl" style={{ color: heroContent.descriptionHighlightColor }}>
+              {heroContent.description}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link 
@@ -234,8 +234,7 @@ const HomePage = () => {
       {/* Stats Section - Separate from Hero for scroll animation */}
       <section 
         ref={statsRef} 
-        className="py-8 md:py-12"
-        style={{ background: `linear-gradient(to right, ${colors[600]}, ${colors[700]})` }}
+        className="py-8 md:py-12 bg-black/30 backdrop-blur-sm"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
@@ -401,16 +400,24 @@ const HomePage = () => {
                 className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
                 style={{ scrollBehavior: 'smooth' }}
               >
-                {digiPosts.posts.map((post, index) => (
+                {digiPosts.posts.map((post, index) => {
+                  // Handle both Cloudinary URLs and local URLs
+                  const imageUrl = post.image?.startsWith('http') 
+                    ? post.image 
+                    : post.image?.startsWith('/uploads') 
+                      ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${post.image}`
+                      : post.image || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800';
+                  return (
                   <div 
                     key={index}
                     className="flex-shrink-0 snap-start w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.75rem)]"
                   >
                     <div className="relative rounded-xl overflow-hidden shadow-lg group bg-white h-full">
                       <img 
-                        src={post.image} 
+                        src={imageUrl} 
                         alt={post.caption || `Post ${index + 1}`}
                         className="w-full h-52 sm:h-60 md:h-72 object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800'; }}
                       />
                       {post.caption && (
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
@@ -419,7 +426,8 @@ const HomePage = () => {
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Navigation Arrows */}
@@ -459,19 +467,19 @@ const HomePage = () => {
       )}
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
+      <section ref={ctaRef} className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className={`text-3xl md:text-4xl font-bold text-white mb-4 transition-all duration-700 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             Ready to Find Your New Home?
           </h2>
-          <p className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
+          <p className={`mb-8 max-w-2xl mx-auto transition-all duration-700 delay-100 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className={`flex flex-wrap justify-center gap-4 transition-all duration-700 delay-200 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Link 
               to="/houses" 
-              className="font-medium py-2.5 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 hover:scale-105 animate-pulse-subtle"
+              className="font-medium py-2.5 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 hover:scale-105 animate-pulse-subtle shadow-lg"
               style={{ color: colors[600] }}
             >
               Browse Houses
@@ -481,7 +489,7 @@ const HomePage = () => {
               href={`https://wa.me/${companyInfo.whatsapp || '254700000000'}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 hover:bg-white hover:scale-105 animate-pulse-subtle"
+              className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 hover:bg-white hover:scale-105 animate-pulse-subtle shadow-lg"
               style={{ animationDelay: '0.5s' }}
               onMouseEnter={(e) => e.currentTarget.style.color = colors[600]}
               onMouseLeave={(e) => e.currentTarget.style.color = 'white'}

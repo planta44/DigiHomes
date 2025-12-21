@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { adminMiddleware } = require('../middleware/auth.middleware');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const {
   getAllPages,
   getPageBySlug,
@@ -13,9 +13,9 @@ const {
 router.get('/', getAllPages);
 router.get('/:slug', getPageBySlug);
 
-// Admin routes
-router.post('/', adminMiddleware, createPage);
-router.put('/:slug', adminMiddleware, updatePage);
-router.delete('/:slug', adminMiddleware, deletePage);
+// Admin routes (require both auth and admin middleware)
+router.post('/', authMiddleware, adminMiddleware, createPage);
+router.put('/:slug', authMiddleware, adminMiddleware, updatePage);
+router.delete('/:slug', authMiddleware, adminMiddleware, deletePage);
 
 module.exports = router;

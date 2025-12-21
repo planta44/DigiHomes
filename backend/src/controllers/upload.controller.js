@@ -2,6 +2,9 @@ const db = require('../config/database');
 const path = require('path');
 const fs = require('fs');
 
+// Check if Cloudinary is configured
+const useCloudinary = process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET;
+
 // Upload images for a house
 const uploadImages = async (req, res) => {
   try {
@@ -15,10 +18,12 @@ const uploadImages = async (req, res) => {
     // Check if house exists
     const houseCheck = await db.query('SELECT id FROM houses WHERE id = $1', [houseId]);
     if (houseCheck.rows.length === 0) {
-      // Delete uploaded files
-      files.forEach(file => {
-        fs.unlinkSync(file.path);
-      });
+      // Delete uploaded files (only for local storage)
+      if (!useCloudinary) {
+        files.forEach(file => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+      }
       return res.status(404).json({ error: 'House not found' });
     }
 
@@ -30,7 +35,8 @@ const uploadImages = async (req, res) => {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const imageUrl = `/uploads/${file.filename}`;
+      // Cloudinary returns full URL in file.path, local storage needs /uploads/ prefix
+      const imageUrl = useCloudinary ? file.path : `/uploads/${file.filename}`;
       const isPrimary = isFirstUpload && i === 0;
 
       const result = await db.query(

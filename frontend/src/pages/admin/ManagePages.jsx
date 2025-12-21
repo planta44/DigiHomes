@@ -1,8 +1,64 @@
-import { useState, useEffect } from 'react';
-import { Save, Loader2, Plus, Trash2, Image, FileText } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Save, Loader2, Plus, Trash2, Image, FileText, Upload, Link as LinkIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../components/layout/AdminLayout';
 import api from '../../config/api';
+
+// Image Upload Field Component
+const ImageUploadField = ({ value, onChange, label }) => {
+  const [uploading, setUploading] = useState(false);
+  const [mode, setMode] = useState('url');
+  const fileInputRef = useRef(null);
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    setUploading(true);
+    try {
+      const response = await api.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      // Handle both Cloudinary URLs and local URLs
+      const imageUrl = response.data.url;
+      onChange(imageUrl);
+      toast.success('Image uploaded');
+    } catch (error) {
+      toast.error('Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="flex flex-wrap gap-2 mb-2">
+        <button type="button" onClick={() => setMode('upload')}
+          className={`flex items-center gap-1 px-3 py-1 text-xs rounded-lg ${mode === 'upload' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100'}`}>
+          <Upload className="w-3 h-3" /> Upload
+        </button>
+        <button type="button" onClick={() => setMode('url')}
+          className={`flex items-center gap-1 px-3 py-1 text-xs rounded-lg ${mode === 'url' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100'}`}>
+          <LinkIcon className="w-3 h-3" /> URL
+        </button>
+      </div>
+      {mode === 'upload' ? (
+        <div>
+          <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
+          <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+            className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 text-sm">
+            {uploading ? 'Uploading...' : <><Upload className="w-4 h-4" /> Click to upload</>}
+          </button>
+        </div>
+      ) : (
+        <input type="url" value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder="https://..." className="input-field text-sm" />
+      )}
+      {value && <img src={value} alt="Preview" className="mt-2 h-32 w-full object-cover rounded-lg" onError={(e) => e.target.style.display = 'none'} />}
+    </div>
+  );
+};
 
 const ManagePages = () => {
   const [pages, setPages] = useState({
@@ -179,23 +235,11 @@ const ManagePages = () => {
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Background Image URL</label>
-              <input
-                type="text"
-                value={pages[activeTab]?.content?.hero?.backgroundImage || ''}
-                onChange={(e) => updatePageContent(activeTab, 'hero.backgroundImage', e.target.value)}
-                className="input-field"
-                placeholder="https://..."
-              />
-              {pages[activeTab]?.content?.hero?.backgroundImage && (
-                <img 
-                  src={pages[activeTab].content.hero.backgroundImage} 
-                  alt="Preview" 
-                  className="mt-2 h-32 w-full object-cover rounded-lg"
-                />
-              )}
-            </div>
+            <ImageUploadField
+              label="Background Image"
+              value={pages[activeTab]?.content?.hero?.backgroundImage || ''}
+              onChange={(url) => updatePageContent(activeTab, 'hero.backgroundImage', url)}
+            />
           </div>
 
           {/* Sections */}

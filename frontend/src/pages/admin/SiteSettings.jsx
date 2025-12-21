@@ -35,7 +35,10 @@ const ImageUploadField = ({ value, onChange, label }) => {
       const response = await api.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      const imageUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${response.data.url}`;
+      // Handle both Cloudinary (full URL) and local uploads (relative path)
+      const imageUrl = response.data.url.startsWith('http') 
+        ? response.data.url 
+        : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${response.data.url}`;
       onChange(imageUrl);
       toast.success('Image uploaded');
     } catch (error) {

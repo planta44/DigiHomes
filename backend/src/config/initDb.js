@@ -96,14 +96,15 @@ const initDatabase = async () => {
 
     // Create default admin if not exists
     const bcrypt = require('bcryptjs');
-    const adminCheck = await db.query('SELECT id FROM users WHERE email = $1', ['admin@digihomes.co.ke']);
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@digihomes.co.ke';
+    const adminCheck = await db.query('SELECT id FROM users WHERE email = $1', [adminEmail]);
     if (adminCheck.rows.length === 0) {
       const hashedPassword = await bcrypt.hash('admin123', 10);
       await db.query(
         'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)',
-        ['Admin', 'admin@digihomes.co.ke', hashedPassword, 'admin']
+        ['Admin', adminEmail, hashedPassword, 'admin']
       );
-      console.log('✅ Default admin user created');
+      console.log(`✅ Default admin user created with email: ${adminEmail}`);
     }
 
     // Create default locations if not exist
