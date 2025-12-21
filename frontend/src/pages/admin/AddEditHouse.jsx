@@ -570,7 +570,7 @@ const AddEditHouse = () => {
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  {isEditing ? 'Update House' : 'Create House'}
+                  {isEditing ? 'Update Property' : 'Create Property'}
                 </>
               )}
             </button>

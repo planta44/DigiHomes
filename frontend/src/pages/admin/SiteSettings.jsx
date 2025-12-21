@@ -195,7 +195,6 @@ const SiteSettings = () => {
     { id: 'houses', label: 'Houses', icon: Home },
     { id: 'locations_display', label: 'Locations', icon: Globe },
     { id: 'about', label: 'About', icon: FileText },
-    { id: 'digi_posts', label: 'Digi Posts', icon: Image },
     { id: 'company', label: 'Company', icon: Building },
     { id: 'footer', label: 'Footer', icon: FileText },
     { id: 'contact', label: 'Contact', icon: Phone },
@@ -812,68 +811,6 @@ const SiteSettings = () => {
                 <button onClick={() => handleSave('about_section', settings.about_section)} disabled={saving} className="btn-primary">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
                 </button>
-              </div>
-            )}
-
-            {/* Digi Posts */}
-            {activeTab === 'digi_posts' && (
-              <div className="space-y-4">
-                <h3 className="font-semibold">Digi Posts</h3>
-                <p className="text-sm text-gray-600">Add company posters, announcements, and promotional images that will display in a scrollable slideshow on the homepage.</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
-                    <input type="text" value={settings.digi_posts?.title || ''} onChange={(e) => setSettings(prev => ({
-                      ...prev, digi_posts: { ...prev.digi_posts, title: e.target.value }
-                    }))} className="input-field" placeholder="Digi Posts" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Section Subtitle</label>
-                    <input type="text" value={settings.digi_posts?.subtitle || ''} onChange={(e) => setSettings(prev => ({
-                      ...prev, digi_posts: { ...prev.digi_posts, subtitle: e.target.value }
-                    }))} className="input-field" placeholder="Stay updated with our latest news" />
-                  </div>
-                </div>
-                
-                <h4 className="font-medium text-sm pt-4 border-t">Posts ({(settings.digi_posts?.posts || []).length})</h4>
-                <div className="space-y-4">
-                  {(settings.digi_posts?.posts || []).map((post, index) => (
-                    <div key={index} className="p-4 border rounded-lg bg-gray-50 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Post {index + 1}</span>
-                        <button onClick={() => {
-                          const newPosts = settings.digi_posts.posts.filter((_, i) => i !== index);
-                          setSettings(prev => ({ ...prev, digi_posts: { ...prev.digi_posts, posts: newPosts } }));
-                        }} className="text-red-500 hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
-                      </div>
-                      <ImageUpload
-                        value={post.image || ''}
-                        onChange={(url) => {
-                          const newPosts = [...settings.digi_posts.posts];
-                          newPosts[index] = { ...newPosts[index], image: url };
-                          setSettings(prev => ({ ...prev, digi_posts: { ...prev.digi_posts, posts: newPosts } }));
-                        }}
-                        label="Image"
-                      />
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Caption (optional)</label>
-                        <input type="text" value={post.caption || ''} onChange={(e) => {
-                          const newPosts = [...settings.digi_posts.posts];
-                          newPosts[index] = { ...newPosts[index], caption: e.target.value };
-                          setSettings(prev => ({ ...prev, digi_posts: { ...prev.digi_posts, posts: newPosts } }));
-                        }} className="input-field" placeholder="Enter caption for this post" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button onClick={() => setSettings(prev => ({
-                    ...prev, digi_posts: { ...prev.digi_posts, posts: [...(prev.digi_posts?.posts || []), { image: '', caption: '' }] }
-                  }))} className="btn-secondary text-sm"><Plus className="w-4 h-4" /> Add Post</button>
-                  <button onClick={() => handleSave('digi_posts', settings.digi_posts)} disabled={saving} className="btn-primary text-sm">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
-                  </button>
-                </div>
               </div>
             )}
 

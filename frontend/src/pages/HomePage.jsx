@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -10,9 +10,7 @@ import {
   CheckCircle,
   Star,
   Users,
-  Home,
-  ChevronLeft,
-  ChevronRight
+  Home
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
@@ -67,11 +65,8 @@ const HomePage = () => {
   const [featuresRef, featuresVisible] = useScrollAnimation(0.2, true);
   const [housesRef, housesVisible] = useScrollAnimation(0.1, true);
   const [locationsRef, locationsVisible] = useScrollAnimation(0.2, true);
-  const [postsRef, postsVisible] = useScrollAnimation(0.2, true);
   const [ctaRef, ctaVisible] = useScrollAnimation(0.3, true);
   const { colors } = useTheme();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const slideRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -154,32 +149,6 @@ const HomePage = () => {
     subtitle: settings?.about_section?.subtitle || '',
     content: settings?.about_section?.content || ''
   };
-  const digiPosts = {
-    title: settings?.digi_posts?.title || '',
-    subtitle: settings?.digi_posts?.subtitle || '',
-    posts: settings?.digi_posts?.posts || []
-  };
-
-  // Auto-slide for Digi Posts - slide one at a time
-  useEffect(() => {
-    if (digiPosts.posts.length > 1 && slideRef.current) {
-      const interval = setInterval(() => {
-        const container = slideRef.current;
-        if (container) {
-          const cardWidth = container.querySelector('div')?.offsetWidth || 300;
-          const maxScroll = container.scrollWidth - container.clientWidth;
-          const currentScroll = container.scrollLeft;
-          
-          if (currentScroll >= maxScroll - 10) {
-            container.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            container.scrollBy({ left: cardWidth + 16, behavior: 'smooth' });
-          }
-        }
-      }, 4000);
-      return () => clearInterval(interval);
-    }
-  }, [digiPosts.posts.length]);
 
   
   return (
@@ -413,101 +382,6 @@ const HomePage = () => {
                 {aboutSection.content}
               </p>
             )}
-          </div>
-        </section>
-      )}
-
-      {/* Digi Posts Section */}
-      {digiPosts?.posts?.length > 0 && (
-        <section ref={postsRef} className="py-16 md:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {(digiPosts.title || digiPosts.subtitle) && (
-              <div className={`text-center mb-12 transition-all ${postsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms` }}>
-                {digiPosts.title && (
-                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    {digiPosts.title}
-                  </h2>
-                )}
-                {digiPosts.subtitle && (
-                  <p className="text-gray-600 max-w-2xl mx-auto">
-                    {digiPosts.subtitle}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Slideshow Container */}
-            <div className={`relative transition-all ${postsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms`, transitionDelay: '200ms' }}>
-              {/* Slider - 2 per row on mobile, 3 per row on desktop */}
-              <div 
-                ref={slideRef}
-                className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
-                style={{ scrollBehavior: 'smooth' }}
-              >
-                {digiPosts.posts.map((post, index) => {
-                  // Handle both Cloudinary URLs and local URLs
-                  const imageUrl = post.image?.startsWith('http') 
-                    ? post.image 
-                    : post.image?.startsWith('/uploads') 
-                      ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${post.image}`
-                      : post.image;
-                  if (!imageUrl) return null;
-                  return (
-                  <div 
-                    key={index}
-                    className="flex-shrink-0 snap-start w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.75rem)]"
-                  >
-                    <div className="rounded-xl overflow-hidden shadow-lg group bg-white h-full flex flex-col">
-                      <div className="overflow-hidden">
-                        <img 
-                          src={imageUrl} 
-                          alt={post.caption || `Post ${index + 1}`}
-                          className="w-full h-52 sm:h-60 md:h-72 object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      {post.caption && (
-                        <div className="p-4 bg-white">
-                          <p className="text-gray-700 text-sm font-medium">{post.caption}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  );
-                })}
-              </div>
-
-              {/* Navigation Arrows */}
-              {digiPosts.posts.length > 2 && (
-                <>
-                  <button 
-                    onClick={() => {
-                      const container = slideRef.current;
-                      if (container) {
-                        const cardWidth = container.querySelector('div')?.offsetWidth || 300;
-                        container.scrollBy({ left: -(cardWidth + 16), behavior: 'smooth' });
-                      }
-                    }}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors z-10"
-                    style={{ color: colors[600] }}
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </button>
-                  <button 
-                    onClick={() => {
-                      const container = slideRef.current;
-                      if (container) {
-                        const cardWidth = container.querySelector('div')?.offsetWidth || 300;
-                        container.scrollBy({ left: cardWidth + 16, behavior: 'smooth' });
-                      }
-                    }}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors z-10"
-                    style={{ color: colors[600] }}
-                  >
-                    <ChevronRight className="w-6 h-6" />
-                  </button>
-                </>
-              )}
-            </div>
           </div>
         </section>
       )}

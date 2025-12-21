@@ -87,29 +87,34 @@ const initDatabase = async () => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- Create indexes
+      -- Create indexes (basic ones that always exist)
       CREATE INDEX IF NOT EXISTS idx_houses_location ON houses(location);
       CREATE INDEX IF NOT EXISTS idx_houses_vacancy ON houses(vacancy_status);
       CREATE INDEX IF NOT EXISTS idx_houses_type ON houses(house_type);
       CREATE INDEX IF NOT EXISTS idx_house_images_house_id ON house_images(house_id);
       CREATE INDEX IF NOT EXISTS idx_pages_slug ON pages(slug);
-      CREATE INDEX IF NOT EXISTS idx_houses_property_type ON houses(property_type);
-      CREATE INDEX IF NOT EXISTS idx_houses_listing_type ON houses(listing_type);
     `);
 
     console.log('✅ Database tables initialized');
 
     // Add new columns if they don't exist (migration for existing databases)
     try {
-      await db.query(`
-        ALTER TABLE houses ADD COLUMN IF NOT EXISTS property_type VARCHAR(20) DEFAULT 'house';
-        ALTER TABLE houses ADD COLUMN IF NOT EXISTS listing_type VARCHAR(20) DEFAULT 'rent';
-        ALTER TABLE houses ADD COLUMN IF NOT EXISTS size_acres DECIMAL(10, 2);
-        ALTER TABLE houses ADD COLUMN IF NOT EXISTS dimensions VARCHAR(50);
-      `);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS property_type VARCHAR(20) DEFAULT 'house'`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS listing_type VARCHAR(20) DEFAULT 'rent'`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS size_acres DECIMAL(10, 2)`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS dimensions VARCHAR(50)`);
       console.log('✅ Property columns migration complete');
     } catch (err) {
-      // Columns may already exist
+      console.log('Migration note:', err.message);
+    }
+
+    // Create indexes for new columns (after migration)
+    try {
+      await db.query(`CREATE INDEX IF NOT EXISTS idx_houses_property_type ON houses(property_type)`);
+      await db.query(`CREATE INDEX IF NOT EXISTS idx_houses_listing_type ON houses(listing_type)`);
+      console.log('✅ New column indexes created');
+    } catch (err) {
+      // Indexes may already exist
     }
 
     // Create default admin if not exists

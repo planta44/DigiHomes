@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Home, Building, ArrowRight, Filter } from 'lucide-react';
+import { Search, MapPin, Home, Building, ArrowRight, DollarSign, Ruler } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
@@ -11,27 +11,40 @@ const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [houseTypes, setHouseTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ location: '', property_type: '' });
+  const [filters, setFilters] = useState({ 
+    search: '',
+    location: '', 
+    property_type: '',
+    house_type: '',
+    min_price: '',
+    max_price: '',
+    bedrooms: ''
+  });
   const { colors } = useTheme();
   const [heroRef, heroVisible] = useScrollAnimation(0.1, true);
   const [contentRef, contentVisible] = useScrollAnimation(0.1, true);
-  const [propertiesRef, propertiesVisible] = useScrollAnimation(0.1, true);
+  const [propertiesRef, propertiesVisible] = useScrollAnimation(0.01, true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const fetchData = async () => {
       try {
-        const [pageRes, propertiesRes, locationsRes] = await Promise.all([
+        const [pageRes, propertiesRes, locationsRes, typesRes] = await Promise.all([
           api.get('/pages/buy').catch(() => ({ data: null })),
           api.get('/houses').catch(() => ({ data: [] })),
-          api.get('/settings/locations').catch(() => ({ data: [] }))
+          api.get('/settings/locations').catch(() => ({ data: [] })),
+          api.get('/settings/house-types').catch(() => ({ data: [] }))
         ]);
         setPageData(pageRes.data);
         // Filter to only show properties for sale (listing_type='buy')
         const allProperties = propertiesRes.data || [];
-        setProperties(allProperties.filter(p => p.listing_type === 'buy' && p.vacancy_status === 'available'));
+        setProperties(allProperties.filter(p => 
+          (p.listing_type === 'buy' || !p.listing_type) && p.vacancy_status === 'available'
+        ));
         setLocations(locationsRes.data);
+        setHouseTypes(typesRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -43,13 +56,20 @@ const BuyPage = () => {
 
   // Filter properties based on selected filters
   const filteredProperties = properties.filter(p => {
+    const matchesSearch = !filters.search || 
+      p.title?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      p.description?.toLowerCase().includes(filters.search.toLowerCase());
     const matchesLocation = !filters.location || p.location === filters.location;
-    const matchesType = !filters.property_type || p.property_type === filters.property_type;
-    return matchesLocation && matchesType;
+    const matchesPropertyType = !filters.property_type || p.property_type === filters.property_type;
+    const matchesHouseType = !filters.house_type || p.house_type === filters.house_type;
+    const matchesMinPrice = !filters.min_price || p.rent_price >= parseFloat(filters.min_price);
+    const matchesMaxPrice = !filters.max_price || p.rent_price <= parseFloat(filters.max_price);
+    const matchesBedrooms = !filters.bedrooms || p.bedrooms >= parseInt(filters.bedrooms);
+    return matchesSearch && matchesLocation && matchesPropertyType && matchesHouseType && matchesMinPrice && matchesMaxPrice && matchesBedrooms;
   });
 
   const content = pageData?.content || {
-    hero: { title: '', subtitle: '', backgroundImage: '' },
+    hero: { title: 'Properties For Sale', subtitle: 'Find your dream home or investment property', backgroundImage: '' },
     sections: [],
     callToAction: {}
   };
@@ -91,27 +111,134 @@ const BuyPage = () => {
             <p className="text-gray-600">Browse available properties for purchase</p>
           </div>
 
-          {/* Filters */}
-          <div className={`flex flex-wrap gap-4 mb-8 transition-all duration-700 delay-100 ${propertiesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <select
-              value={filters.location}
-              onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-              className="px-4 py-2 rounded-lg border border-gray-300 bg-white min-w-[150px]"
-            >
-              <option value="">All Locations</option>
-              {locations.map(loc => (
-                <option key={loc.id} value={loc.name}>{loc.name}</option>
-              ))}
-            </select>
-            <select
-              value={filters.property_type}
-              onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value }))}
-              className="px-4 py-2 rounded-lg border border-gray-300 bg-white min-w-[150px]"
-            >
-              <option value="">All Types</option>
-              <option value="house">Houses</option>
-              <option value="land">Land</option>
-            </select>
+          {/* Filters - Similar to Available Houses */}
+          <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 transition-all duration-700 delay-100 ${propertiesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Search */}
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={filters.search}
+                    onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                    placeholder="Search properties..."
+                    className="input-field pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <select
+                    value={filters.location}
+                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                    className="input-field pl-10 appearance-none cursor-pointer"
+                  >
+                    <option value="">All Locations</option>
+                    {locations.map(loc => (
+                      <option key={loc.id} value={loc.name}>{loc.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Property Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <select
+                    value={filters.property_type}
+                    onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value }))}
+                    className="input-field pl-10 appearance-none cursor-pointer"
+                  >
+                    <option value="">All Types</option>
+                    <option value="house">Houses</option>
+                    <option value="land">Land</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* House Type - Only show if property_type is house or empty */}
+              {filters.property_type !== 'land' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">House Type</label>
+                  <div className="relative">
+                    <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <select
+                      value={filters.house_type}
+                      onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
+                      className="input-field pl-10 appearance-none cursor-pointer"
+                    >
+                      <option value="">All House Types</option>
+                      {houseTypes.map(type => (
+                        <option key={type.id} value={type.name}>{type.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Bedrooms - Only show if property_type is house or empty */}
+              {filters.property_type !== 'land' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                  <select
+                    value={filters.bedrooms}
+                    onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
+                    className="input-field appearance-none cursor-pointer"
+                  >
+                    <option value="">Any</option>
+                    <option value="1">1+</option>
+                    <option value="2">2+</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Min Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Min Price (KES)</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="number"
+                    value={filters.min_price}
+                    onChange={(e) => setFilters(prev => ({ ...prev, min_price: e.target.value }))}
+                    placeholder="Min"
+                    className="input-field pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Max Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Max Price (KES)</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="number"
+                    value={filters.max_price}
+                    onChange={(e) => setFilters(prev => ({ ...prev, max_price: e.target.value }))}
+                    placeholder="Max"
+                    className="input-field pl-10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Results count */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-gray-600">
+                Showing <span className="font-semibold text-gray-900">{filteredProperties.length}</span> properties for sale
+              </p>
+            </div>
           </div>
 
           {loading ? (
