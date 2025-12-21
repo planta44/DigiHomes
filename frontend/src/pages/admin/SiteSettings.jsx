@@ -383,32 +383,57 @@ const SiteSettings = () => {
                   </div>
                 </div>
 
-                {/* Stats Ribbon Settings */}
+                {/* Stats Ribbon Settings - New Approach */}
                 <div className="border-t pt-4">
-                  <h4 className="font-medium text-sm mb-3">Stats Ribbon Settings (Homepage)</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Background Color</label>
-                      <div className="flex gap-2">
-                        <input type="color" value={settings.hero_content.statsRibbonColor || '#000000'} 
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: e.target.value }
-                          }))} className="w-10 h-10 rounded cursor-pointer border" />
-                        <input type="text" value={settings.hero_content.statsRibbonColor || '#000000'} 
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev, hero_content: { ...prev.hero_content, statsRibbonColor: e.target.value }
-                          }))} className="input-field flex-1 text-sm" placeholder="#000000" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Ribbon Opacity: {(settings.hero_content.statsRibbonOpacity ?? 0.3).toFixed(1)}</label>
-                      <input type="range" min="0" max="1" step="0.1" value={settings.hero_content.statsRibbonOpacity ?? 0.3}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev, hero_content: { ...prev.hero_content, statsRibbonOpacity: parseFloat(e.target.value) }
-                        }))} className="w-full mt-2" />
-                    </div>
+                  <h4 className="font-medium text-sm mb-3">Stats Ribbon Background</h4>
+                  <p className="text-xs text-gray-500 mb-3">Choose a preset style or customize your own</p>
+                  
+                  {/* Preset Options */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    {[
+                      { name: 'Dark', bg: 'rgba(0,0,0,0.7)', preview: 'bg-gray-900' },
+                      { name: 'Primary', bg: 'rgba(37,99,235,0.85)', preview: 'bg-blue-600' },
+                      { name: 'Gradient Dark', bg: 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(30,30,30,0.9))', preview: 'bg-gradient-to-br from-gray-900 to-gray-800' },
+                      { name: 'Glass', bg: 'rgba(255,255,255,0.1)', preview: 'bg-white/20' }
+                    ].map((preset) => (
+                      <button
+                        key={preset.name}
+                        type="button"
+                        onClick={() => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, statsRibbonStyle: preset.bg }
+                        }))}
+                        className={`p-3 rounded-lg border-2 transition-all ${
+                          settings.hero_content.statsRibbonStyle === preset.bg 
+                            ? 'border-primary-500 ring-2 ring-primary-200' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className={`h-8 rounded ${preset.preview} mb-2`}></div>
+                        <span className="text-xs font-medium text-gray-700">{preset.name}</span>
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">Set opacity to 0 for fully transparent (blur only). The ribbon will blur against the hero background image.</p>
+
+                  {/* Custom RGBA Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Custom Background (CSS)</label>
+                    <input 
+                      type="text" 
+                      value={settings.hero_content.statsRibbonStyle || 'rgba(0,0,0,0.7)'} 
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev, hero_content: { ...prev.hero_content, statsRibbonStyle: e.target.value }
+                      }))} 
+                      className="input-field text-sm" 
+                      placeholder="rgba(0,0,0,0.7) or linear-gradient(...)" 
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Use rgba(), hex, or CSS gradients</p>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="mt-4 p-4 rounded-lg text-white text-center" style={{ background: settings.hero_content.statsRibbonStyle || 'rgba(0,0,0,0.7)' }}>
+                    <span className="text-2xl font-bold">100+</span>
+                    <p className="text-sm opacity-80">Preview</p>
+                  </div>
                 </div>
 
                 {/* Hamburger Menu Text Colors */}

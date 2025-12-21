@@ -19,7 +19,7 @@ const HouseCard = ({ house }) => {
   };
 
   return (
-    <div className="card group">
+    <div className="card group shadow-lg hover:shadow-xl transition-shadow duration-300">
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img

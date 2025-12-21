@@ -108,26 +108,22 @@ const createHouse = async (req, res) => {
       return res.status(400).json({ error: 'Title, location, and price are required' });
     }
 
-    // Try with new columns first, fall back to old schema if columns don't exist
-    try {
-      const result = await db.query(
-        `INSERT INTO houses (title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-         RETURNING *`,
-        [title, description, location, house_type || '', property_type || 'house', listing_type || 'rent', bedrooms || 1, bathrooms || 1, size_acres || null, dimensions || null, rent_price, vacancy_status || 'available', featured || false]
-      );
-      return res.status(201).json(result.rows[0]);
-    } catch (columnError) {
-      // Fallback to old schema without new columns
-      console.log('Using fallback schema for create:', columnError.message);
-      const result = await db.query(
-        `INSERT INTO houses (title, description, location, house_type, bedrooms, bathrooms, rent_price, vacancy_status, featured)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-         RETURNING *`,
-        [title, description, location, house_type || '', bedrooms || 1, bathrooms || 1, rent_price, vacancy_status || 'available', featured || false]
-      );
-      return res.status(201).json(result.rows[0]);
-    }
+    // Convert empty strings to null for numeric fields
+    const cleanSizeAcres = size_acres === '' || size_acres === undefined ? null : parseFloat(size_acres) || null;
+    const cleanBedrooms = bedrooms === '' || bedrooms === undefined ? 1 : parseInt(bedrooms) || 1;
+    const cleanBathrooms = bathrooms === '' || bathrooms === undefined ? 1 : parseInt(bathrooms) || 1;
+    const cleanRentPrice = parseFloat(rent_price) || 0;
+    const cleanDimensions = dimensions === '' || dimensions === undefined ? null : dimensions;
+    const cleanListingType = listing_type || 'rent';
+    const cleanPropertyType = property_type || 'house';
+
+    const result = await db.query(
+      `INSERT INTO houses (title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       RETURNING *`,
+      [title, description, location, house_type || '', cleanPropertyType, cleanListingType, cleanBedrooms, cleanBathrooms, cleanSizeAcres, cleanDimensions, cleanRentPrice, vacancy_status || 'available', featured || false]
+    );
+    return res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Create house error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
@@ -145,50 +141,36 @@ const updateHouse = async (req, res) => {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    // Try with new columns first, fall back to old schema if columns don't exist
-    try {
-      const result = await db.query(
-        `UPDATE houses 
-         SET title = COALESCE($1, title),
-             description = COALESCE($2, description),
-             location = COALESCE($3, location),
-             house_type = COALESCE($4, house_type),
-             property_type = COALESCE($5, property_type),
-             listing_type = COALESCE($6, listing_type),
-             bedrooms = COALESCE($7, bedrooms),
-             bathrooms = COALESCE($8, bathrooms),
-             size_acres = $9,
-             dimensions = $10,
-             rent_price = COALESCE($11, rent_price),
-             vacancy_status = COALESCE($12, vacancy_status),
-             featured = COALESCE($13, featured),
-             updated_at = CURRENT_TIMESTAMP
-         WHERE id = $14
-         RETURNING *`,
-        [title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, id]
-      );
-      return res.json(result.rows[0]);
-    } catch (columnError) {
-      // Fallback to old schema without new columns
-      console.log('Using fallback schema for update:', columnError.message);
-      const result = await db.query(
-        `UPDATE houses 
-         SET title = COALESCE($1, title),
-             description = COALESCE($2, description),
-             location = COALESCE($3, location),
-             house_type = COALESCE($4, house_type),
-             bedrooms = COALESCE($5, bedrooms),
-             bathrooms = COALESCE($6, bathrooms),
-             rent_price = COALESCE($7, rent_price),
-             vacancy_status = COALESCE($8, vacancy_status),
-             featured = COALESCE($9, featured),
-             updated_at = CURRENT_TIMESTAMP
-         WHERE id = $10
-         RETURNING *`,
-        [title, description, location, house_type, bedrooms, bathrooms, rent_price, vacancy_status, featured, id]
-      );
-      return res.json(result.rows[0]);
-    }
+    // Convert empty strings to null for numeric fields
+    const cleanSizeAcres = size_acres === '' || size_acres === undefined ? null : size_acres;
+    const cleanBedrooms = bedrooms === '' || bedrooms === undefined ? null : parseInt(bedrooms) || null;
+    const cleanBathrooms = bathrooms === '' || bathrooms === undefined ? null : parseInt(bathrooms) || null;
+    const cleanRentPrice = rent_price === '' || rent_price === undefined ? null : parseFloat(rent_price) || null;
+    const cleanDimensions = dimensions === '' || dimensions === undefined ? null : dimensions;
+    const cleanListingType = listing_type || 'rent';
+    const cleanPropertyType = property_type || 'house';
+
+    const result = await db.query(
+      `UPDATE houses 
+       SET title = COALESCE($1, title),
+           description = COALESCE($2, description),
+           location = COALESCE($3, location),
+           house_type = COALESCE($4, house_type),
+           property_type = $5,
+           listing_type = $6,
+           bedrooms = $7,
+           bathrooms = $8,
+           size_acres = $9,
+           dimensions = $10,
+           rent_price = COALESCE($11, rent_price),
+           vacancy_status = COALESCE($12, vacancy_status),
+           featured = COALESCE($13, featured),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $14
+       RETURNING *`,
+      [title, description, location, house_type, cleanPropertyType, cleanListingType, cleanBedrooms, cleanBathrooms, cleanSizeAcres, cleanDimensions, cleanRentPrice, vacancy_status, featured, id]
+    );
+    return res.json(result.rows[0]);
   } catch (error) {
     console.error('Update house error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });

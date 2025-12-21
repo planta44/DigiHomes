@@ -41,7 +41,7 @@ const FeatureCard = ({ feature, index, isVisible, animSettings }) => {
   const stagger = animSettings?.staggerDelay || 100;
   return (
     <div 
-      className={`text-center p-6 rounded-xl hover:bg-gray-50 transition-all ${
+      className={`text-center p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all ${
         isVisible 
           ? 'opacity-100 translate-y-0' 
           : 'opacity-0 translate-y-10'
@@ -131,12 +131,11 @@ const HomePage = () => {
     overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
     overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6,
     statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe',
-    statsRibbonColor: settings?.hero_content?.statsRibbonColor || '#000000',
-    statsRibbonOpacity: settings?.hero_content?.statsRibbonOpacity ?? 0.3
+    statsRibbonStyle: settings?.hero_content?.statsRibbonStyle || 'rgba(0,0,0,0.7)'
   };
 
-  // Compute stats ribbon background with proper opacity
-  const statsRibbonBg = hexToRgba(heroContent.statsRibbonColor, heroContent.statsRibbonOpacity);
+  // Stats ribbon background - now uses direct CSS value
+  const statsRibbonBg = heroContent.statsRibbonStyle;
   const featuresSection = settings?.features_section || { title: 'Why Choose DIGIHOMES?', subtitle: "We're committed to making your house-hunting experience smooth and successful." };
   const housesSection = settings?.houses_section || { title: 'Available Houses', subtitle: 'Explore our selection of quality rental properties' };
   const locationsSection = settings?.locations_section || {
@@ -215,10 +214,7 @@ const HomePage = () => {
       <section 
         ref={statsRef} 
         className="py-8 md:py-12 backdrop-blur-md relative"
-        style={{ 
-          backgroundColor: statsRibbonBg,
-          boxShadow: 'inset 0 0 0 2000px ' + statsRibbonBg
-        }}
+        style={{ background: statsRibbonBg }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">

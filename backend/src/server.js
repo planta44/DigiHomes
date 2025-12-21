@@ -9,6 +9,7 @@ const newsletterRoutes = require('./routes/newsletter.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const settingsRoutes = require('./routes/settings.routes');
 const pagesRoutes = require('./routes/pages.routes');
+const reelsRoutes = require('./routes/reels.routes');
 const initDatabase = require('./config/initDb');
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/pages', pagesRoutes);
+app.use('/api/reels', reelsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

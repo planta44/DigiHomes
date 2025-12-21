@@ -11,7 +11,8 @@ import ContactPage from './pages/ContactPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import ServicesPage from './pages/ServicesPage';
 import BuyPage from './pages/BuyPage';
-import RentPage from './pages/RentPage';
+import RentalsPage from './pages/RentalsPage';
+import DigiReelsPage from './pages/DigiReelsPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -20,6 +21,7 @@ import AddEditHouse from './pages/admin/AddEditHouse';
 import Subscribers from './pages/admin/Subscribers';
 import SiteSettings from './pages/admin/SiteSettings';
 import ManagePages from './pages/admin/ManagePages';
+import ManageReels from './pages/admin/ManageReels';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -46,7 +48,8 @@ function App() {
           <Route path="/houses/:id" element={<HouseDetailsPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/buy" element={<BuyPage />} />
-          <Route path="/rent" element={<RentPage />} />
+          <Route path="/rentals" element={<RentalsPage />} />
+          <Route path="/reels" element={<DigiReelsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
 
@@ -84,6 +87,11 @@ function App() {
           <Route path="/admin/pages" element={
             <ProtectedRoute>
               <ManagePages />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/reels" element={
+            <ProtectedRoute>
+              <ManageReels />
             </ProtectedRoute>
           } />
         </Routes>

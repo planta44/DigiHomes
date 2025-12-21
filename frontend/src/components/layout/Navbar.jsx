@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Building, Phone, Briefcase, ShoppingBag, Key } from 'lucide-react';
+import { Menu, X, Home, Building, Phone, Briefcase, ShoppingBag, Key, Play } from 'lucide-react';
 import api from '../../config/api';
 
 const Navbar = () => {
@@ -56,7 +56,8 @@ const Navbar = () => {
     { path: '/houses', label: 'Houses', icon: Building },
     { path: '/services', label: 'Services', icon: Briefcase },
     { path: '/buy', label: 'Buy', icon: ShoppingBag },
-    { path: '/rent', label: 'Rent', icon: Key },
+    { path: '/rentals', label: 'Rentals', icon: Key },
+    { path: '/reels', label: 'Reels', icon: Play },
     { path: '/contact', label: 'Contact', icon: Phone },
   ];
 

@@ -87,6 +87,20 @@ const initDatabase = async () => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      -- Digi Reels table for video/image posts
+      CREATE TABLE IF NOT EXISTS digi_reels (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        media_url VARCHAR(500) NOT NULL,
+        media_type VARCHAR(20) DEFAULT 'image',
+        thumbnail_url VARCHAR(500),
+        is_active BOOLEAN DEFAULT true,
+        display_order INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       -- Create indexes (basic ones that always exist)
       CREATE INDEX IF NOT EXISTS idx_houses_location ON houses(location);
       CREATE INDEX IF NOT EXISTS idx_houses_vacancy ON houses(vacancy_status);
