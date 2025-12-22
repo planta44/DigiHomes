@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
-import { useInView, useScrollAnimation } from '../hooks/useScrollAnimation';
+import { usePopAnimation } from '../hooks/useAnimations';
 
 const ContactPage = () => {
-  // Hero animation
-  const [heroRef, heroVisible] = useInView();
-  const [contentRef, contentVisible] = useScrollAnimation();
+  // Animation hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
+  const [contentRef, contentAnimated] = usePopAnimation();
   
   const [settings, setSettings] = useState({
     contact_page: {
@@ -63,8 +63,8 @@ const ContactPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className={`text-3xl md:text-4xl font-bold mb-4 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>{contact_page.title}</h1>
-          <p className={`text-white/80 max-w-2xl mx-auto transition-all duration-700 delay-150 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h1 className={`text-3xl md:text-4xl font-bold mb-4 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>{contact_page.title}</h1>
+          <p className={`text-white/80 max-w-2xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}>
             {contact_page.subtitle}
           </p>
         </div>

@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useScrollAnimation, useInView } from '../hooks/useScrollAnimation';
+import { usePopAnimation } from '../hooks/useAnimations';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -25,10 +25,10 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Hero animation
-  const [heroRef, heroVisible] = useInView();
-  const [contentRef, contentVisible] = useScrollAnimation();
-  const [propertiesRef, propertiesVisible] = useScrollAnimation();
+  // Animation hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
+  const [contentRef, contentAnimated] = usePopAnimation();
+  const [propertiesRef, propertiesAnimated] = usePopAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -94,12 +94,12 @@ const BuyPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 
-            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}
           >
             {content.hero.title}
           </h1>
           <p 
-            className={`text-xl md:text-2xl max-w-3xl mx-auto transition-all duration-700 delay-200 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`text-xl md:text-2xl max-w-3xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -110,13 +110,13 @@ const BuyPage = () => {
       {/* Properties For Sale Section */}
       <section ref={propertiesRef} className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`mb-8 transition-all duration-700 ${propertiesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`mb-8 pop-initial ${propertiesAnimated ? 'pop-animated' : ''}`}>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Properties For Sale</h2>
             <p className="text-gray-600">Browse available properties for purchase</p>
           </div>
 
           {/* Filters - Similar to Rent page with More Filters toggle */}
-          <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 transition-all duration-700 delay-100 ${propertiesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 pop-initial pop-delay-2 ${propertiesAnimated ? 'pop-animated' : ''}`}>
             {/* Main Filters - Always visible */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search */}
@@ -304,8 +304,7 @@ const BuyPage = () => {
             {content.sections.map((section, index) => (
               <div 
                 key={index}
-                className={`mb-16 last:mb-0 transition-all duration-700 ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${index * 150}ms` }}
+                className={`mb-16 last:mb-0 pop-initial pop-delay-${Math.min(index + 1, 5)} ${contentAnimated ? 'pop-animated' : ''}`}
               >
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
                 <p className="text-gray-600 text-lg mb-8">{section.description}</p>
@@ -314,8 +313,7 @@ const BuyPage = () => {
                     {section.items.map((item, i) => (
                       <div 
                         key={i}
-                        className={`flex items-center gap-3 p-4 bg-gray-50 rounded-lg transition-all duration-500 ${contentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-                        style={{ transitionDelay: `${(index * 150) + (i * 75)}ms` }}
+                        className={`flex items-center gap-3 p-4 bg-gray-50 rounded-lg card-pop-initial pop-delay-${Math.min(i + 2, 9)} ${contentAnimated ? 'card-pop-animated' : ''}`}
                       >
                         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors[100] }}>
                           <Home className="w-5 h-5" style={{ color: colors[600] }} />

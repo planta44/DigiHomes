@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
 import api from '../config/api';
-import { useInView, useScrollAnimation } from '../hooks/useScrollAnimation';
+import { usePopAnimation } from '../hooks/useAnimations';
 
 const HousesPage = () => {
   const [searchParams] = useSearchParams();
@@ -19,6 +19,10 @@ const HousesPage = () => {
     house_type: '',
     status: ''
   });
+
+  // Animation hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
+  const [cardsRef, cardsAnimated] = usePopAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -65,10 +69,6 @@ const HousesPage = () => {
   };
 
   const availableCount = houses.filter(h => h.vacancy_status === 'available').length;
-  
-  // Animation hooks
-  const [heroRef, heroVisible] = useInView();
-  const [cardsRef, cardsVisible] = useScrollAnimation();
 
   return (
     <PublicLayout>
@@ -77,11 +77,11 @@ const HousesPage = () => {
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60')` }}></div>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className={`flex items-center justify-center gap-3 mb-4 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`flex items-center justify-center gap-3 mb-4 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>
             <Building className="w-8 h-8" />
             <h1 className="text-3xl md:text-4xl font-bold">Available Houses</h1>
           </div>
-          <p className={`text-white/80 max-w-2xl mx-auto transition-all duration-700 delay-150 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <p className={`text-white/80 max-w-2xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}>
             Browse our selection of quality rental properties in Nakuru and Nyahururu
           </p>
         </div>
@@ -117,8 +117,7 @@ const HousesPage = () => {
             {houses.map((house, index) => (
               <div
                 key={house.id}
-                className={`transition-all duration-500 ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className={`card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${cardsAnimated ? 'card-pop-animated' : ''}`}
               >
                 <HouseCard house={house} />
               </div>

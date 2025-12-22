@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useScrollAnimation, useInView } from '../hooks/useScrollAnimation';
+import { usePopAnimation } from '../hooks/useAnimations';
 
 const RentPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -23,9 +23,9 @@ const RentPage = () => {
   const [locations, setLocations] = useState([]);
   const [houseTypes, setHouseTypes] = useState([]);
   const { colors } = useTheme();
-  // Hero animation
-  const [heroRef, heroVisible] = useInView();
-  const [housesRef, housesVisible] = useScrollAnimation();
+  // Animation hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
+  const [housesRef, housesAnimated] = usePopAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -99,12 +99,12 @@ const RentPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 
-            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}
           >
             {content.hero.title}
           </h1>
           <p 
-            className={`text-xl md:text-2xl max-w-3xl mx-auto mb-8 transition-all duration-700 delay-200 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`text-xl md:text-2xl max-w-3xl mx-auto mb-8 pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -116,13 +116,13 @@ const RentPage = () => {
       {/* Properties Grid */}
       <section ref={housesRef} className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`mb-8 transition-all duration-700 ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`mb-8 pop-initial ${housesAnimated ? 'pop-animated' : ''}`}>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Properties For Rent</h2>
             <p className="text-gray-600">Browse available rental properties</p>
           </div>
 
           {/* Filters - Similar to Available Houses */}
-          <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 transition-all duration-700 delay-100 ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 pop-initial pop-delay-2 ${housesAnimated ? 'pop-animated' : ''}`}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Search */}
               <div className="lg:col-span-2">
@@ -256,8 +256,7 @@ const RentPage = () => {
               {filteredHouses.map((house, index) => (
                 <div 
                   key={house.id}
-                  className={`transition-all duration-500 ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
+                  className={`card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${housesAnimated ? 'card-pop-animated' : ''}`}
                 >
                   <HouseCard house={house} />
                 </div>
@@ -273,7 +272,7 @@ const RentPage = () => {
 
           {/* View All Link */}
           <div 
-            className={`mt-12 text-center transition-all duration-700 delay-500 ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`mt-12 text-center pop-initial pop-delay-5 ${housesAnimated ? 'pop-animated' : ''}`}
           >
             <Link
               to="/houses"

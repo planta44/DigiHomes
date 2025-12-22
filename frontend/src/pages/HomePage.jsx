@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -16,123 +16,11 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-
-// Hook for counting up animation - resets and re-animates when trigger changes
-const useCountUp = (end, duration = 2000, trigger = true) => {
-  const [count, setCount] = useState('0');
-  const countRef = useRef(null);
-  const hasAnimatedRef = useRef(false);
-  
-  useEffect(() => {
-    // Reset count when trigger becomes false
-    if (!trigger) {
-      setCount('0');
-      hasAnimatedRef.current = false;
-      if (countRef.current) {
-        cancelAnimationFrame(countRef.current);
-      }
-      return;
-    }
-    
-    // Parse numeric value from string like "100+" or "5+"
-    const numericValue = parseInt(String(end).replace(/[^0-9]/g, '')) || 0;
-    const suffix = String(end).replace(/[0-9]/g, '');
-    
-    let startTime;
-    const animate = (currentTime) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-      const currentCount = Math.floor(progress * numericValue);
-      setCount(currentCount + suffix);
-      
-      if (progress < 1) {
-        countRef.current = requestAnimationFrame(animate);
-      } else {
-        hasAnimatedRef.current = true;
-      }
-    };
-    
-    countRef.current = requestAnimationFrame(animate);
-    
-    return () => {
-      if (countRef.current) {
-        cancelAnimationFrame(countRef.current);
-      }
-    };
-  }, [end, duration, trigger]);
-  
-  return count;
-};
-
-// Hook for detecting when element is visible - always starts visible, tracks scroll for re-animation
-const useInView = (threshold = 0.1) => {
-  const [isInView, setIsInView] = useState(true);
-  const ref = useRef(null);
-  
-  useEffect(() => {
-    const currentRef = ref.current;
-    if (!currentRef) return;
-    
-    // Small delay to let initial render complete
-    const timer = setTimeout(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          setIsInView(entry.isIntersecting);
-        },
-        { threshold: 0.1 }
-      );
-      
-      observer.observe(currentRef);
-      
-      return () => observer.disconnect();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
-  return [ref, isInView];
-};
-
-// Hook for scroll-triggered animations - always visible, animation is enhancement only
-const useScrollAnimation = (delay = 0) => {
-  const [isVisible, setIsVisible] = useState(true);
-  const ref = useRef(null);
-  
-  useEffect(() => {
-    const currentRef = ref.current;
-    if (!currentRef) return;
-    
-    const timer = setTimeout(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => setIsVisible(true), delay);
-          }
-        },
-        { threshold: 0.1 }
-      );
-      
-      observer.observe(currentRef);
-      
-      return () => observer.disconnect();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [delay]);
-  
-  return [ref, isVisible];
-};
-
-// Hook for staggered children animations - items always visible
-const useStaggeredAnimation = (itemCount) => {
-  const [visibleItems] = useState(() => Array.from({ length: Math.max(itemCount, 20) }, (_, i) => i));
-  const ref = useRef(null);
-  return [ref, visibleItems];
-};
+import { usePopAnimation, useStaggerAnimation, useCountUp } from '../hooks/useAnimations';
 
 // Stat item with count-up animation
-const StatItem = ({ stat, isVisible, numberColor, textColor }) => {
-  const animatedValue = useCountUp(stat.value, 2000, isVisible);
+const StatItem = ({ stat, shouldAnimate, numberColor, textColor }) => {
+  const animatedValue = useCountUp(stat.value, 2000, shouldAnimate);
   return (
     <div className="text-center">
       <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>
@@ -169,21 +57,14 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Hero animation
-  const [heroRef, heroVisible] = useInView();
-  
-  // Stats animation
-  const [statsRef, statsVisible] = useInView();
-  
-  // Section animations with staggered delays
-  const [featuresHeaderRef, featuresHeaderVisible] = useScrollAnimation(0);
-  const [featuresRef, featuresVisible] = useScrollAnimation(100);
-  const [housesHeaderRef, housesHeaderVisible] = useScrollAnimation(0);
-  const [housesRef, housesVisible] = useScrollAnimation(100);
-  const [locationsHeaderRef, locationsHeaderVisible] = useScrollAnimation(0);
-  const [locationsRef, locationsVisible] = useScrollAnimation(100);
-  const [aboutRef, aboutVisible] = useScrollAnimation(0);
-  const [ctaRef, ctaVisible] = useScrollAnimation(0);
+  // Animation hooks - using new reliable hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
+  const [statsRef, statsAnimated] = usePopAnimation();
+  const [featuresRef, featuresAnimated] = usePopAnimation();
+  const [housesRef, housesAnimated] = usePopAnimation();
+  const [locationsRef, locationsAnimated] = usePopAnimation();
+  const [aboutRef, aboutAnimated] = usePopAnimation();
+  const [ctaRef, ctaAnimated] = usePopAnimation();
 
   useEffect(() => {
     fetchData();
@@ -369,14 +250,14 @@ const HomePage = () => {
         <div className="hero-content-wrapper absolute left-0 right-0 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
-              <h1 className={`hero-pop-up text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left ${heroVisible ? 'visible delay-1' : ''}`}>
+              <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>
                 {heroContent.title}{' '}
                 <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
               </h1>
-              <p className={`hero-pop-up text-lg md:text-xl mb-6 max-w-2xl text-left ${heroVisible ? 'visible delay-2' : ''}`} style={{ color: heroContent.descriptionHighlightColor }}>
+              <p className={`text-lg md:text-xl mb-6 max-w-2xl text-left pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`} style={{ color: heroContent.descriptionHighlightColor }}>
                 {heroContent.description}
               </p>
-              <div className={`hero-pop-up flex flex-wrap gap-4 justify-start ${heroVisible ? 'visible delay-3' : ''}`}>
+              <div className={`flex flex-wrap gap-4 justify-start pop-initial pop-delay-3 ${heroAnimated ? 'pop-animated' : ''}`}>
                 <Link 
                   to="/houses" 
                   className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
@@ -415,8 +296,8 @@ const HomePage = () => {
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
-            ref={featuresHeaderRef}
-            className={`text-center mb-12 transition-all duration-700 ${featuresHeaderVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            ref={featuresRef}
+            className={`text-center mb-12 pop-initial ${featuresAnimated ? 'pop-animated' : ''}`}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
@@ -426,12 +307,11 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div ref={featuresRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className={`transition-all duration-500 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className={`card-pop-initial pop-delay-${index + 2} ${featuresAnimated ? 'card-pop-animated' : ''}`}
               >
                 <FeatureCard feature={feature} />
               </div>
@@ -456,7 +336,7 @@ const HomePage = () => {
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
-                <StatItem key={`${index}-${statsVisible}`} stat={stat} isVisible={statsVisible} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
+                <StatItem key={index} stat={stat} shouldAnimate={statsAnimated} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
               ))}
             </div>
           </div>
@@ -467,8 +347,8 @@ const HomePage = () => {
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
-            ref={housesHeaderRef}
-            className={`flex flex-col md:flex-row md:items-end justify-between mb-10 transition-all duration-700 ${housesHeaderVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            ref={housesRef}
+            className={`flex flex-col md:flex-row md:items-end justify-between mb-10 pop-initial ${housesAnimated ? 'pop-animated' : ''}`}
           >
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -492,12 +372,11 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : featuredHouses.length > 0 ? (
-            <div ref={housesRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredHouses.map((house, index) => (
                 <div 
                   key={house.id}
-                  className={`transition-all duration-500 ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
+                  className={`card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${housesAnimated ? 'card-pop-animated' : ''}`}
                 >
                   <HouseCard house={house} />
                 </div>
@@ -515,8 +394,8 @@ const HomePage = () => {
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
-            ref={locationsHeaderRef}
-            className={`text-center mb-12 transition-all duration-700 ${locationsHeaderVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            ref={locationsRef}
+            className={`text-center mb-12 pop-initial ${locationsAnimated ? 'pop-animated' : ''}`}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
@@ -526,7 +405,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div ref={locationsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(locationsSection.locations || []).map((loc, index) => {
               const imageUrl = loc.image?.startsWith('http') 
                 ? loc.image 
@@ -536,8 +415,7 @@ const HomePage = () => {
               return (
               <div 
                 key={loc.name || index}
-                className={`relative rounded-2xl overflow-hidden group h-64 transition-all duration-500 ${locationsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${index * 150}ms` }}
+                className={`relative rounded-2xl overflow-hidden group h-64 card-pop-initial pop-delay-${index + 2} ${locationsAnimated ? 'card-pop-animated' : ''}`}
               >
                 <img 
                   src={imageUrl} 
@@ -569,7 +447,7 @@ const HomePage = () => {
       {(aboutSection.title || aboutSection.content) && (
         <section ref={aboutRef} className="py-16 md:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center transition-all duration-700 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pop-initial ${aboutAnimated ? 'pop-animated' : ''}`}>
               {/* Image Side */}
               {aboutSection.image && (
                 <div className="relative">
@@ -652,14 +530,14 @@ const HomePage = () => {
       {/* CTA Section */}
       <section ref={ctaRef} className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className={`text-3xl md:text-4xl font-bold text-white mb-4 transition-all duration-700 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className={`text-3xl md:text-4xl font-bold text-white mb-4 pop-initial ${ctaAnimated ? 'pop-animated' : ''}`}>
             Ready to Find Your New Home?
           </h2>
-          <p className={`mb-8 max-w-2xl mx-auto transition-all duration-700 delay-100 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ color: colors[100] }}>
+          <p className={`mb-8 max-w-2xl mx-auto pop-initial pop-delay-2 ${ctaAnimated ? 'pop-animated' : ''}`} style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div className={`flex flex-wrap justify-center gap-4 transition-all duration-700 delay-200 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`flex flex-wrap justify-center gap-4 pop-initial pop-delay-3 ${ctaAnimated ? 'pop-animated' : ''}`}>
             <Link 
               to="/houses" 
               className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"

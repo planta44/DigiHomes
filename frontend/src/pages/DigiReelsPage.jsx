@@ -3,7 +3,7 @@ import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } 
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useInView } from '../hooks/useScrollAnimation';
+import { usePopAnimation } from '../hooks/useAnimations';
 
 const DigiReelsPage = () => {
   const [reels, setReels] = useState([]);
@@ -11,8 +11,8 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
-  // Hero animation
-  const [heroRef, heroVisible] = useInView();
+  // Animation hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -90,14 +90,14 @@ const DigiReelsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 className={`text-4xl md:text-6xl font-bold text-white mb-6 transition-all duration-700 delay-100 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h1 className={`text-4xl md:text-6xl font-bold text-white mb-6 pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}>
             Digi Reels
           </h1>
-          <p className={`text-xl text-white/80 max-w-2xl mx-auto transition-all duration-700 delay-200 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <p className={`text-xl text-white/80 max-w-2xl mx-auto pop-initial pop-delay-3 ${heroAnimated ? 'pop-animated' : ''}`}>
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>

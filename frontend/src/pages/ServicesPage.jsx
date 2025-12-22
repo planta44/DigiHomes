@@ -3,7 +3,7 @@ import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefc
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { usePopAnimation } from '../hooks/useAnimations';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
@@ -24,8 +24,9 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  const [heroRef, heroVisible] = useScrollAnimation(0.1, true);
-  const [sectionsRef, sectionsVisible] = useScrollAnimation(0.1, true);
+  // Animation hooks
+  const [heroRef, heroAnimated] = usePopAnimation();
+  const [sectionsRef, sectionsAnimated] = usePopAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,12 +63,12 @@ const ServicesPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 
-            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}
           >
             {content.hero.title}
           </h1>
           <p 
-            className={`text-xl md:text-2xl max-w-3xl mx-auto transition-all duration-700 delay-200 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            className={`text-xl md:text-2xl max-w-3xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -84,10 +85,7 @@ const ServicesPage = () => {
               return (
                 <div 
                   key={index}
-                  className={`bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-all duration-500 ${
-                    sectionsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                  }`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
+                  className={`bg-gray-50 rounded-2xl p-8 hover:shadow-lg card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${sectionsAnimated ? 'card-pop-animated' : ''}`}
                 >
                   <div 
                     className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"
@@ -102,10 +100,7 @@ const ServicesPage = () => {
                       {section.items.map((item, i) => (
                         <li 
                           key={i} 
-                          className={`flex items-center gap-2 text-gray-700 transition-all duration-500 ${
-                            sectionsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                          }`}
-                          style={{ transitionDelay: `${(index * 100) + (i * 50)}ms` }}
+                          className="flex items-center gap-2 text-gray-700"
                         >
                           <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                           {item}
