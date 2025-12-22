@@ -3,7 +3,7 @@ import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } 
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { usePopAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation } from '../hooks/useAnimations';
 
 const DigiReelsPage = () => {
   const [reels, setReels] = useState([]);
@@ -11,10 +11,10 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
-  // Animation hooks - SAFE: content visible by default
-  const [heroRef, heroAnim] = usePopAnimation(0);
-  const [heroRef2, heroAnim2] = usePopAnimation(1);
-  const [heroRef3, heroAnim3] = usePopAnimation(2);
+  // Hero animations - re-animate when scrolling back to top
+  const [heroRef, heroAnim] = useHeroAnimation(0);
+  const [heroRef2, heroAnim2] = useHeroAnimation(1);
+  const [heroRef3, heroAnim3] = useHeroAnimation(2);
 
   useEffect(() => {
     window.scrollTo(0, 0);

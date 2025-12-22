@@ -5,6 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
+import { useHeroAnimation, useStaggerAnimation } from '../hooks/useAnimations';
 
 const RentalsPage = () => {
   const [properties, setProperties] = useState([]);
@@ -16,6 +17,12 @@ const RentalsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCards, setVisibleCards] = useState([]);
   const { colors } = useTheme();
+  
+  // Hero animations - re-animate when scrolling back to top
+  const [heroRef, heroAnim] = useHeroAnimation(0);
+  const [heroRef2, heroAnim2] = useHeroAnimation(1);
+  // Card animations - re-animate on scroll
+  const [cardsRef, getCardClass] = useStaggerAnimation();
   
   const [filters, setFilters] = useState({
     search: '',
@@ -152,10 +159,10 @@ const RentalsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 ref={heroRef} className={`text-4xl md:text-5xl font-bold text-white mb-4 ${heroAnim}`}>
             Find Your Perfect Rental
           </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto mb-8">
+          <p ref={heroRef2} className={`text-xl text-white/80 max-w-2xl mx-auto mb-8 ${heroAnim2}`}>
             Discover quality rental properties in Nakuru and Nyahururu
           </p>
           
@@ -319,12 +326,17 @@ const RentalsPage = () => {
 
         {/* Properties Grid/List */}
         {filteredProperties.length > 0 ? (
-          <div className={viewMode === 'grid' 
-            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' 
-            : 'flex flex-col gap-4'
-          }>
-            {filteredProperties.map((property) => (
-              <HouseCard key={property.id} house={property} />
+          <div 
+            ref={cardsRef}
+            className={viewMode === 'grid' 
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' 
+              : 'flex flex-col gap-4'
+            }
+          >
+            {filteredProperties.map((property, index) => (
+              <div key={property.id} data-anim-item className={getCardClass(index)}>
+                <HouseCard house={property} />
+              </div>
             ))}
           </div>
         ) : (

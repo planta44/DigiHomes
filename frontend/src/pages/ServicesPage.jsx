@@ -3,7 +3,7 @@ import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefc
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { usePopAnimation, useStaggerAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useStaggerAnimation } from '../hooks/useAnimations';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
@@ -24,10 +24,11 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  // Animation hooks - SAFE: content visible by default
-  const [heroRef, heroAnim] = usePopAnimation(0);
-  const [heroRef2, heroAnim2] = usePopAnimation(1);
-  const [sectionsRef, getSectionClass] = useStaggerAnimation(150);
+  // Hero animations - re-animate when scrolling back to top
+  const [heroRef, heroAnim] = useHeroAnimation(0);
+  const [heroRef2, heroAnim2] = useHeroAnimation(1);
+  // Card animations - re-animate on scroll
+  const [sectionsRef, getSectionClass] = useStaggerAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);

@@ -16,15 +16,15 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { usePopAnimation, useStaggerAnimation, useCountUp } from '../hooks/useAnimations';
+import { useHeroAnimation, useStaggerAnimation, useCountUp, useStatsObserver, useSectionAnimation } from '../hooks/useAnimations';
 
-// Stat item with count-up animation
-const StatItem = ({ stat, shouldAnimate, numberColor, textColor }) => {
-  const animatedValue = useCountUp(stat.value, 2000, shouldAnimate);
+// Stat item with count-up animation - re-counts when section comes back into view
+const StatItem = ({ stat, isInView, numberColor, textColor }) => {
+  const animatedValue = useCountUp(stat.value, 2000, isInView);
   return (
     <div className="text-center">
       <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>
-        {animatedValue || stat.value}
+        {animatedValue}
       </div>
       <div className="text-sm md:text-base font-medium uppercase tracking-wider" style={{ color: textColor || '#9ca3af' }}>
         {stat.label}
@@ -57,21 +57,27 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Animation hooks - SAFE: content visible by default, animations added via JS
-  const [heroRef, heroAnim] = usePopAnimation(0);
-  const [heroRef2, heroAnim2] = usePopAnimation(1);
-  const [heroRef3, heroAnim3] = usePopAnimation(2);
-  const [statsRef, statsAnim] = usePopAnimation(0);
-  const [featuresRef, featuresAnim] = usePopAnimation(0);
-  const [featuresGridRef, getFeatureClass] = useStaggerAnimation(100);
-  const [housesRef, housesAnim] = usePopAnimation(0);
-  const [housesGridRef, getHouseClass] = useStaggerAnimation(100);
-  const [locationsRef, locationsAnim] = usePopAnimation(0);
-  const [locationsGridRef, getLocationClass] = useStaggerAnimation(150);
-  const [aboutRef, aboutAnim] = usePopAnimation(0);
-  const [ctaRef, ctaAnim] = usePopAnimation(0);
-  const [ctaRef2, ctaAnim2] = usePopAnimation(1);
-  const [ctaRef3, ctaAnim3] = usePopAnimation(2);
+  // Hero animations - re-animate when scrolling back to top
+  const [heroRef, heroAnim] = useHeroAnimation(0);
+  const [heroRef2, heroAnim2] = useHeroAnimation(1);
+  const [heroRef3, heroAnim3] = useHeroAnimation(2);
+  
+  // Stats section - re-counts when scrolling back into view
+  const [statsRef, statsInView] = useStatsObserver();
+  
+  // Section animations - re-animate on scroll
+  const [featuresRef, featuresAnim] = useSectionAnimation(0);
+  const [featuresGridRef, getFeatureClass] = useStaggerAnimation();
+  const [housesRef, housesAnim] = useSectionAnimation(0);
+  const [housesGridRef, getHouseClass] = useStaggerAnimation();
+  const [locationsRef, locationsAnim] = useSectionAnimation(0);
+  const [locationsGridRef, getLocationClass] = useStaggerAnimation();
+  const [aboutRef, aboutAnim] = useSectionAnimation(0);
+  
+  // CTA animations - re-animate on scroll
+  const [ctaRef, ctaAnim] = useHeroAnimation(0);
+  const [ctaRef2, ctaAnim2] = useHeroAnimation(1);
+  const [ctaRef3, ctaAnim3] = useHeroAnimation(2);
 
   useEffect(() => {
     fetchData();
@@ -344,7 +350,7 @@ const HomePage = () => {
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
-                <StatItem key={index} stat={stat} shouldAnimate={statsAnim.includes('done')} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
+                <StatItem key={index} stat={stat} isInView={statsInView} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
               ))}
             </div>
           </div>

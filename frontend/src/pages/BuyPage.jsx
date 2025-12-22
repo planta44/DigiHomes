@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { usePopAnimation, useStaggerAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useStaggerAnimation, useSectionAnimation } from '../hooks/useAnimations';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -25,13 +25,15 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Animation hooks - SAFE: content visible by default
-  const [heroRef, heroAnim] = usePopAnimation(0);
-  const [heroRef2, heroAnim2] = usePopAnimation(1);
-  const [propertiesRef, propertiesAnim] = usePopAnimation(0);
-  const [propertiesRef2, propertiesAnim2] = usePopAnimation(1);
-  const [cardsRef, getCardClass] = useStaggerAnimation(100);
-  const [contentRef, contentAnim] = usePopAnimation(0);
+  // Hero animations - re-animate when scrolling back to top
+  const [heroRef, heroAnim] = useHeroAnimation(0);
+  const [heroRef2, heroAnim2] = useHeroAnimation(1);
+  // Section animations
+  const [propertiesRef, propertiesAnim] = useSectionAnimation(0);
+  const [propertiesRef2, propertiesAnim2] = useSectionAnimation(1);
+  // Card animations - re-animate on scroll
+  const [cardsRef, getCardClass] = useStaggerAnimation();
+  const [contentRef, contentAnim] = useSectionAnimation(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);

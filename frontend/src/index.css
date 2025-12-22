@@ -109,37 +109,35 @@
   /* SAFE Animation Classes - Only applied via JavaScript */
   /* Content is ALWAYS visible by default. These classes are added by JS after mount. */
   
-  /* Pop animation - ready state (JS adds this first) */
+  /* Pop animation for hero/section elements */
   .anim-pop-ready {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
   
-  /* Pop animation - done state (JS adds this when in viewport) */
   .anim-pop-done {
     opacity: 1 !important;
     transform: translateY(0) !important;
   }
   
-  /* Delay classes for staggered pop animations */
+  /* Card animation - slightly faster for product cards */
+  .anim-card-ready {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+  
+  .anim-card-done {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  
+  /* Delay utility classes */
   .anim-delay-0 { transition-delay: 0ms; }
   .anim-delay-1 { transition-delay: 100ms; }
   .anim-delay-2 { transition-delay: 200ms; }
   .anim-delay-3 { transition-delay: 300ms; }
   .anim-delay-4 { transition-delay: 400ms; }
   .anim-delay-5 { transition-delay: 500ms; }
-  
-  /* Staggered item animation - ready state */
-  .anim-item-ready {
-    opacity: 0;
-    transform: translateY(15px);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-  }
-  
-  /* Staggered item animation - done state */
-  .anim-item-done {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
 }

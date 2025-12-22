@@ -129,6 +129,62 @@ const deleteHouseType = async (req, res) => {
   }
 };
 
+// Get animation settings (public)
+const getAnimationSettings = async (req, res) => {
+  try {
+    const result = await db.query(
+      "SELECT setting_value FROM site_settings WHERE setting_key = 'animation_settings'"
+    );
+    
+    // Default animation settings
+    const defaultSettings = {
+      baseDelay: 100,
+      cardStaggerMultiplier: 1,
+      heroStaggerMultiplier: 1.5,
+      sectionStaggerMultiplier: 1.2
+    };
+    
+    if (result.rows.length > 0 && result.rows[0].setting_value) {
+      const stored = typeof result.rows[0].setting_value === 'string' 
+        ? JSON.parse(result.rows[0].setting_value) 
+        : result.rows[0].setting_value;
+      res.json({ ...defaultSettings, ...stored });
+    } else {
+      res.json(defaultSettings);
+    }
+  } catch (error) {
+    console.error('Get animation settings error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Update animation settings (admin only)
+const updateAnimationSettings = async (req, res) => {
+  try {
+    const { baseDelay, cardStaggerMultiplier, heroStaggerMultiplier, sectionStaggerMultiplier } = req.body;
+    
+    const settings = {
+      baseDelay: Math.max(50, Math.min(500, parseInt(baseDelay) || 100)),
+      cardStaggerMultiplier: Math.max(0.5, Math.min(3, parseFloat(cardStaggerMultiplier) || 1)),
+      heroStaggerMultiplier: Math.max(0.5, Math.min(3, parseFloat(heroStaggerMultiplier) || 1.5)),
+      sectionStaggerMultiplier: Math.max(0.5, Math.min(3, parseFloat(sectionStaggerMultiplier) || 1.2))
+    };
+
+    await db.query(
+      `INSERT INTO site_settings (setting_key, setting_value, updated_at) 
+       VALUES ('animation_settings', $1, CURRENT_TIMESTAMP)
+       ON CONFLICT (setting_key) 
+       DO UPDATE SET setting_value = $1, updated_at = CURRENT_TIMESTAMP`,
+      [JSON.stringify(settings)]
+    );
+
+    res.json(settings);
+  } catch (error) {
+    console.error('Update animation settings error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = {
   getSettings,
   updateSetting,
@@ -137,5 +193,7 @@ module.exports = {
   deleteLocation,
   getHouseTypes,
   addHouseType,
-  deleteHouseType
+  deleteHouseType,
+  getAnimationSettings,
+  updateAnimationSettings
 };

@@ -197,6 +197,7 @@ const SiteSettings = () => {
     { id: 'company', label: 'Company', icon: Building },
     { id: 'footer', label: 'Footer', icon: FileText },
     { id: 'contact', label: 'Contact', icon: Phone },
+    { id: 'animations', label: 'Animations', icon: Zap },
     { id: 'dropdown_options', label: 'Options', icon: MapPin }
   ];
 
@@ -1331,6 +1332,111 @@ const SiteSettings = () => {
 
                 <button onClick={() => handleSave('contact_page', settings.contact_page)} disabled={saving} className="btn-primary">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Contact Page
+                </button>
+              </div>
+            )}
+
+            {/* Animation Settings */}
+            {activeTab === 'animations' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-2">Animation Timing Control</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Control how fast or slow animations appear across the website. Lower values = faster animations.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-4 border rounded-lg bg-gray-50">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Base Delay: {settings.animation_settings.baseDelay || 100}ms
+                    </label>
+                    <input
+                      type="range"
+                      min="50"
+                      max="300"
+                      step="25"
+                      value={settings.animation_settings.baseDelay || 100}
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev,
+                        animation_settings: { ...prev.animation_settings, baseDelay: parseInt(e.target.value) }
+                      }))}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Base timing between staggered animations (50-300ms)</p>
+                  </div>
+
+                  <div className="p-4 border rounded-lg bg-gray-50">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Card Stagger: {settings.animation_settings.cardStaggerMultiplier || 1}x
+                    </label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2"
+                      step="0.1"
+                      value={settings.animation_settings.cardStaggerMultiplier || 1}
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev,
+                        animation_settings: { ...prev.animation_settings, cardStaggerMultiplier: parseFloat(e.target.value) }
+                      }))}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Multiplier for product card animations</p>
+                  </div>
+
+                  <div className="p-4 border rounded-lg bg-gray-50">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Hero Text Stagger: {settings.animation_settings.heroStaggerMultiplier || 1.5}x
+                    </label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="3"
+                      step="0.1"
+                      value={settings.animation_settings.heroStaggerMultiplier || 1.5}
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev,
+                        animation_settings: { ...prev.animation_settings, heroStaggerMultiplier: parseFloat(e.target.value) }
+                      }))}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Multiplier for hero section text animations</p>
+                  </div>
+
+                  <div className="p-4 border rounded-lg bg-gray-50">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Section Stagger: {settings.animation_settings.sectionStaggerMultiplier || 1.2}x
+                    </label>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2"
+                      step="0.1"
+                      value={settings.animation_settings.sectionStaggerMultiplier || 1.2}
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev,
+                        animation_settings: { ...prev.animation_settings, sectionStaggerMultiplier: parseFloat(e.target.value) }
+                      }))}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Multiplier for homepage section animations</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
+                    <HelpCircle className="w-4 h-4" /> How it works
+                  </h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• <strong>Base Delay:</strong> Time between each item appearing (e.g., 100ms between cards)</li>
+                    <li>• <strong>Multipliers:</strong> Adjust speed for different element types (1x = normal, 2x = slower)</li>
+                    <li>• <strong>Safe default:</strong> Current values are optimized for mobile performance</li>
+                  </ul>
+                </div>
+
+                <button onClick={() => handleSave('animation_settings', settings.animation_settings)} disabled={saving} className="btn-primary">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Animation Settings
                 </button>
               </div>
             )}

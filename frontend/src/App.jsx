@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AnimationProvider } from './context/AnimationContext';
 
 // Public Pages
 import HomePage from './pages/HomePage';
@@ -29,19 +30,20 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#333',
-              color: '#fff',
-            },
-          }}
-        />
-        <Routes>
+      <AnimationProvider>
+        <AuthProvider>
+          <Router>
+            <Toaster 
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#333',
+                  color: '#fff',
+                },
+              }}
+            />
+            <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/houses" element={<HousesPage />} />
@@ -95,8 +97,9 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
-        </Router>
-      </AuthProvider>
+          </Router>
+        </AuthProvider>
+      </AnimationProvider>
     </ThemeProvider>
   );
 }
