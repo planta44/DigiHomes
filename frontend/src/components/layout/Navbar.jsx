@@ -80,15 +80,14 @@ const Navbar = () => {
   const firstPart = brandName.slice(0, splitAt);
   const secondPart = brandName.slice(splitAt);
 
-  // Determine if navbar should be transparent (only on homepage when not scrolled)
-  const isTransparent = isHomePage && !isScrolled && !isOpen;
+  // Determine if navbar should be transparent (only on mobile homepage when not scrolled)
+  // Desktop always has white background
+  const isTransparentMobile = isHomePage && !isScrolled && !isOpen;
 
   return (
     <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isTransparent 
-          ? 'bg-transparent' 
-          : 'bg-white shadow-md'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-md ${
+        isTransparentMobile ? 'md:bg-white md:shadow-md bg-transparent shadow-none' : ''
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,29 +105,27 @@ const Navbar = () => {
             <div className="flex items-center">
               <span 
                 className="font-bold text-xl sm:text-2xl transition-colors duration-300"
-                style={{ color: isTransparent ? '#ffffff' : brandSettings.primaryColor }}
+                style={{ color: brandSettings.primaryColor }}
               >
                 {firstPart}
               </span>
               <span 
                 className="font-bold text-xl sm:text-2xl transition-colors duration-300"
-                style={{ color: isTransparent ? '#ffffff' : brandSettings.secondaryColor }}
+                style={{ color: brandSettings.secondaryColor }}
               >
                 {secondPart}
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Always normal colors since desktop has white bg */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`flex items-center gap-2 font-medium transition-colors duration-300 ${
-                  isTransparent
-                    ? (isActive(link.path) ? 'text-white font-semibold' : 'text-white/90 hover:text-white')
-                    : (isActive(link.path) ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600')
+                  isActive(link.path) ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600'
                 }`}
               >
                 <link.icon className="w-4 h-4" />
@@ -140,7 +137,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             className={`md:hidden p-2 rounded-lg z-50 transition-colors duration-300 ${
-              isTransparent ? 'text-white hover:bg-white/20' : 'text-gray-900 hover:bg-gray-100'
+              isTransparentMobile ? 'text-white hover:bg-white/20' : 'text-gray-900 hover:bg-gray-100'
             }`}
             onClick={() => setIsOpen(!isOpen)}
           >

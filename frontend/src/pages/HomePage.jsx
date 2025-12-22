@@ -214,7 +214,8 @@ const HomePage = () => {
           className="absolute inset-0 md:hidden"
           style={{ backgroundColor: heroContent.overlayColorMobile, opacity: heroContent.overlayOpacityMobile }}
         ></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-32 pb-8">
+        {/* Hero content - more top padding on mobile for fixed header */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-32 pb-16 md:pb-24">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               {heroContent.title}{' '}
@@ -242,30 +243,6 @@ const HomePage = () => {
                 <Phone className="w-5 h-5" />
                 Contact Us
               </Link>
-            </div>
-          </div>
-        </div>
-        
-        {/* Stats Section - Inside Hero with Blur, positioned lower */}
-        <div 
-          ref={statsRef} 
-          className="relative mt-16 md:mt-20 py-6 md:py-8 backdrop-blur-lg"
-          style={{ background: statsRibbonBg }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
-              {stats.map((stat, index) => (
-                <StatItem 
-                  key={index} 
-                  value={stat.value} 
-                  label={stat.label} 
-                  isVisible={statsVisible}
-                  index={index}
-                  duration={animSettings.duration}
-                  labelColor={heroContent.statsLabelColor}
-                  numberColor={heroContent.statsNumberColor}
-                />
-              ))}
             </div>
           </div>
         </div>
@@ -300,6 +277,42 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Stats Section - New Design Below Features */}
+      <section 
+        ref={statsRef}
+        className="py-16 md:py-20"
+        style={{ background: `linear-gradient(135deg, ${colors[600]} 0%, ${colors[800]} 100%)` }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div 
+                key={index}
+                className="text-center transition-opacity"
+                style={{ 
+                  transitionDuration: `${animSettings.duration}ms`,
+                  transitionDelay: `${index * animSettings.staggerDelay}ms`,
+                  opacity: statsVisible ? 1 : 0
+                }}
+              >
+                <div 
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2"
+                  style={{ color: heroContent.statsNumberColor }}
+                >
+                  {stat.value}
+                </div>
+                <div 
+                  className="text-sm md:text-base font-medium uppercase tracking-wider"
+                  style={{ color: heroContent.statsLabelColor }}
+                >
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Featured Houses */}
       <section ref={housesRef} className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -329,19 +342,15 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : featuredHouses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredHouses.map((house, index) => (
-                <div 
+                <HouseCard 
                   key={house.id}
-                  className="transition-opacity h-full"
-                  style={{ 
-                    transitionDuration: '500ms', 
-                    transitionDelay: `${index * 50}ms`,
-                    opacity: housesVisible ? 1 : 0
-                  }}
-                >
-                  <HouseCard house={house} />
-                </div>
+                  house={house} 
+                  index={index}
+                  isVisible={housesVisible}
+                  animSettings={animSettings}
+                />
               ))}
             </div>
           ) : (
@@ -411,42 +420,106 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* About Section with Line-by-Line Animation */}
+      {/* About Section - New Modern Split Design */}
       {(aboutSection.title || aboutSection.content) && (
-        <section ref={aboutRef} className="py-16 md:py-24 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            {aboutSection.title && (
-              <h2 
-                className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 transition-opacity duration-500"
-                style={{ opacity: aboutVisible ? 1 : 0 }}
+        <section ref={aboutRef} className="py-20 md:py-28 bg-white overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              {/* Left Side - Decorative Element */}
+              <div 
+                className="relative transition-opacity"
+                style={{ 
+                  transitionDuration: `${animSettings.duration}ms`,
+                  opacity: aboutVisible ? 1 : 0
+                }}
               >
-                {aboutSection.title}
-              </h2>
-            )}
-            {aboutSection.subtitle && (
-              <p 
-                className="text-lg text-primary-600 font-medium mb-6 transition-opacity duration-500"
-                style={{ opacity: aboutVisible ? 1 : 0, transitionDelay: '100ms' }}
-              >
-                {aboutSection.subtitle}
-              </p>
-            )}
-            {aboutSection.content && (
-              <div className="text-gray-600 leading-relaxed text-left space-y-3">
-                {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
-                  <p 
-                    key={index}
-                    className="transition-opacity duration-500"
+                <div 
+                  className="aspect-square rounded-3xl relative overflow-hidden"
+                  style={{ background: `linear-gradient(135deg, ${colors[100]} 0%, ${colors[200]} 100%)` }}
+                >
+                  <div 
+                    className="absolute inset-4 rounded-2xl"
+                    style={{ background: `linear-gradient(135deg, ${colors[500]} 0%, ${colors[700]} 100%)` }}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Building className="w-24 h-24 md:w-32 md:h-32 text-white/30" />
+                    </div>
+                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                      <div className="text-5xl md:text-6xl font-bold mb-1">5+</div>
+                      <div className="text-sm md:text-base opacity-80">Years of Excellence</div>
+                    </div>
+                  </div>
+                </div>
+                {/* Floating accent */}
+                <div 
+                  className="absolute -bottom-4 -right-4 w-24 h-24 rounded-2xl"
+                  style={{ backgroundColor: colors[300] }}
+                ></div>
+              </div>
+
+              {/* Right Side - Content */}
+              <div>
+                {aboutSection.subtitle && (
+                  <div 
+                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4 transition-opacity"
                     style={{ 
-                      opacity: aboutVisible ? 1 : 0,
-                      transitionDelay: `${200 + (index * 100)}ms` 
+                      backgroundColor: colors[100], 
+                      color: colors[700],
+                      transitionDuration: `${animSettings.duration}ms`,
+                      opacity: aboutVisible ? 1 : 0
                     }}
                   >
-                    {line}
-                  </p>
-                ))}
+                    {aboutSection.subtitle}
+                  </div>
+                )}
+                {aboutSection.title && (
+                  <h2 
+                    className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 transition-opacity"
+                    style={{ 
+                      transitionDuration: `${animSettings.duration}ms`,
+                      transitionDelay: `${animSettings.staggerDelay}ms`,
+                      opacity: aboutVisible ? 1 : 0
+                    }}
+                  >
+                    {aboutSection.title}
+                  </h2>
+                )}
+                {aboutSection.content && (
+                  <div className="space-y-4">
+                    {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
+                      <p 
+                        key={index}
+                        className="text-gray-600 text-lg leading-relaxed transition-opacity"
+                        style={{ 
+                          transitionDuration: `${animSettings.duration}ms`,
+                          transitionDelay: `${(index + 2) * animSettings.staggerDelay}ms`,
+                          opacity: aboutVisible ? 1 : 0
+                        }}
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                )}
+                <div 
+                  className="mt-8 transition-opacity"
+                  style={{ 
+                    transitionDuration: `${animSettings.duration}ms`,
+                    transitionDelay: `${5 * animSettings.staggerDelay}ms`,
+                    opacity: aboutVisible ? 1 : 0
+                  }}
+                >
+                  <Link 
+                    to="/contact"
+                    className="inline-flex items-center gap-2 font-semibold hover:gap-3 transition-all"
+                    style={{ color: colors[600] }}
+                  >
+                    Get in Touch
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </section>
       )}
