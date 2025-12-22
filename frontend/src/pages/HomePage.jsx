@@ -20,7 +20,7 @@ import { useHeroAnimation, useStaggerAnimation, useCountUp, useStatsObserver, us
 
 // Stat item with count-up animation - re-counts when section comes back into view
 const StatItem = ({ stat, isInView, numberColor, textColor }) => {
-  const animatedValue = useCountUp(stat.value, 2000, isInView);
+  const animatedValue = useCountUp(stat.value, isInView);
   return (
     <div className="text-center">
       <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>

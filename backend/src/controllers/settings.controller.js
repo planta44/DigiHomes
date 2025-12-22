@@ -141,7 +141,9 @@ const getAnimationSettings = async (req, res) => {
       baseDelay: 100,
       cardStaggerMultiplier: 1,
       heroStaggerMultiplier: 1.5,
-      sectionStaggerMultiplier: 1.2
+      sectionStaggerMultiplier: 1.2,
+      heroTextDelay: 300,
+      statsCountDuration: 2000
     };
     
     if (result.rows.length > 0 && result.rows[0].setting_value) {
@@ -161,13 +163,15 @@ const getAnimationSettings = async (req, res) => {
 // Update animation settings (admin only)
 const updateAnimationSettings = async (req, res) => {
   try {
-    const { baseDelay, cardStaggerMultiplier, heroStaggerMultiplier, sectionStaggerMultiplier } = req.body;
+    const { baseDelay, cardStaggerMultiplier, heroStaggerMultiplier, sectionStaggerMultiplier, heroTextDelay, statsCountDuration } = req.body;
     
     const settings = {
       baseDelay: Math.max(50, Math.min(500, parseInt(baseDelay) || 100)),
-      cardStaggerMultiplier: Math.max(0.5, Math.min(3, parseFloat(cardStaggerMultiplier) || 1)),
-      heroStaggerMultiplier: Math.max(0.5, Math.min(3, parseFloat(heroStaggerMultiplier) || 1.5)),
-      sectionStaggerMultiplier: Math.max(0.5, Math.min(3, parseFloat(sectionStaggerMultiplier) || 1.2))
+      cardStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(cardStaggerMultiplier) || 1)),
+      heroStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(heroStaggerMultiplier) || 1.5)),
+      sectionStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(sectionStaggerMultiplier) || 1.2)),
+      heroTextDelay: Math.max(100, Math.min(2000, parseInt(heroTextDelay) || 300)),
+      statsCountDuration: Math.max(500, Math.min(5000, parseInt(statsCountDuration) || 2000))
     };
 
     await db.query(

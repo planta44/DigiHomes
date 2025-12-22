@@ -84,7 +84,7 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { duration: 700, staggerDelay: 100 },
+    animation_settings: { baseDelay: 100, cardStaggerMultiplier: 1, heroStaggerMultiplier: 1.5, sectionStaggerMultiplier: 1.2, heroTextDelay: 300, statsCountDuration: 2000 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
@@ -1342,85 +1342,137 @@ const SiteSettings = () => {
                 <div>
                   <h3 className="font-semibold mb-2">Animation Timing Control</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Control how fast or slow animations appear across the website. Lower values = faster animations.
+                    Control how fast or slow animations appear across the website. Higher values = slower/more delayed animations.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 border rounded-lg bg-gray-50">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Base Delay: {settings.animation_settings.baseDelay || 100}ms
-                    </label>
-                    <input
-                      type="range"
-                      min="50"
-                      max="300"
-                      step="25"
-                      value={settings.animation_settings.baseDelay || 100}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        animation_settings: { ...prev.animation_settings, baseDelay: parseInt(e.target.value) }
-                      }))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Base timing between staggered animations (50-300ms)</p>
-                  </div>
+                {/* Hero Text Animations */}
+                <div className="border-b pb-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Hero Section Text Animations</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border rounded-lg bg-blue-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Hero Text Initial Delay: {settings.animation_settings.heroTextDelay || 300}ms
+                      </label>
+                      <input
+                        type="range"
+                        min="100"
+                        max="1000"
+                        step="50"
+                        value={settings.animation_settings.heroTextDelay || 300}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, heroTextDelay: parseInt(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Delay before hero text starts appearing (100-1000ms)</p>
+                    </div>
 
-                  <div className="p-4 border rounded-lg bg-gray-50">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Card Stagger: {settings.animation_settings.cardStaggerMultiplier || 1}x
-                    </label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="2"
-                      step="0.1"
-                      value={settings.animation_settings.cardStaggerMultiplier || 1}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        animation_settings: { ...prev.animation_settings, cardStaggerMultiplier: parseFloat(e.target.value) }
-                      }))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Multiplier for product card animations</p>
+                    <div className="p-4 border rounded-lg bg-blue-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Hero Text Stagger: {settings.animation_settings.heroStaggerMultiplier || 1.5}x
+                      </label>
+                      <input
+                        type="range"
+                        min="1"
+                        max="5"
+                        step="0.5"
+                        value={settings.animation_settings.heroStaggerMultiplier || 1.5}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, heroStaggerMultiplier: parseFloat(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Delay between each hero text element (1x-5x)</p>
+                    </div>
                   </div>
+                </div>
 
-                  <div className="p-4 border rounded-lg bg-gray-50">
+                {/* Stats Counter */}
+                <div className="border-b pb-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Stats Counter Animation</h4>
+                  <div className="p-4 border rounded-lg bg-green-50">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Hero Text Stagger: {settings.animation_settings.heroStaggerMultiplier || 1.5}x
+                      Stats Count Duration: {(settings.animation_settings.statsCountDuration || 2000) / 1000}s
                     </label>
                     <input
                       type="range"
-                      min="0.5"
-                      max="3"
-                      step="0.1"
-                      value={settings.animation_settings.heroStaggerMultiplier || 1.5}
+                      min="1000"
+                      max="5000"
+                      step="250"
+                      value={settings.animation_settings.statsCountDuration || 2000}
                       onChange={(e) => setSettings(prev => ({
                         ...prev,
-                        animation_settings: { ...prev.animation_settings, heroStaggerMultiplier: parseFloat(e.target.value) }
+                        animation_settings: { ...prev.animation_settings, statsCountDuration: parseInt(e.target.value) }
                       }))}
                       className="w-full"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Multiplier for hero section text animations</p>
+                    <p className="text-xs text-gray-500 mt-1">How long it takes for stats numbers to count up (1-5 seconds)</p>
                   </div>
+                </div>
 
-                  <div className="p-4 border rounded-lg bg-gray-50">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Section Stagger: {settings.animation_settings.sectionStaggerMultiplier || 1.2}x
-                    </label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="2"
-                      step="0.1"
-                      value={settings.animation_settings.sectionStaggerMultiplier || 1.2}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        animation_settings: { ...prev.animation_settings, sectionStaggerMultiplier: parseFloat(e.target.value) }
-                      }))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Multiplier for homepage section animations</p>
+                {/* Card & Section Animations */}
+                <div className="border-b pb-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Card & Section Animations</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border rounded-lg bg-gray-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Base Delay: {settings.animation_settings.baseDelay || 100}ms
+                      </label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="300"
+                        step="25"
+                        value={settings.animation_settings.baseDelay || 100}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, baseDelay: parseInt(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Base timing between staggered items (50-300ms)</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-gray-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Card Stagger: {settings.animation_settings.cardStaggerMultiplier || 1}x
+                      </label>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="3"
+                        step="0.1"
+                        value={settings.animation_settings.cardStaggerMultiplier || 1}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardStaggerMultiplier: parseFloat(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Delay multiplier for product cards</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-gray-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Section Stagger: {settings.animation_settings.sectionStaggerMultiplier || 1.2}x
+                      </label>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="3"
+                        step="0.1"
+                        value={settings.animation_settings.sectionStaggerMultiplier || 1.2}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, sectionStaggerMultiplier: parseFloat(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Delay multiplier for homepage sections</p>
+                    </div>
                   </div>
                 </div>
 
@@ -1429,9 +1481,9 @@ const SiteSettings = () => {
                     <HelpCircle className="w-4 h-4" /> How it works
                   </h4>
                   <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• <strong>Base Delay:</strong> Time between each item appearing (e.g., 100ms between cards)</li>
-                    <li>• <strong>Multipliers:</strong> Adjust speed for different element types (1x = normal, 2x = slower)</li>
-                    <li>• <strong>Safe default:</strong> Current values are optimized for mobile performance</li>
+                    <li>• <strong>Hero Text Delay:</strong> Wait time before hero text starts appearing on page load</li>
+                    <li>• <strong>Stats Count Duration:</strong> How long the counting animation takes</li>
+                    <li>• <strong>Stagger Multipliers:</strong> Control speed between items (higher = slower)</li>
                   </ul>
                 </div>
 

@@ -7,7 +7,9 @@ let globalAnimationSettings = {
   baseDelay: 100,
   cardStaggerMultiplier: 1,
   heroStaggerMultiplier: 1.5,
-  sectionStaggerMultiplier: 1.2
+  sectionStaggerMultiplier: 1.2,
+  heroTextDelay: 300,
+  statsCountDuration: 2000
 };
 
 export const setAnimationSettings = (settings) => {
@@ -17,28 +19,35 @@ export const setAnimationSettings = (settings) => {
 export const getAnimationSettings = () => globalAnimationSettings;
 
 /**
- * Hero Pop Animation - Re-animates when scrolling back to top
+ * Hero Pop Animation - Triggers on page load AND when scrolling back
  * Content always visible by default, animation is purely visual
  */
 export const useHeroAnimation = (elementDelay = 0) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
   const ref = useRef(null);
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
+    // Calculate delay based on element order
+    const delay = globalAnimationSettings.heroTextDelay + 
+                  (elementDelay * globalAnimationSettings.baseDelay * globalAnimationSettings.heroStaggerMultiplier);
+
+    // Start with animation ready state
+    setShouldAnimate(true);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Delay based on element order for stagger effect
-          const delay = elementDelay * globalAnimationSettings.baseDelay * globalAnimationSettings.heroStaggerMultiplier;
+          // Animate in with delay
           setTimeout(() => {
             setIsVisible(true);
-            setHasAnimated(true);
-          }, delay);
-        } else if (hasAnimated) {
+            initialLoadDone.current = true;
+          }, initialLoadDone.current ? delay / 2 : delay);
+        } else if (initialLoadDone.current) {
           // Reset when scrolling away - allows re-animation
           setIsVisible(false);
         }
@@ -48,11 +57,12 @@ export const useHeroAnimation = (elementDelay = 0) => {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [elementDelay, hasAnimated]);
+  }, [elementDelay]);
 
-  // Always return classes that allow content to be visible
-  const animClass = isVisible ? 'anim-pop-ready anim-pop-done' : 
-                    hasAnimated ? 'anim-pop-ready' : '';
+  // Apply animation classes
+  const animClass = !shouldAnimate ? '' :
+                    isVisible ? 'anim-pop-ready anim-pop-done' : 
+                    'anim-pop-ready';
   
   return [ref, animClass];
 };
@@ -191,10 +201,12 @@ export const useStaggerAnimation = (staggerDelay = null) => {
 
 /**
  * Stats Count-up Hook - Re-counts when scrolling back into view
+ * Uses admin-configurable duration
  */
-export const useCountUp = (endValue, duration = 2000, isInView = true) => {
+export const useCountUp = (endValue, isInView = true) => {
   const [count, setCount] = useState(null);
   const animationRef = useRef(null);
+  const duration = globalAnimationSettings.statsCountDuration || 2000;
 
   useEffect(() => {
     // Cancel any running animation
@@ -204,13 +216,12 @@ export const useCountUp = (endValue, duration = 2000, isInView = true) => {
     }
 
     if (!isInView) {
-      // Reset to null when out of view (will show endValue as fallback)
-      setCount(null);
+      // Reset to 0 when out of view to prepare for re-count
+      setCount(0);
       return;
     }
 
     // Start counting from 0
-    setCount(0);
     const numericEnd = parseInt(String(endValue).replace(/\D/g, '')) || 0;
     const startTime = Date.now();
 
@@ -218,29 +229,33 @@ export const useCountUp = (endValue, duration = 2000, isInView = true) => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const easeOut = 1 - Math.pow(1 - progress, 4);
-      setCount(Math.floor(easeOut * numericEnd));
+      const currentCount = Math.floor(easeOut * numericEnd);
+      setCount(currentCount);
 
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       }
     };
 
-    animationRef.current = requestAnimationFrame(animate);
+    // Small delay before starting count
+    const timer = setTimeout(() => {
+      animationRef.current = requestAnimationFrame(animate);
+    }, 200);
 
     return () => {
+      clearTimeout(timer);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [endValue, duration, isInView]);
 
-  // If count is null, show the actual endValue (fallback for no JS)
-  if (count === null) return endValue;
-  
+  // Show 0 initially, count up when in view
   const suffix = String(endValue).replace(/[0-9]/g, '');
-  return count + suffix;
+  return (count === null ? 0 : count) + suffix;
 };
 
 /**
  * Stats Section Observer - Detects when stats section is in view
+ * Lower threshold for earlier triggering
  */
 export const useStatsObserver = () => {
   const [isInView, setIsInView] = useState(false);
@@ -254,7 +269,7 @@ export const useStatsObserver = () => {
       ([entry]) => {
         setIsInView(entry.isIntersecting);
       },
-      { threshold: 0.3, rootMargin: '0px' }
+      { threshold: 0.15, rootMargin: '50px' }
     );
 
     observer.observe(element);
