@@ -53,8 +53,8 @@ const useCountUp = (end, duration = 2000, trigger = true) => {
   return count;
 };
 
-// Hook for detecting when element is visible
-const useInView = (threshold = 0.3) => {
+// Hook for detecting when element is visible (triggers every time element enters view)
+const useInView = (threshold = 0.3, triggerOnce = false) => {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef(null);
   
@@ -63,7 +63,9 @@ const useInView = (threshold = 0.3) => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsInView(true);
-          observer.disconnect();
+          if (triggerOnce) observer.disconnect();
+        } else {
+          if (!triggerOnce) setIsInView(false);
         }
       },
       { threshold }
@@ -74,9 +76,35 @@ const useInView = (threshold = 0.3) => {
     }
     
     return () => observer.disconnect();
-  }, [threshold]);
+  }, [threshold, triggerOnce]);
   
   return [ref, isInView];
+};
+
+// Hook for scroll-triggered animations with delay
+const useScrollAnimation = (delay = 0) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setIsVisible(true), delay);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [delay]);
+  
+  return [ref, isVisible];
 };
 
 // Stat item with count-up animation
@@ -114,9 +142,11 @@ const FeatureCard = ({ feature }) => {
 const HomePage = () => {
   const [featuredHouses, setFeaturedHouses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [settings, setSettings] = useState(null);
+  const [heroVisible, setHeroVisible] = useState(false);
   const { colors } = useTheme();
-  const [statsRef, statsVisible] = useInView(0.3);
+  const [statsRef, statsVisible] = useInView(0.2, false); // Triggers every time stats enter/leave view
 
   useEffect(() => {
     fetchData();
@@ -154,8 +184,12 @@ const HomePage = () => {
       
       setFeaturedHouses(houses);
       setSettings(siteSettings);
+      setSettingsLoaded(true);
+      // Trigger hero animation after a short delay
+      setTimeout(() => setHeroVisible(true), 100);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setSettingsLoaded(true); // Still mark as loaded even on error
     } finally {
       setLoading(false);
     }
@@ -183,12 +217,12 @@ const HomePage = () => {
   const companyInfo = settings?.company_info || {};
   const aboutSection = settings?.about_section || { title: '', subtitle: '', content: '', image: '' };
 
-  // Hero positioning settings
+  // Hero positioning settings - now using percentage from bottom
   const heroPositioning = {
     desktopHeight: settings?.hero_content?.desktopHeight || '100vh',
     mobileHeight: settings?.hero_content?.mobileHeight || '100vh',
-    desktopAlign: settings?.hero_content?.desktopAlign || 'bottom',
-    mobileAlign: settings?.hero_content?.mobileAlign || 'bottom'
+    desktopAlign: settings?.hero_content?.desktopAlign || '10', // percentage from bottom
+    mobileAlign: settings?.hero_content?.mobileAlign || '10' // percentage from bottom
   };
 
   const heroContent = {
@@ -213,46 +247,78 @@ const HomePage = () => {
     locations: []
   };
 
-  // Get alignment classes
-  const getAlignmentClass = (align) => {
-    switch (align) {
-      case 'top': return 'justify-start pt-24';
-      case 'center': return 'justify-center';
-      case 'bottom': 
-      default: return 'justify-end';
-    }
-  };
-
   return (
     <PublicLayout>
-      {/* Hero Section */}
-      <section 
-        className="relative text-white overflow-hidden flex flex-col"
-        style={{ 
-          backgroundColor: '#1a1a1a',
-          minHeight: heroPositioning.mobileHeight
-        }}
-      >
-        {/* Desktop height override */}
-        <style>{`
-          @media (min-width: 768px) {
-            .hero-section { min-height: ${heroPositioning.desktopHeight} !important; }
+      {/* Global styles for hero positioning and animations */}
+      <style>{`
+        .hero-container {
+          min-height: ${heroPositioning.mobileHeight};
+        }
+        @media (min-width: 768px) {
+          .hero-container {
+            min-height: ${heroPositioning.desktopHeight} !important;
           }
-        `}</style>
-        <div className="hero-section absolute inset-0"></div>
-        
+        }
+        .hero-content-wrapper {
+          bottom: ${heroPositioning.mobileAlign}%;
+        }
+        @media (min-width: 768px) {
+          .hero-content-wrapper {
+            bottom: ${heroPositioning.desktopAlign}% !important;
+          }
+        }
+        @keyframes popUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes pulse-scale {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        .hero-pop-up {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        .hero-pop-up.visible {
+          animation: popUp 0.6s ease-out forwards;
+        }
+        .hero-pop-up.visible.delay-1 { animation-delay: 0.1s; }
+        .hero-pop-up.visible.delay-2 { animation-delay: 0.2s; }
+        .hero-pop-up.visible.delay-3 { animation-delay: 0.3s; }
+        .btn-animate {
+          animation: pulse-scale 2s ease-in-out infinite;
+        }
+        .btn-animate:hover {
+          animation: none;
+        }
+      `}</style>
+
+      {/* Hero Section */}
+      <section className="hero-container relative text-white overflow-hidden">
         {/* Desktop Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center hidden md:block"
           style={{ 
-            backgroundImage: heroContent.backgroundImage ? `url('${heroContent.backgroundImage}')` : 'none'
+            backgroundImage: heroContent.backgroundImage ? `url('${heroContent.backgroundImage}')` : 'none',
+            backgroundColor: '#1a1a1a'
           }}
         ></div>
         {/* Mobile Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center md:hidden"
           style={{ 
-            backgroundImage: heroContent.backgroundImageMobile ? `url('${heroContent.backgroundImageMobile}')` : 'none'
+            backgroundImage: heroContent.backgroundImageMobile ? `url('${heroContent.backgroundImageMobile}')` : 'none',
+            backgroundColor: '#1a1a1a'
           }}
         ></div>
         {/* Desktop Overlay */}
@@ -266,27 +332,37 @@ const HomePage = () => {
           style={{ backgroundColor: heroContent.overlayColorMobile, opacity: heroContent.overlayOpacityMobile }}
         ></div>
         
-        {/* Content wrapper with alignment */}
-        <div className={`relative flex-1 flex flex-col ${getAlignmentClass(heroPositioning.mobileAlign)} md:${getAlignmentClass(heroPositioning.desktopAlign)}`}>
-          {/* Hero content - aligned left */}
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
+        {/* Content wrapper with percentage-based positioning from bottom */}
+        <div className="hero-content-wrapper absolute left-0 right-0 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
+              <h1 className={`hero-pop-up text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left ${heroVisible ? 'visible delay-1' : ''}`}>
                 {heroContent.title}{' '}
                 <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
               </h1>
-              <p className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
+              <p className={`hero-pop-up text-lg md:text-xl mb-6 max-w-2xl text-left ${heroVisible ? 'visible delay-2' : ''}`} style={{ color: heroContent.descriptionHighlightColor }}>
                 {heroContent.description}
               </p>
-              <div className="flex flex-wrap gap-4 justify-start">
+              <div className={`hero-pop-up flex flex-wrap gap-4 justify-start ${heroVisible ? 'visible delay-3' : ''}`}>
                 <Link 
                   to="/houses" 
-                  className="font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
+                  className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
                   style={{ color: colors[600] }}
                 >
                   Browse Houses
                   <ArrowRight className="w-5 h-5" />
                 </Link>
+                {companyInfo.whatsapp && (
+                  <a 
+                    href={`https://wa.me/${companyInfo.whatsapp.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-animate border-2 border-green-500 bg-green-500 text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-green-600"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WhatsApp Us
+                  </a>
+                )}
                 <Link 
                   to="/contact" 
                   className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-white"
@@ -322,26 +398,28 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Stats Section - Count up animation */}
-      <section 
-        ref={statsRef}
-        className="py-16 md:py-20"
-        style={{ backgroundColor: statsSection.backgroundColor || '#1f2937' }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {statsSection.title && (
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
-              {statsSection.subtitle && <p className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
+      {/* Stats Section - Count up animation - only render when settings loaded to prevent flash */}
+      {settingsLoaded && (
+        <section 
+          ref={statsRef}
+          className="py-16 md:py-20 transition-opacity duration-300"
+          style={{ backgroundColor: statsSection.backgroundColor || '#1f2937' }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {statsSection.title && (
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
+                {statsSection.subtitle && <p className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
+              </div>
+            )}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+              {stats.map((stat, index) => (
+                <StatItem key={`${index}-${statsVisible}`} stat={stat} isVisible={statsVisible} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
+              ))}
             </div>
-          )}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <StatItem key={index} stat={stat} isVisible={statsVisible} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
-            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Houses */}
       <section className="py-16 md:py-24 bg-gray-50">
@@ -479,9 +557,20 @@ const HomePage = () => {
                       {aboutSection.title}
                     </h2>
                   )}
+                  {/* Desktop Content */}
                   {aboutSection.content && (
-                    <div className="space-y-4">
+                    <div className="space-y-4 hidden md:block">
                       {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
+                        <p key={index} className="text-gray-600 text-lg leading-relaxed">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  {/* Mobile Content - fallback to desktop if not set */}
+                  {(aboutSection.contentMobile || aboutSection.content) && (
+                    <div className="space-y-4 md:hidden">
+                      {(aboutSection.contentMobile || aboutSection.content).split('\n').filter(line => line.trim()).map((line, index) => (
                         <p key={index} className="text-gray-600 text-lg leading-relaxed">
                           {line}
                         </p>

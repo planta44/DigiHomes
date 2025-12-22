@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Home, Building, ArrowRight, DollarSign, Ruler } from 'lucide-react';
+import { Search, MapPin, Home, Building, ArrowRight, DollarSign, Ruler, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
@@ -13,6 +13,7 @@ const BuyPage = () => {
   const [locations, setLocations] = useState([]);
   const [houseTypes, setHouseTypes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [filters, setFilters] = useState({ 
     search: '',
     location: '', 
@@ -113,11 +114,12 @@ const BuyPage = () => {
             <p className="text-gray-600">Browse available properties for purchase</p>
           </div>
 
-          {/* Filters - Similar to Available Houses */}
+          {/* Filters - Similar to Rent page with More Filters toggle */}
           <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 transition-all duration-700 delay-100 ${propertiesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Main Filters - Always visible */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search */}
-              <div className="lg:col-span-2">
+              <div className="md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -149,105 +151,122 @@ const BuyPage = () => {
                 </div>
               </div>
 
-              {/* Property Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <select
-                    value={filters.property_type}
-                    onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value }))}
-                    className="input-field pl-10 appearance-none cursor-pointer"
-                  >
-                    <option value="">All Types</option>
-                    <option value="house">Houses</option>
-                    <option value="land">Land</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Buy or Lease */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Buy or Lease</label>
-                <select
-                  value={filters.listing_type}
-                  onChange={(e) => setFilters(prev => ({ ...prev, listing_type: e.target.value }))}
-                  className="input-field appearance-none cursor-pointer"
+              {/* More Filters Button */}
+              <div className="flex items-end">
+                <button
+                  onClick={() => setShowMoreFilters(!showMoreFilters)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:border-gray-400 hover:bg-gray-50 transition-colors"
                 >
-                  <option value="">All</option>
-                  <option value="buy">Buy</option>
-                  <option value="lease">Lease</option>
-                </select>
+                  <SlidersHorizontal className="w-5 h-5" />
+                  More Filters
+                  {showMoreFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
               </div>
+            </div>
 
-              {/* House Type - Only show if property_type is house or empty */}
-              {filters.property_type !== 'land' && (
+            {/* More Filters - Collapsible */}
+            {showMoreFilters && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+                {/* Property Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">House Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
                   <div className="relative">
-                    <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <select
-                      value={filters.house_type}
-                      onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
+                      value={filters.property_type}
+                      onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value }))}
                       className="input-field pl-10 appearance-none cursor-pointer"
                     >
-                      <option value="">All House Types</option>
-                      {houseTypes.map(type => (
-                        <option key={type.id} value={type.name}>{type.name}</option>
-                      ))}
+                      <option value="">All Types</option>
+                      <option value="house">Houses</option>
+                      <option value="land">Land</option>
                     </select>
                   </div>
                 </div>
-              )}
 
-              {/* Bedrooms - Only show if property_type is house or empty */}
-              {filters.property_type !== 'land' && (
+                {/* Buy or Lease */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Buy or Lease</label>
                   <select
-                    value={filters.bedrooms}
-                    onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
+                    value={filters.listing_type}
+                    onChange={(e) => setFilters(prev => ({ ...prev, listing_type: e.target.value }))}
                     className="input-field appearance-none cursor-pointer"
                   >
-                    <option value="">Any</option>
-                    <option value="1">1+</option>
-                    <option value="2">2+</option>
-                    <option value="3">3+</option>
-                    <option value="4">4+</option>
+                    <option value="">All</option>
+                    <option value="buy">Buy</option>
+                    <option value="lease">Lease</option>
                   </select>
                 </div>
-              )}
 
-              {/* Min Price */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Min Price (KES)</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="number"
-                    value={filters.min_price}
-                    onChange={(e) => setFilters(prev => ({ ...prev, min_price: e.target.value }))}
-                    placeholder="Min"
-                    className="input-field pl-10"
-                  />
+                {/* House Type - Only show if property_type is house or empty */}
+                {filters.property_type !== 'land' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">House Type</label>
+                    <div className="relative">
+                      <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <select
+                        value={filters.house_type}
+                        onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
+                        className="input-field pl-10 appearance-none cursor-pointer"
+                      >
+                        <option value="">All House Types</option>
+                        {houseTypes.map(type => (
+                          <option key={type.id} value={type.name}>{type.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bedrooms - Only show if property_type is house or empty */}
+                {filters.property_type !== 'land' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                    <select
+                      value={filters.bedrooms}
+                      onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
+                      className="input-field appearance-none cursor-pointer"
+                    >
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Min Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Min Price (KES)</label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="number"
+                      value={filters.min_price}
+                      onChange={(e) => setFilters(prev => ({ ...prev, min_price: e.target.value }))}
+                      placeholder="Min"
+                      className="input-field pl-10"
+                    />
+                  </div>
+                </div>
+
+                {/* Max Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Price (KES)</label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="number"
+                      value={filters.max_price}
+                      onChange={(e) => setFilters(prev => ({ ...prev, max_price: e.target.value }))}
+                      placeholder="Max"
+                      className="input-field pl-10"
+                    />
+                  </div>
                 </div>
               </div>
-
-              {/* Max Price */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Max Price (KES)</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="number"
-                    value={filters.max_price}
-                    onChange={(e) => setFilters(prev => ({ ...prev, max_price: e.target.value }))}
-                    placeholder="Max"
-                    className="input-field pl-10"
-                  />
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Results count */}
             <div className="mt-4 pt-4 border-t border-gray-200">

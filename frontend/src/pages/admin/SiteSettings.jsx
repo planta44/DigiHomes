@@ -92,7 +92,7 @@ const SiteSettings = () => {
     stats_section: { title: '', subtitle: '', stats: [{ value: '100+', label: 'Happy Clients' }], backgroundColor: '#1f2937', textColor: '#9ca3af', numberColor: '#ffffff' },
     houses_section: { title: '', subtitle: '' },
     locations_section: { title: '', subtitle: '', locations: [] },
-    about_section: { title: '', subtitle: '', content: '', image: '', desktopWidth: '60', mobileWidth: '100', desktopAlign: 'left', mobileAlign: 'center' },
+    about_section: { title: '', subtitle: '', content: '', contentMobile: '', image: '', desktopWidth: '60', mobileWidth: '100', desktopAlign: 'left', mobileAlign: 'center' },
     footer_content: { tagline: '', description: '', quickLinks: [], contactLocations: [], contactPhones: [], contactEmail: '' },
     contact_page: { title: '', subtitle: '', workingHours: [], offices: [], faqs: [] },
     digi_posts: { title: '', subtitle: '', posts: [] }
@@ -566,12 +566,13 @@ const SiteSettings = () => {
                 {/* Positioning Settings */}
                 <div className="border-t pt-4 mt-4">
                   <h4 className="font-medium text-sm mb-3">Content Positioning</h4>
+                  <p className="text-xs text-gray-500 mb-4">Position content as a percentage from the bottom of the hero section</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Desktop Settings */}
                     <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
                       <h5 className="font-medium text-sm text-gray-800">Desktop (Large Screens)</h5>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Section Height</label>
                         <select value={settings.hero_content.desktopHeight || '100vh'} onChange={(e) => setSettings(prev => ({
                           ...prev, hero_content: { ...prev.hero_content, desktopHeight: e.target.value }
                         }))} className="input-field">
@@ -583,14 +584,23 @@ const SiteSettings = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Alignment</label>
-                        <select value={settings.hero_content.desktopAlign || 'bottom'} onChange={(e) => setSettings(prev => ({
-                          ...prev, hero_content: { ...prev.hero_content, desktopAlign: e.target.value }
-                        }))} className="input-field">
-                          <option value="top">Top</option>
-                          <option value="center">Center</option>
-                          <option value="bottom">Bottom</option>
-                        </select>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Position (% from bottom)</label>
+                        <input 
+                          type="range" 
+                          min="5" 
+                          max="50" 
+                          step="5" 
+                          value={settings.hero_content.desktopAlign || '10'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, desktopAlign: e.target.value }
+                          }))} 
+                          className="w-full" 
+                        />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>5%</span>
+                          <span className="font-medium">{settings.hero_content.desktopAlign || '10'}%</span>
+                          <span>50%</span>
+                        </div>
                       </div>
                     </div>
                     
@@ -598,7 +608,7 @@ const SiteSettings = () => {
                     <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
                       <h5 className="font-medium text-sm text-gray-800">Mobile (Small Screens)</h5>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Section Height</label>
                         <select value={settings.hero_content.mobileHeight || '100vh'} onChange={(e) => setSettings(prev => ({
                           ...prev, hero_content: { ...prev.hero_content, mobileHeight: e.target.value }
                         }))} className="input-field">
@@ -610,14 +620,23 @@ const SiteSettings = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Alignment</label>
-                        <select value={settings.hero_content.mobileAlign || 'bottom'} onChange={(e) => setSettings(prev => ({
-                          ...prev, hero_content: { ...prev.hero_content, mobileAlign: e.target.value }
-                        }))} className="input-field">
-                          <option value="top">Top</option>
-                          <option value="center">Center</option>
-                          <option value="bottom">Bottom</option>
-                        </select>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Position (% from bottom)</label>
+                        <input 
+                          type="range" 
+                          min="5" 
+                          max="50" 
+                          step="5" 
+                          value={settings.hero_content.mobileAlign || '10'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, mobileAlign: e.target.value }
+                          }))} 
+                          className="w-full" 
+                        />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>5%</span>
+                          <span className="font-medium">{settings.hero_content.mobileAlign || '10'}%</span>
+                          <span>50%</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -888,17 +907,33 @@ const SiteSettings = () => {
                     ...prev, about_section: { ...prev.about_section, title: e.target.value }
                   }))} className="input-field" placeholder="Your Trusted Property Partner" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                  <textarea 
-                    value={settings.about_section?.content || ''} 
-                    onChange={(e) => setSettings(prev => ({
-                      ...prev, about_section: { ...prev.about_section, content: e.target.value }
-                    }))} 
-                    className="input-field min-h-[150px]" 
-                    placeholder="Write about your company, mission, values, etc. Use new lines for paragraphs."
-                    rows={6}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Content (Desktop)</label>
+                    <textarea 
+                      value={settings.about_section?.content || ''} 
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev, about_section: { ...prev.about_section, content: e.target.value }
+                      }))} 
+                      className="input-field min-h-[150px]" 
+                      placeholder="Desktop content - shown on larger screens"
+                      rows={6}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Shown on desktop/tablet screens</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Content (Mobile)</label>
+                    <textarea 
+                      value={settings.about_section?.contentMobile || ''} 
+                      onChange={(e) => setSettings(prev => ({
+                        ...prev, about_section: { ...prev.about_section, contentMobile: e.target.value }
+                      }))} 
+                      className="input-field min-h-[150px]" 
+                      placeholder="Mobile content - shorter version for small screens (optional)"
+                      rows={6}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Shown on mobile screens. Leave empty to use desktop content.</p>
+                  </div>
                 </div>
                 <ImageUploadField 
                   label="Section Image (optional)" 
