@@ -23,6 +23,7 @@ const AdminDashboard = () => {
   const [recentHouses, setRecentHouses] = useState([]);
   const [allHouses, setAllHouses] = useState([]);
   const [featuredIds, setFeaturedIds] = useState([]);
+  const [featuredSearch, setFeaturedSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [savingFeatured, setSavingFeatured] = useState(false);
 
@@ -98,7 +99,14 @@ const AdminDashboard = () => {
   };
 
   const getAvailableHouses = () => {
-    return allHouses.filter(h => !featuredIds.includes(h.id) && h.vacancy_status === 'available');
+    return allHouses.filter(h => {
+      const notFeatured = !featuredIds.includes(h.id);
+      const isAvailable = h.vacancy_status === 'available';
+      const matchesSearch = !featuredSearch || 
+        h.title?.toLowerCase().includes(featuredSearch.toLowerCase()) ||
+        h.location?.toLowerCase().includes(featuredSearch.toLowerCase());
+      return notFeatured && isAvailable && matchesSearch;
+    });
   };
 
   const formatPrice = (price) => {
@@ -262,6 +270,13 @@ const AdminDashboard = () => {
           {/* Available Properties to Add */}
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-2">Available Properties</h3>
+            <input
+              type="text"
+              placeholder="Search by name or location..."
+              value={featuredSearch}
+              onChange={(e) => setFeaturedSearch(e.target.value)}
+              className="w-full px-3 py-2 mb-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
             <div className="max-h-48 overflow-y-auto border rounded-lg">
               {getAvailableHouses().length > 0 ? (
                 <div className="divide-y">

@@ -5,6 +5,7 @@ import api from '../../config/api';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [brandSettings, setBrandSettings] = useState({
     name: 'DIGIHOMES',
     primaryColor: '#2563eb',
@@ -16,6 +17,7 @@ const Navbar = () => {
   });
   const [logo, setLogo] = useState('');
   const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -51,6 +53,16 @@ const Navbar = () => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
+  // Handle scroll for transparent header effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial position
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const navLinks = [
     { path: '/', label: 'Home', icon: Home },
     { path: '/houses', label: 'Houses', icon: Building },
@@ -68,8 +80,17 @@ const Navbar = () => {
   const firstPart = brandName.slice(0, splitAt);
   const secondPart = brandName.slice(splitAt);
 
+  // Determine if navbar should be transparent (only on homepage when not scrolled)
+  const isTransparent = isHomePage && !isScrolled && !isOpen;
+
   return (
-    <nav className="bg-white shadow-md z-50">
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isTransparent 
+          ? 'bg-transparent' 
+          : 'bg-white shadow-md'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo + Brand Name */}
@@ -83,10 +104,16 @@ const Navbar = () => {
               />
             )}
             <div className="flex items-center">
-              <span style={{ color: brandSettings.primaryColor }} className="font-bold text-xl sm:text-2xl">
+              <span 
+                className="font-bold text-xl sm:text-2xl transition-colors duration-300"
+                style={{ color: isTransparent ? '#ffffff' : brandSettings.primaryColor }}
+              >
                 {firstPart}
               </span>
-              <span style={{ color: brandSettings.secondaryColor }} className="font-bold text-xl sm:text-2xl">
+              <span 
+                className="font-bold text-xl sm:text-2xl transition-colors duration-300"
+                style={{ color: isTransparent ? '#ffffff' : brandSettings.secondaryColor }}
+              >
                 {secondPart}
               </span>
             </div>
@@ -98,10 +125,10 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`flex items-center gap-2 font-medium transition-colors ${
-                  isActive(link.path)
-                    ? 'text-primary-600'
-                    : 'text-gray-600 hover:text-primary-600'
+                className={`flex items-center gap-2 font-medium transition-colors duration-300 ${
+                  isTransparent
+                    ? (isActive(link.path) ? 'text-white font-semibold' : 'text-white/90 hover:text-white')
+                    : (isActive(link.path) ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600')
                 }`}
               >
                 <link.icon className="w-4 h-4" />
@@ -112,7 +139,9 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 z-50"
+            className={`md:hidden p-2 rounded-lg z-50 transition-colors duration-300 ${
+              isTransparent ? 'text-white hover:bg-white/20' : 'text-gray-900 hover:bg-gray-100'
+            }`}
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

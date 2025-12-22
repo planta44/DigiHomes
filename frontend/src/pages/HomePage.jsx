@@ -22,14 +22,14 @@ const iconMap = {
   Building, MapPin, Shield, Clock, Star, Users, Home, CheckCircle
 };
 
-const StatItem = ({ value, label, isVisible, index, duration, labelColor }) => {
+const StatItem = ({ value, label, isVisible, index, duration, labelColor, numberColor }) => {
   const animatedValue = useCountUp(value, duration || 2000, isVisible);
   return (
     <div 
       className={`transition-all ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
       style={{ transitionDuration: `${duration || 700}ms`, transitionDelay: `${index * 150}ms` }}
     >
-      <div className="text-3xl md:text-4xl font-bold">{animatedValue}</div>
+      <div className="text-3xl md:text-4xl font-bold" style={{ color: numberColor || '#ffffff' }}>{animatedValue}</div>
       <div className="text-sm" style={{ color: labelColor || '#bfdbfe' }}>{label}</div>
     </div>
   );
@@ -37,22 +37,22 @@ const StatItem = ({ value, label, isVisible, index, duration, labelColor }) => {
 
 const FeatureCard = ({ feature, index, isVisible, animSettings }) => {
   const IconComponent = iconMap[feature.icon] || Building;
-  const duration = animSettings?.duration || 700;
-  const stagger = animSettings?.staggerDelay || 100;
+  const duration = animSettings?.duration || 500;
+  const stagger = animSettings?.staggerDelay || 50;
   return (
     <div 
-      className={`text-center p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all ${
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-10'
-      }`}
-      style={{ transitionDuration: `${duration}ms`, transitionDelay: `${index * stagger}ms` }}
+      className="text-center p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-opacity h-full flex flex-col"
+      style={{ 
+        transitionDuration: `${duration}ms`, 
+        transitionDelay: `${index * stagger}ms`,
+        opacity: isVisible ? 1 : 0
+      }}
     >
-      <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+      <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4 flex-shrink-0">
         <IconComponent className="w-7 h-7 text-primary-600" />
       </div>
       <h3 className="font-semibold text-lg text-gray-900 mb-2">{feature.title}</h3>
-      <p className="text-gray-600 text-sm">{feature.description}</p>
+      <p className="text-gray-600 text-sm flex-grow">{feature.description}</p>
     </div>
   );
 };
@@ -80,11 +80,28 @@ const HomePage = () => {
         api.get('/settings').catch(() => ({ data: {} }))
       ]);
       
-      const houses = housesRes.data
-        .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
-        .slice(0, 6);
+      const allHouses = housesRes.data || [];
+      const siteSettings = settingsRes.data || {};
+      
+      // Use admin-selected featured IDs if available, otherwise fallback to featured flag
+      const savedFeaturedIds = siteSettings.featured_properties || [];
+      let houses;
+      
+      if (savedFeaturedIds.length > 0) {
+        // Get houses in the order specified by admin
+        houses = savedFeaturedIds
+          .map(id => allHouses.find(h => h.id === id))
+          .filter(Boolean)
+          .slice(0, 6);
+      } else {
+        // Fallback: sort by featured flag
+        houses = allHouses
+          .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
+          .slice(0, 6);
+      }
+      
       setFeaturedHouses(houses);
-      setSettings(settingsRes.data);
+      setSettings(siteSettings);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -132,6 +149,7 @@ const HomePage = () => {
     overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
     overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6,
     statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe',
+    statsNumberColor: settings?.hero_content?.statsNumberColor || '#ffffff',
     statsRibbonStyle: settings?.hero_content?.statsRibbonStyle || 'rgba(0,0,0,0.7)'
   };
 
@@ -151,22 +169,40 @@ const HomePage = () => {
   };
 
   
+  // Preload hero background image
+  useEffect(() => {
+    if (heroContent.backgroundImage) {
+      const img = new Image();
+      img.src = heroContent.backgroundImage;
+    }
+    if (heroContent.backgroundImageMobile) {
+      const img = new Image();
+      img.src = heroContent.backgroundImageMobile;
+    }
+  }, [heroContent.backgroundImage, heroContent.backgroundImageMobile]);
+
   return (
     <PublicLayout>
-      {/* Hero Section */}
+      {/* Hero Section - Use neutral dark background as fallback instead of blue */}
       <section 
-        className="relative text-white overflow-hidden"
-        style={{ background: `linear-gradient(to bottom right, ${colors[600]}, ${colors[700]}, ${colors[800]})` }}
+        className="relative text-white overflow-hidden min-h-[100vh]"
+        style={{ backgroundColor: '#1a1a1a' }}
       >
         {/* Desktop Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center hidden md:block"
-          style={{ backgroundImage: `url('${heroContent.backgroundImage}')` }}
+          className="absolute inset-0 bg-cover bg-center hidden md:block transition-opacity duration-500"
+          style={{ 
+            backgroundImage: heroContent.backgroundImage ? `url('${heroContent.backgroundImage}')` : 'none',
+            opacity: heroContent.backgroundImage ? 1 : 0
+          }}
         ></div>
         {/* Mobile Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center md:hidden"
-          style={{ backgroundImage: `url('${heroContent.backgroundImageMobile}')` }}
+          className="absolute inset-0 bg-cover bg-center md:hidden transition-opacity duration-500"
+          style={{ 
+            backgroundImage: heroContent.backgroundImageMobile ? `url('${heroContent.backgroundImageMobile}')` : 'none',
+            opacity: heroContent.backgroundImageMobile ? 1 : 0
+          }}
         ></div>
         {/* Desktop Overlay */}
         <div 
@@ -210,14 +246,14 @@ const HomePage = () => {
           </div>
         </div>
         
-        {/* Stats Section - Inside Hero with Blur */}
+        {/* Stats Section - Inside Hero with Blur, positioned lower */}
         <div 
           ref={statsRef} 
-          className="relative mt-8 py-6 md:py-8 backdrop-blur-lg"
-          style={{ background: 'rgba(0,0,0,0.3)' }}
+          className="relative mt-16 md:mt-20 py-6 md:py-8 backdrop-blur-lg"
+          style={{ background: statsRibbonBg }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center text-white">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
               {stats.map((stat, index) => (
                 <StatItem 
                   key={index} 
@@ -227,6 +263,7 @@ const HomePage = () => {
                   index={index}
                   duration={animSettings.duration}
                   labelColor={heroContent.statsLabelColor}
+                  numberColor={heroContent.statsNumberColor}
                 />
               ))}
             </div>
@@ -237,7 +274,10 @@ const HomePage = () => {
       {/* Features Section */}
       <section ref={featuresRef} className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`text-center mb-12 transition-all duration-700 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div 
+            className="text-center mb-12 transition-opacity duration-500"
+            style={{ opacity: featuresVisible ? 1 : 0 }}
+          >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
             </h2>
@@ -263,7 +303,10 @@ const HomePage = () => {
       {/* Featured Houses */}
       <section ref={housesRef} className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex flex-col md:flex-row md:items-end justify-between mb-10 transition-all ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms` }}>
+          <div 
+            className="flex flex-col md:flex-row md:items-end justify-between mb-10 transition-opacity"
+            style={{ transitionDuration: '500ms', opacity: housesVisible ? 1 : 0 }}
+          >
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                 {housesSection.title}
@@ -287,19 +330,19 @@ const HomePage = () => {
             </div>
           ) : featuredHouses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredHouses.map((house, index) => {
-                // Calculate row (0, 1, 2...) based on 3 columns for lg, 2 for md, 1 for sm
-                const rowIndex = Math.floor(index / 3);
-                return (
-                  <div 
-                    key={house.id}
-                    className={`transition-all ${housesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                    style={{ transitionDuration: `${animSettings.duration}ms`, transitionDelay: `${rowIndex * (animSettings.staggerDelay * 3)}ms` }}
-                  >
-                    <HouseCard house={house} />
-                  </div>
-                );
-              })}
+              {featuredHouses.map((house, index) => (
+                <div 
+                  key={house.id}
+                  className="transition-opacity h-full"
+                  style={{ 
+                    transitionDuration: '500ms', 
+                    transitionDelay: `${index * 50}ms`,
+                    opacity: housesVisible ? 1 : 0
+                  }}
+                >
+                  <HouseCard house={house} />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
@@ -312,7 +355,10 @@ const HomePage = () => {
       {/* Locations Section */}
       <section ref={locationsRef} className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`text-center mb-12 transition-all ${locationsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDuration: `${animSettings.duration}ms` }}>
+          <div 
+            className="text-center mb-12 transition-opacity duration-500"
+            style={{ opacity: locationsVisible ? 1 : 0 }}
+          >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
             </h2>
@@ -332,13 +378,18 @@ const HomePage = () => {
               return (
               <div 
                 key={loc.name || index}
-                className={`relative rounded-2xl overflow-hidden group transition-all ${locationsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDuration: `${animSettings.duration}ms`, transitionDelay: `${index * animSettings.staggerDelay}ms` }}
+                className="relative rounded-2xl overflow-hidden group transition-opacity h-64"
+                style={{ 
+                  transitionDuration: '500ms', 
+                  transitionDelay: `${index * 100}ms`,
+                  opacity: locationsVisible ? 1 : 0
+                }}
               >
                 <img 
                   src={imageUrl} 
                   alt={loc.name} 
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
                   onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800'; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
@@ -366,14 +417,16 @@ const HomePage = () => {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             {aboutSection.title && (
               <h2 
-                className={`text-3xl md:text-4xl font-bold text-gray-900 mb-4 transition-all duration-500 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 transition-opacity duration-500"
+                style={{ opacity: aboutVisible ? 1 : 0 }}
               >
                 {aboutSection.title}
               </h2>
             )}
             {aboutSection.subtitle && (
               <p 
-                className={`text-lg text-primary-600 font-medium mb-6 transition-all duration-500 delay-100 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                className="text-lg text-primary-600 font-medium mb-6 transition-opacity duration-500"
+                style={{ opacity: aboutVisible ? 1 : 0, transitionDelay: '100ms' }}
               >
                 {aboutSection.subtitle}
               </p>
@@ -383,8 +436,11 @@ const HomePage = () => {
                 {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
                   <p 
                     key={index}
-                    className={`transition-all duration-500 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-                    style={{ transitionDelay: `${200 + (index * 100)}ms` }}
+                    className="transition-opacity duration-500"
+                    style={{ 
+                      opacity: aboutVisible ? 1 : 0,
+                      transitionDelay: `${200 + (index * 100)}ms` 
+                    }}
                   >
                     {line}
                   </p>
@@ -398,14 +454,23 @@ const HomePage = () => {
       {/* CTA Section */}
       <section ref={ctaRef} className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className={`text-3xl md:text-4xl font-bold text-white mb-4 transition-all duration-700 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 
+            className="text-3xl md:text-4xl font-bold text-white mb-4 transition-opacity duration-500"
+            style={{ opacity: ctaVisible ? 1 : 0 }}
+          >
             Ready to Find Your New Home?
           </h2>
-          <p className={`mb-8 max-w-2xl mx-auto transition-all duration-700 delay-100 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ color: colors[100] }}>
+          <p 
+            className="mb-8 max-w-2xl mx-auto transition-opacity duration-500" 
+            style={{ color: colors[100], opacity: ctaVisible ? 1 : 0, transitionDelay: '100ms' }}
+          >
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div className={`flex flex-wrap justify-center gap-4 transition-all duration-700 delay-200 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div 
+            className="flex flex-wrap justify-center gap-4 transition-opacity duration-500"
+            style={{ opacity: ctaVisible ? 1 : 0, transitionDelay: '200ms' }}
+          >
             <Link 
               to="/houses" 
               className="font-medium py-2.5 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 hover:scale-105 animate-pulse-subtle shadow-lg"

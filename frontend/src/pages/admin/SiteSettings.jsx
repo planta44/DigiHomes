@@ -429,10 +429,56 @@ const SiteSettings = () => {
                     <p className="text-xs text-gray-500 mt-1">Use rgba(), hex, or CSS gradients</p>
                   </div>
 
+                  {/* Stats Colors */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Stats Number Color</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="color" 
+                          value={settings.hero_content.statsNumberColor || '#ffffff'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, statsNumberColor: e.target.value }
+                          }))}
+                          className="w-10 h-10 rounded border cursor-pointer"
+                        />
+                        <input 
+                          type="text" 
+                          value={settings.hero_content.statsNumberColor || '#ffffff'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, statsNumberColor: e.target.value }
+                          }))}
+                          className="input-field text-sm flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Stats Label Color</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="color" 
+                          value={settings.hero_content.statsLabelColor || '#bfdbfe'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
+                          }))}
+                          className="w-10 h-10 rounded border cursor-pointer"
+                        />
+                        <input 
+                          type="text" 
+                          value={settings.hero_content.statsLabelColor || '#bfdbfe'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
+                          }))}
+                          className="input-field text-sm flex-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Preview */}
-                  <div className="mt-4 p-4 rounded-lg text-white text-center" style={{ background: settings.hero_content.statsRibbonStyle || 'rgba(0,0,0,0.7)' }}>
-                    <span className="text-2xl font-bold">100+</span>
-                    <p className="text-sm opacity-80">Preview</p>
+                  <div className="mt-4 p-4 rounded-lg text-center" style={{ background: settings.hero_content.statsRibbonStyle || 'rgba(0,0,0,0.7)' }}>
+                    <span className="text-2xl font-bold" style={{ color: settings.hero_content.statsNumberColor || '#ffffff' }}>100+</span>
+                    <p className="text-sm" style={{ color: settings.hero_content.statsLabelColor || '#bfdbfe' }}>Preview Label</p>
                   </div>
                 </div>
 

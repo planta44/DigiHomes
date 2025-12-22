@@ -39,14 +39,15 @@ const HouseCard = ({ house }) => {
   const listingBadge = getListingBadge();
 
   return (
-    <div className="card group shadow-lg hover:shadow-xl transition-shadow duration-300">
-      {/* Image */}
-      <div className="relative h-48 overflow-hidden">
+    <div className="card group shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white rounded-xl overflow-hidden flex flex-col h-full">
+      {/* Image - Fixed height to prevent layout shift */}
+      <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
         <img
           src={imageUrl}
           alt={house.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
+          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop&q=60'; }}
         />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
@@ -69,8 +70,8 @@ const HouseCard = ({ house }) => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
+      {/* Content - Flex grow to fill remaining space */}
+      <div className="p-4 flex flex-col flex-grow">
         <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-1">
           {house.title}
         </h3>
@@ -80,8 +81,8 @@ const HouseCard = ({ house }) => {
           <span className="truncate">{house.location}, Kenya</span>
         </div>
 
-        {/* Property Details - Different for Land vs House */}
-        <div className="flex items-center gap-3 text-gray-600 text-sm mb-4 flex-wrap">
+        {/* Property Details - Different for Land vs House, fixed min-height */}
+        <div className="flex items-center gap-3 text-gray-600 text-sm mb-4 flex-wrap min-h-[24px]">
           {isLand ? (
             <>
               {house.size_acres && (
@@ -116,9 +117,12 @@ const HouseCard = ({ house }) => {
           )}
         </div>
 
+        {/* Spacer to push button to bottom */}
+        <div className="flex-grow"></div>
+        
         <Link
           to={`/houses/${house.id}`}
-          className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-600 hover:text-white transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-600 hover:text-white transition-colors mt-auto"
         >
           View Details
           <ArrowRight className="w-4 h-4" />
