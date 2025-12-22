@@ -67,8 +67,8 @@ const HousesPage = () => {
   const availableCount = houses.filter(h => h.vacancy_status === 'available').length;
   
   // Animation hooks
-  const [heroRef, heroVisible] = useInView(0.3, false);
-  const [cardsRef, cardsVisible] = useScrollAnimation(0.1);
+  const [heroRef, heroVisible] = useInView();
+  const [cardsRef, cardsVisible] = useScrollAnimation();
 
   return (
     <PublicLayout>

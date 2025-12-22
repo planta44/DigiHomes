@@ -1,93 +1,66 @@
 import { useState, useEffect, useRef } from 'react';
 
-export const useScrollAnimation = (threshold = 0.1, resetOnExit = false) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const useScrollAnimation = (delay = 0) => {
+  const [isVisible, setIsVisible] = useState(true); // Start visible to prevent hidden content
   const ref = useRef(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        } else if (resetOnExit) {
-          setIsVisible(false);
-        }
-      },
-      { threshold }
-    );
-
     const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
+    if (!currentRef) return;
 
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, [threshold, resetOnExit]);
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => setIsVisible(true), delay);
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(currentRef);
+
+      return () => observer.disconnect();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [delay]);
 
   return [ref, isVisible];
 };
 
-// Hook for detecting when element is visible - can repeat animation on re-entry
-export const useInView = (threshold = 0.3, triggerOnce = false) => {
-  const [isInView, setIsInView] = useState(false);
+// Hook for detecting when element is visible - always starts visible
+export const useInView = (threshold = 0.1) => {
+  const [isInView, setIsInView] = useState(true);
   const ref = useRef(null);
   
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          if (triggerOnce) observer.disconnect();
-        } else {
-          if (!triggerOnce) setIsInView(false);
-        }
-      },
-      { threshold }
-    );
-    
     const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
+    if (!currentRef) return;
     
-    return () => observer.disconnect();
-  }, [threshold, triggerOnce]);
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setIsInView(entry.isIntersecting);
+        },
+        { threshold: 0.1 }
+      );
+      
+      observer.observe(currentRef);
+      
+      return () => observer.disconnect();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   return [ref, isInView];
 };
 
-// Hook for staggered children animations
-export const useStaggeredAnimation = (itemCount, baseDelay = 0, staggerDelay = 100) => {
-  const [visibleItems, setVisibleItems] = useState([]);
+// Hook for staggered children animations - items always visible
+export const useStaggeredAnimation = (itemCount) => {
+  const [visibleItems] = useState(() => Array.from({ length: Math.max(itemCount, 20) }, (_, i) => i));
   const ref = useRef(null);
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          for (let i = 0; i < itemCount; i++) {
-            setTimeout(() => {
-              setVisibleItems(prev => [...prev, i]);
-            }, baseDelay + (i * staggerDelay));
-          }
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    
-    const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-    
-    return () => observer.disconnect();
-  }, [itemCount, baseDelay, staggerDelay]);
-  
   return [ref, visibleItems];
 };
 

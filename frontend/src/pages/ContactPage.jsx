@@ -5,9 +5,9 @@ import api from '../config/api';
 import { useInView, useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const ContactPage = () => {
-  // Hero animation repeats when scrolling back to top
-  const [heroRef, heroVisible] = useInView(0.3, false);
-  const [contentRef, contentVisible] = useScrollAnimation(0.1);
+  // Hero animation
+  const [heroRef, heroVisible] = useInView();
+  const [contentRef, contentVisible] = useScrollAnimation();
   
   const [settings, setSettings] = useState({
     contact_page: {

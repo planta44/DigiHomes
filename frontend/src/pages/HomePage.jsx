@@ -64,90 +64,69 @@ const useCountUp = (end, duration = 2000, trigger = true) => {
   return count;
 };
 
-// Hook for detecting when element is visible (triggers every time element enters view)
-const useInView = (threshold = 0.3, triggerOnce = false) => {
-  const [isInView, setIsInView] = useState(false);
+// Hook for detecting when element is visible - always starts visible, tracks scroll for re-animation
+const useInView = (threshold = 0.1) => {
+  const [isInView, setIsInView] = useState(true);
   const ref = useRef(null);
   
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          if (triggerOnce) observer.disconnect();
-        } else {
-          if (!triggerOnce) setIsInView(false);
-        }
-      },
-      { threshold }
-    );
+    const currentRef = ref.current;
+    if (!currentRef) return;
     
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    // Small delay to let initial render complete
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setIsInView(entry.isIntersecting);
+        },
+        { threshold: 0.1 }
+      );
+      
+      observer.observe(currentRef);
+      
+      return () => observer.disconnect();
+    }, 100);
     
-    return () => observer.disconnect();
-  }, [threshold, triggerOnce]);
+    return () => clearTimeout(timer);
+  }, []);
   
   return [ref, isInView];
 };
 
-// Hook for scroll-triggered animations with delay - supports repeat on re-entry
-const useScrollAnimation = (delay = 0, repeat = false) => {
-  const [isVisible, setIsVisible] = useState(false);
+// Hook for scroll-triggered animations - always visible, animation is enhancement only
+const useScrollAnimation = (delay = 0) => {
+  const [isVisible, setIsVisible] = useState(true);
   const ref = useRef(null);
   
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
-          if (!repeat) observer.disconnect();
-        } else if (repeat) {
-          setIsVisible(false);
-        }
-      },
-      { threshold: 0.1 }
-    );
+    const currentRef = ref.current;
+    if (!currentRef) return;
     
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => setIsVisible(true), delay);
+          }
+        },
+        { threshold: 0.1 }
+      );
+      
+      observer.observe(currentRef);
+      
+      return () => observer.disconnect();
+    }, 100);
     
-    return () => observer.disconnect();
-  }, [delay, repeat]);
+    return () => clearTimeout(timer);
+  }, [delay]);
   
   return [ref, isVisible];
 };
 
-// Hook for staggered children animations
-const useStaggeredAnimation = (itemCount, baseDelay = 0, staggerDelay = 100) => {
-  const [visibleItems, setVisibleItems] = useState([]);
+// Hook for staggered children animations - items always visible
+const useStaggeredAnimation = (itemCount) => {
+  const [visibleItems] = useState(() => Array.from({ length: Math.max(itemCount, 20) }, (_, i) => i));
   const ref = useRef(null);
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          // Stagger the visibility of each item
-          for (let i = 0; i < itemCount; i++) {
-            setTimeout(() => {
-              setVisibleItems(prev => [...prev, i]);
-            }, baseDelay + (i * staggerDelay));
-          }
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-    
-    return () => observer.disconnect();
-  }, [itemCount, baseDelay, staggerDelay]);
-  
   return [ref, visibleItems];
 };
 
@@ -190,11 +169,11 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Hero animation - repeats when scrolling back to top
-  const [heroRef, heroVisible] = useInView(0.3, false);
+  // Hero animation
+  const [heroRef, heroVisible] = useInView();
   
-  // Stats animation - triggers every time stats enter/leave view
-  const [statsRef, statsVisible] = useInView(0.2, false);
+  // Stats animation
+  const [statsRef, statsVisible] = useInView();
   
   // Section animations with staggered delays
   const [featuresHeaderRef, featuresHeaderVisible] = useScrollAnimation(0);

@@ -25,10 +25,10 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Hero animation repeats when scrolling back to top
-  const [heroRef, heroVisible] = useInView(0.3, false);
-  const [contentRef, contentVisible] = useScrollAnimation(0.1, true);
-  const [propertiesRef, propertiesVisible] = useScrollAnimation(0.01, true);
+  // Hero animation
+  const [heroRef, heroVisible] = useInView();
+  const [contentRef, contentVisible] = useScrollAnimation();
+  const [propertiesRef, propertiesVisible] = useScrollAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);

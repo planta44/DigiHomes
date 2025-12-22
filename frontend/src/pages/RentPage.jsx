@@ -23,9 +23,9 @@ const RentPage = () => {
   const [locations, setLocations] = useState([]);
   const [houseTypes, setHouseTypes] = useState([]);
   const { colors } = useTheme();
-  // Hero animation repeats when scrolling back to top
-  const [heroRef, heroVisible] = useInView(0.3, false);
-  const [housesRef, housesVisible] = useScrollAnimation(0.01, true);
+  // Hero animation
+  const [heroRef, heroVisible] = useInView();
+  const [housesRef, housesVisible] = useScrollAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);

@@ -11,8 +11,8 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
-  // Hero animation repeats when scrolling back to top
-  const [heroRef, heroVisible] = useInView(0.3, false);
+  // Hero animation
+  const [heroRef, heroVisible] = useInView();
 
   useEffect(() => {
     window.scrollTo(0, 0);
