@@ -68,7 +68,7 @@ const Navbar = () => {
     { path: '/houses', label: 'Houses', icon: Building },
     { path: '/services', label: 'Services', icon: Briefcase },
     { path: '/buy', label: 'Buy', icon: ShoppingBag },
-    { path: '/rentals', label: 'Rentals', icon: Key },
+    { path: '/rentals', label: 'Rent', icon: Key },
     { path: '/reels', label: 'Reels', icon: Play },
     { path: '/contact', label: 'Contact', icon: Phone },
   ];
@@ -80,15 +80,15 @@ const Navbar = () => {
   const firstPart = brandName.slice(0, splitAt);
   const secondPart = brandName.slice(splitAt);
 
-  // Determine if navbar should be transparent (only on mobile homepage when not scrolled)
-  // Desktop always has white background
+  // Determine if navbar should be transparent (only on mobile/tablet homepage when not scrolled)
+  // Large screens always have white background
   const isTransparentMobile = isHomePage && !isScrolled && !isOpen;
 
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isTransparentMobile 
-          ? 'bg-transparent md:bg-white md:shadow-md' 
+          ? 'bg-transparent lg:bg-white lg:shadow-md' 
           : 'bg-white shadow-md'
       }`}
     >
@@ -105,28 +105,34 @@ const Navbar = () => {
               />
             )}
             <div className="flex items-center">
+              {/* On large screens, always use brand colors. On mobile/tablet, use white when transparent */}
               <span 
                 className="font-bold text-xl sm:text-2xl transition-colors duration-300"
-                style={{ color: isTransparentMobile ? '#ffffff' : brandSettings.primaryColor }}
+                style={{ 
+                  color: brandSettings.primaryColor,
+                  // Override with white on mobile/tablet when transparent
+                  ...(isTransparentMobile && { color: '#ffffff' })
+                }}
               >
-                {firstPart}
+                <span className="lg:hidden" style={{ color: isTransparentMobile ? '#ffffff' : brandSettings.primaryColor }}>{firstPart}</span>
+                <span className="hidden lg:inline" style={{ color: brandSettings.primaryColor }}>{firstPart}</span>
               </span>
               <span 
                 className="font-bold text-xl sm:text-2xl transition-colors duration-300"
-                style={{ color: isTransparentMobile ? '#ffffff' : brandSettings.secondaryColor }}
               >
-                {secondPart}
+                <span className="lg:hidden" style={{ color: isTransparentMobile ? '#ffffff' : brandSettings.secondaryColor }}>{secondPart}</span>
+                <span className="hidden lg:inline" style={{ color: brandSettings.secondaryColor }}>{secondPart}</span>
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation - Always normal colors since desktop has white bg */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop Navigation - Only show on large screens */}
+          <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`flex items-center gap-2 font-medium transition-colors duration-300 ${
+                className={`flex items-center gap-1.5 font-medium transition-colors duration-300 text-sm ${
                   isActive(link.path) ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600'
                 }`}
               >
@@ -136,9 +142,9 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile/Tablet Menu Button - Show on screens smaller than lg */}
           <button
-            className={`md:hidden p-2 rounded-lg z-50 transition-colors duration-300 ${
+            className={`lg:hidden p-2 rounded-lg z-50 transition-colors duration-300 ${
               isTransparentMobile ? 'text-white hover:bg-white/20' : 'text-gray-900 hover:bg-gray-100'
             }`}
             onClick={() => setIsOpen(!isOpen)}
@@ -148,9 +154,9 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Full Screen Mobile Navigation */}
+      {/* Full Screen Mobile/Tablet Navigation */}
       <div 
-        className={`fixed inset-0 z-50 md:hidden transition-all duration-500 ${
+        className={`fixed inset-0 z-50 lg:hidden transition-all duration-500 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >

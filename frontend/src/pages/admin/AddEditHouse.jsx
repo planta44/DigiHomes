@@ -37,7 +37,9 @@ const AddEditHouse = () => {
     dimensions: '',
     rent_price: '',
     vacancy_status: 'available',
-    featured: false
+    featured: false,
+    lease_duration_type: 'months',
+    lease_duration: ''
   });
 
   const [locations, setLocations] = useState([]);
@@ -91,7 +93,9 @@ const AddEditHouse = () => {
         dimensions: house.dimensions || '',
         rent_price: house.rent_price,
         vacancy_status: house.vacancy_status,
-        featured: house.featured
+        featured: house.featured,
+        lease_duration_type: house.lease_duration_type || 'months',
+        lease_duration: house.lease_duration || ''
       });
       setImages(house.images || []);
     } catch (error) {
@@ -365,18 +369,57 @@ const AddEditHouse = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {formData.listing_type === 'buy' ? 'Price (KES)' : 'Rent/Month (KES)'} <span className="text-red-500">*</span>
+                      {formData.listing_type === 'buy' ? 'Price (KES)' : formData.listing_type === 'lease' ? 'Lease Price (KES)' : 'Rent/Month (KES)'} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
                       name="rent_price"
                       value={formData.rent_price}
                       onChange={handleChange}
-                      placeholder={formData.listing_type === 'buy' ? '5000000' : '15000'}
+                      placeholder={formData.listing_type === 'buy' ? '5000000' : formData.listing_type === 'lease' ? '500000' : '15000'}
                       min="0"
                       className="input-field"
                       required
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Lease Duration Fields - only show when listing type is lease */}
+              {formData.listing_type === 'lease' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Lease Duration Type <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="lease_duration_type"
+                      value={formData.lease_duration_type}
+                      onChange={handleChange}
+                      className="input-field"
+                    >
+                      <option value="months">Months</option>
+                      <option value="years">Years</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Duration ({formData.lease_duration_type === 'years' ? 'Years' : 'Months'}) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="lease_duration"
+                      value={formData.lease_duration}
+                      onChange={handleChange}
+                      placeholder={formData.lease_duration_type === 'years' ? '2' : '24'}
+                      min="1"
+                      className="input-field"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formData.lease_duration_type === 'years' 
+                        ? `e.g., 2 years = 24 months lease period` 
+                        : `e.g., 12 months = 1 year lease period`}
+                    </p>
                   </div>
                 </div>
               )}

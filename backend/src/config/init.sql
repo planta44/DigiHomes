@@ -22,9 +22,22 @@ CREATE TABLE IF NOT EXISTS houses (
   rent_price DECIMAL(10, 2) NOT NULL,
   vacancy_status VARCHAR(20) DEFAULT 'available' CHECK (vacancy_status IN ('available', 'occupied')),
   featured BOOLEAN DEFAULT false,
+  lease_duration_type VARCHAR(20) DEFAULT 'months',
+  lease_duration INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add lease duration columns if they don't exist (for existing databases)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'houses' AND column_name = 'lease_duration_type') THEN
+    ALTER TABLE houses ADD COLUMN lease_duration_type VARCHAR(20) DEFAULT 'months';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'houses' AND column_name = 'lease_duration') THEN
+    ALTER TABLE houses ADD COLUMN lease_duration INTEGER;
+  END IF;
+END $$;
 
 -- House Images table
 CREATE TABLE IF NOT EXISTS house_images (

@@ -23,7 +23,15 @@ const HouseCard = ({ house }) => {
 
   const getPriceLabel = () => {
     if (isForSale) return '';
-    if (isForLease) return '';
+    if (isForLease) {
+      // Show lease duration if available
+      if (house.lease_duration && house.lease_duration_type) {
+        const duration = house.lease_duration;
+        const type = house.lease_duration_type === 'years' ? (duration === 1 ? 'yr' : 'yrs') : (duration === 1 ? 'mo' : 'mos');
+        return `/${duration} ${type}`;
+      }
+      return '';
+    }
     return '/mo';
   };
 

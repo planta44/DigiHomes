@@ -85,14 +85,14 @@ const SiteSettings = () => {
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
     animation_settings: { duration: 700, staggerDelay: 100 },
-    hero_stats: [{ value: '100+', label: 'Happy Tenants' }],
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
-    hero_content: { title: '', highlight: '', description: '', backgroundImage: '' },
+    hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
     features_section: { title: '', subtitle: '' },
+    stats_section: { title: '', subtitle: '', stats: [{ value: '100+', label: 'Happy Clients' }] },
     houses_section: { title: '', subtitle: '' },
     locations_section: { title: '', subtitle: '', locations: [] },
-    about_section: { title: '', subtitle: '', content: '' },
+    about_section: { title: '', subtitle: '', content: '', image: '' },
     footer_content: { tagline: '', description: '', quickLinks: [], contactLocations: [], contactPhones: [], contactEmail: '' },
     contact_page: { title: '', subtitle: '', workingHours: [], offices: [], faqs: [] },
     digi_posts: { title: '', subtitle: '', posts: [] }
@@ -117,11 +117,11 @@ const SiteSettings = () => {
         ...prev,
         brand_settings: { ...prev.brand_settings, ...data.brand_settings },
         animation_settings: { ...prev.animation_settings, ...data.animation_settings },
-        hero_stats: data.hero_stats || prev.hero_stats,
         features: data.features || prev.features,
         company_info: { ...prev.company_info, ...data.company_info },
         hero_content: { ...prev.hero_content, ...data.hero_content },
         features_section: { ...prev.features_section, ...data.features_section },
+        stats_section: { ...prev.stats_section, ...data.stats_section },
         houses_section: { ...prev.houses_section, ...data.houses_section },
         locations_section: { ...prev.locations_section, ...data.locations_section },
         about_section: { ...prev.about_section, ...data.about_section },
@@ -188,11 +188,12 @@ const SiteSettings = () => {
 
   const tabs = [
     { id: 'brand', label: 'Brand', icon: Palette },
-    { id: 'animation', label: 'Animation', icon: Zap },
     { id: 'hero', label: 'Hero', icon: Image },
     { id: 'features', label: 'Features', icon: Star },
+    { id: 'stats', label: 'Stats', icon: BarChart3 },
     { id: 'houses', label: 'Houses', icon: Home },
     { id: 'locations_display', label: 'Locations', icon: Globe },
+    { id: 'about', label: 'About', icon: FileText },
     { id: 'company', label: 'Company', icon: Building },
     { id: 'footer', label: 'Footer', icon: FileText },
     { id: 'contact', label: 'Contact', icon: Phone },
@@ -381,105 +382,6 @@ const SiteSettings = () => {
                   </div>
                 </div>
 
-                {/* Stats Ribbon Settings - New Approach */}
-                <div className="border-t pt-4">
-                  <h4 className="font-medium text-sm mb-3">Stats Ribbon Background</h4>
-                  <p className="text-xs text-gray-500 mb-3">Choose a preset style or customize your own</p>
-                  
-                  {/* Preset Options */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                    {[
-                      { name: 'Dark', bg: 'rgba(0,0,0,0.7)', preview: 'bg-gray-900' },
-                      { name: 'Primary', bg: 'rgba(37,99,235,0.85)', preview: 'bg-blue-600' },
-                      { name: 'Gradient Dark', bg: 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(30,30,30,0.9))', preview: 'bg-gradient-to-br from-gray-900 to-gray-800' },
-                      { name: 'Glass', bg: 'rgba(255,255,255,0.1)', preview: 'bg-white/20' }
-                    ].map((preset) => (
-                      <button
-                        key={preset.name}
-                        type="button"
-                        onClick={() => setSettings(prev => ({
-                          ...prev, hero_content: { ...prev.hero_content, statsRibbonStyle: preset.bg }
-                        }))}
-                        className={`p-3 rounded-lg border-2 transition-all ${
-                          settings.hero_content.statsRibbonStyle === preset.bg 
-                            ? 'border-primary-500 ring-2 ring-primary-200' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <div className={`h-8 rounded ${preset.preview} mb-2`}></div>
-                        <span className="text-xs font-medium text-gray-700">{preset.name}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Custom RGBA Input */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Custom Background (CSS)</label>
-                    <input 
-                      type="text" 
-                      value={settings.hero_content.statsRibbonStyle || 'rgba(0,0,0,0.7)'} 
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev, hero_content: { ...prev.hero_content, statsRibbonStyle: e.target.value }
-                      }))} 
-                      className="input-field text-sm" 
-                      placeholder="rgba(0,0,0,0.7) or linear-gradient(...)" 
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Use rgba(), hex, or CSS gradients</p>
-                  </div>
-
-                  {/* Stats Colors */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Stats Number Color</label>
-                      <div className="flex items-center gap-2">
-                        <input 
-                          type="color" 
-                          value={settings.hero_content.statsNumberColor || '#ffffff'} 
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev, hero_content: { ...prev.hero_content, statsNumberColor: e.target.value }
-                          }))}
-                          className="w-10 h-10 rounded border cursor-pointer"
-                        />
-                        <input 
-                          type="text" 
-                          value={settings.hero_content.statsNumberColor || '#ffffff'} 
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev, hero_content: { ...prev.hero_content, statsNumberColor: e.target.value }
-                          }))}
-                          className="input-field text-sm flex-1"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Stats Label Color</label>
-                      <div className="flex items-center gap-2">
-                        <input 
-                          type="color" 
-                          value={settings.hero_content.statsLabelColor || '#bfdbfe'} 
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
-                          }))}
-                          className="w-10 h-10 rounded border cursor-pointer"
-                        />
-                        <input 
-                          type="text" 
-                          value={settings.hero_content.statsLabelColor || '#bfdbfe'} 
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
-                          }))}
-                          className="input-field text-sm flex-1"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Preview */}
-                  <div className="mt-4 p-4 rounded-lg text-center" style={{ background: settings.hero_content.statsRibbonStyle || 'rgba(0,0,0,0.7)' }}>
-                    <span className="text-2xl font-bold" style={{ color: settings.hero_content.statsNumberColor || '#ffffff' }}>100+</span>
-                    <p className="text-sm" style={{ color: settings.hero_content.statsLabelColor || '#bfdbfe' }}>Preview Label</p>
-                  </div>
-                </div>
-
                 {/* Hamburger Menu Text Colors */}
                 <div className="border-t pt-4">
                   <h4 className="font-medium text-sm mb-3">Mobile Menu Text Colors</h4>
@@ -633,7 +535,7 @@ const SiteSettings = () => {
                 {/* Text Colors */}
                 <div className="border-t pt-4 mt-4">
                   <h4 className="font-medium text-sm mb-3">Text Colors</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Title Highlight Color</label>
                       <div className="flex gap-2">
@@ -644,10 +546,10 @@ const SiteSettings = () => {
                           ...prev, hero_content: { ...prev.hero_content, highlightColor: e.target.value }
                         }))} className="input-field flex-1 text-sm" />
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Color of "Nakuru & Nyahururu" in title</p>
+                      <p className="text-xs text-gray-500 mt-1">Color of highlighted text in title</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description Highlight Color</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description Text Color</label>
                       <div className="flex gap-2">
                         <input type="color" value={settings.hero_content.descriptionHighlightColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
                           ...prev, hero_content: { ...prev.hero_content, descriptionHighlightColor: e.target.value }
@@ -656,19 +558,67 @@ const SiteSettings = () => {
                           ...prev, hero_content: { ...prev.hero_content, descriptionHighlightColor: e.target.value }
                         }))} className="input-field flex-1 text-sm" />
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Color of "Nakuru & Nyahururu" in description</p>
+                      <p className="text-xs text-gray-500 mt-1">Color of description text</p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Stats Label Color</label>
-                      <div className="flex gap-2">
-                        <input type="color" value={settings.hero_content.statsLabelColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
-                          ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
-                        }))} className="w-12 h-10 rounded cursor-pointer" />
-                        <input type="text" value={settings.hero_content.statsLabelColor || '#bfdbfe'} onChange={(e) => setSettings(prev => ({
-                          ...prev, hero_content: { ...prev.hero_content, statsLabelColor: e.target.value }
-                        }))} className="input-field flex-1 text-sm" />
+                  </div>
+                </div>
+
+                {/* Positioning Settings */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Content Positioning</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Desktop Settings */}
+                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <h5 className="font-medium text-sm text-gray-800">Desktop (Large Screens)</h5>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                        <select value={settings.hero_content.desktopHeight || '100vh'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, desktopHeight: e.target.value }
+                        }))} className="input-field">
+                          <option value="100vh">Full Screen (100vh)</option>
+                          <option value="90vh">90% Screen</option>
+                          <option value="80vh">80% Screen</option>
+                          <option value="70vh">70% Screen</option>
+                          <option value="60vh">60% Screen</option>
+                        </select>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Color of stats labels (Happy Tenants, etc.)</p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Alignment</label>
+                        <select value={settings.hero_content.desktopAlign || 'bottom'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, desktopAlign: e.target.value }
+                        }))} className="input-field">
+                          <option value="top">Top</option>
+                          <option value="center">Center</option>
+                          <option value="bottom">Bottom</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile Settings */}
+                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <h5 className="font-medium text-sm text-gray-800">Mobile (Small Screens)</h5>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                        <select value={settings.hero_content.mobileHeight || '100vh'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, mobileHeight: e.target.value }
+                        }))} className="input-field">
+                          <option value="100vh">Full Screen (100vh)</option>
+                          <option value="90vh">90% Screen</option>
+                          <option value="80vh">80% Screen</option>
+                          <option value="70vh">70% Screen</option>
+                          <option value="60vh">60% Screen</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Alignment</label>
+                        <select value={settings.hero_content.mobileAlign || 'bottom'} onChange={(e) => setSettings(prev => ({
+                          ...prev, hero_content: { ...prev.hero_content, mobileAlign: e.target.value }
+                        }))} className="input-field">
+                          <option value="top">Top</option>
+                          <option value="center">Center</option>
+                          <option value="bottom">Bottom</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -732,6 +682,62 @@ const SiteSettings = () => {
                   }))} className="btn-secondary text-sm"><Plus className="w-4 h-4" /> Add</button>
                   <button onClick={() => handleSave('features', settings.features)} disabled={saving} className="btn-primary text-sm">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Stats Section */}
+            {activeTab === 'stats' && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">Stats Section</h3>
+                <p className="text-sm text-gray-600">This section appears below "Why Choose DIGIHOMES?" with count-up animations when scrolled into view.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Section Title (optional)</label>
+                    <input type="text" value={settings.stats_section?.title || ''} onChange={(e) => setSettings(prev => ({
+                      ...prev, stats_section: { ...prev.stats_section, title: e.target.value }
+                    }))} className="input-field" placeholder="Our Impact" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Section Subtitle (optional)</label>
+                    <input type="text" value={settings.stats_section?.subtitle || ''} onChange={(e) => setSettings(prev => ({
+                      ...prev, stats_section: { ...prev.stats_section, subtitle: e.target.value }
+                    }))} className="input-field" placeholder="Numbers that speak for themselves" />
+                  </div>
+                </div>
+                
+                <h4 className="font-medium text-sm">Stats Items</h4>
+                {(settings.stats_section?.stats || []).map((stat, index) => (
+                  <div key={index} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center p-3 bg-gray-50 rounded-lg">
+                    <input type="text" value={stat.value} onChange={(e) => {
+                      const newStats = [...(settings.stats_section?.stats || [])];
+                      newStats[index].value = e.target.value;
+                      setSettings(prev => ({ ...prev, stats_section: { ...prev.stats_section, stats: newStats } }));
+                    }} placeholder="100+" className="input-field w-full sm:w-24" />
+                    <input type="text" value={stat.label} onChange={(e) => {
+                      const newStats = [...(settings.stats_section?.stats || [])];
+                      newStats[index].label = e.target.value;
+                      setSettings(prev => ({ ...prev, stats_section: { ...prev.stats_section, stats: newStats } }));
+                    }} placeholder="Label" className="input-field flex-1" />
+                    <button onClick={() => {
+                      const newStats = (settings.stats_section?.stats || []).filter((_, i) => i !== index);
+                      setSettings(prev => ({ ...prev, stats_section: { ...prev.stats_section, stats: newStats } }));
+                    }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                ))}
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => setSettings(prev => ({ 
+                    ...prev, 
+                    stats_section: { 
+                      ...prev.stats_section, 
+                      stats: [...(prev.stats_section?.stats || []), { value: '', label: '' }] 
+                    } 
+                  }))} className="btn-secondary text-sm">
+                    <Plus className="w-4 h-4" /> Add Stat
+                  </button>
+                  <button onClick={() => handleSave('stats_section', settings.stats_section)} disabled={saving} className="btn-primary text-sm">
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Stats
                   </button>
                 </div>
               </div>
@@ -812,6 +818,48 @@ const SiteSettings = () => {
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* About Section */}
+            {activeTab === 'about' && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">About Us Section</h3>
+                <p className="text-sm text-gray-600">This section appears below "Our Locations" on the homepage.</p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle (Badge)</label>
+                  <input type="text" value={settings.about_section?.subtitle || ''} onChange={(e) => setSettings(prev => ({
+                    ...prev, about_section: { ...prev.about_section, subtitle: e.target.value }
+                  }))} className="input-field" placeholder="About Us" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <input type="text" value={settings.about_section?.title || ''} onChange={(e) => setSettings(prev => ({
+                    ...prev, about_section: { ...prev.about_section, title: e.target.value }
+                  }))} className="input-field" placeholder="Your Trusted Property Partner" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                  <textarea 
+                    value={settings.about_section?.content || ''} 
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev, about_section: { ...prev.about_section, content: e.target.value }
+                    }))} 
+                    className="input-field min-h-[150px]" 
+                    placeholder="Write about your company, mission, values, etc. Use new lines for paragraphs."
+                    rows={6}
+                  />
+                </div>
+                <ImageUploadField 
+                  label="Section Image (optional)" 
+                  value={settings.about_section?.image || ''} 
+                  onChange={(url) => setSettings(prev => ({
+                    ...prev, about_section: { ...prev.about_section, image: url }
+                  }))} 
+                />
+                <button onClick={() => handleSave('about_section', settings.about_section)} disabled={saving} className="btn-primary">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save About Section
+                </button>
               </div>
             )}
 

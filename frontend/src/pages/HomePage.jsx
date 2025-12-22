@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -16,6 +16,83 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
+
+// Hook for counting up animation
+const useCountUp = (end, duration = 2000, trigger = true) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(null);
+  
+  useEffect(() => {
+    if (!trigger) return;
+    
+    // Parse numeric value from string like "100+" or "5+"
+    const numericValue = parseInt(String(end).replace(/[^0-9]/g, '')) || 0;
+    const suffix = String(end).replace(/[0-9]/g, '');
+    
+    let startTime;
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const currentCount = Math.floor(progress * numericValue);
+      setCount(currentCount + suffix);
+      
+      if (progress < 1) {
+        countRef.current = requestAnimationFrame(animate);
+      }
+    };
+    
+    countRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (countRef.current) {
+        cancelAnimationFrame(countRef.current);
+      }
+    };
+  }, [end, duration, trigger]);
+  
+  return count;
+};
+
+// Hook for detecting when element is visible
+const useInView = (threshold = 0.3) => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+    
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [threshold]);
+  
+  return [ref, isInView];
+};
+
+// Stat item with count-up animation
+const StatItem = ({ stat, isVisible }) => {
+  const animatedValue = useCountUp(stat.value, 2000, isVisible);
+  return (
+    <div className="text-center">
+      <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
+        {animatedValue || stat.value}
+      </div>
+      <div className="text-sm md:text-base text-white/80 font-medium uppercase tracking-wider">
+        {stat.label}
+      </div>
+    </div>
+  );
+};
 
 const iconMap = {
   Building, MapPin, Shield, Clock, Star, Users, Home, CheckCircle
@@ -39,6 +116,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
+  const [statsRef, statsVisible] = useInView(0.3);
 
   useEffect(() => {
     fetchData();
@@ -54,21 +132,24 @@ const HomePage = () => {
       const allHouses = housesRes.data || [];
       const siteSettings = settingsRes.data || {};
       
+      // Filter out houses for sale - they should only appear on Buy page
+      const rentalHouses = allHouses.filter(h => h.listing_type !== 'buy');
+      
       // Use admin-selected featured IDs if available, otherwise fallback to featured flag
       const savedFeaturedIds = siteSettings.featured_properties || [];
       let houses;
       
       if (savedFeaturedIds.length > 0) {
-        // Get houses in the order specified by admin
+        // Get houses in the order specified by admin (up to 9)
         houses = savedFeaturedIds
-          .map(id => allHouses.find(h => h.id === id))
+          .map(id => rentalHouses.find(h => h.id === id))
           .filter(Boolean)
-          .slice(0, 6);
+          .slice(0, 9);
       } else {
-        // Fallback: sort by featured flag
-        houses = allHouses
+        // Fallback: sort by featured flag (up to 9)
+        houses = rentalHouses
           .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
-          .slice(0, 6);
+          .slice(0, 9);
       }
       
       setFeaturedHouses(houses);
@@ -80,6 +161,14 @@ const HomePage = () => {
     }
   };
 
+  // Default stats
+  const defaultStats = [
+    { value: '100+', label: 'Happy Clients' },
+    { value: '50+', label: 'Properties' },
+    { value: '2', label: 'Locations' },
+    { value: '5+', label: 'Years Experience' }
+  ];
+  
   // Default features if not configured by admin
   const defaultFeatures = [
     { icon: 'Building', title: 'Quality Homes', description: 'Carefully selected properties that meet our high standards for comfort and safety.' },
@@ -87,8 +176,20 @@ const HomePage = () => {
     { icon: 'Shield', title: 'Trusted Agency', description: 'Years of experience helping families find their perfect homes in Kenya.' },
     { icon: 'Clock', title: 'Quick Process', description: 'Streamlined rental process to get you into your new home faster.' }
   ];
+  
+  const stats = settings?.stats_section?.stats?.length > 0 ? settings.stats_section.stats : defaultStats;
+  const statsSection = settings?.stats_section || { title: 'Our Impact', subtitle: '' };
   const features = settings?.features?.length > 0 ? settings.features : defaultFeatures;
   const companyInfo = settings?.company_info || {};
+  const aboutSection = settings?.about_section || { title: '', subtitle: '', content: '', image: '' };
+
+  // Hero positioning settings
+  const heroPositioning = {
+    desktopHeight: settings?.hero_content?.desktopHeight || '100vh',
+    mobileHeight: settings?.hero_content?.mobileHeight || '100vh',
+    desktopAlign: settings?.hero_content?.desktopAlign || 'bottom',
+    mobileAlign: settings?.hero_content?.mobileAlign || 'bottom'
+  };
 
   const heroContent = {
     title: settings?.hero_content?.title || '',
@@ -105,20 +206,41 @@ const HomePage = () => {
   };
 
   const featuresSection = settings?.features_section || { title: 'Why Choose DIGIHOMES?', subtitle: "We're committed to making your house-hunting experience smooth and successful." };
-  const housesSection = settings?.houses_section || { title: 'Available Houses', subtitle: 'Explore our selection of quality rental properties' };
+  const housesSection = settings?.houses_section || { title: 'Featured Properties', subtitle: 'Explore our selection of quality rental properties' };
   const locationsSection = settings?.locations_section || {
     title: '',
     subtitle: '',
     locations: []
   };
 
+  // Get alignment classes
+  const getAlignmentClass = (align) => {
+    switch (align) {
+      case 'top': return 'justify-start pt-24';
+      case 'center': return 'justify-center';
+      case 'bottom': 
+      default: return 'justify-end';
+    }
+  };
+
   return (
     <PublicLayout>
-      {/* Hero Section - Content starts from bottom */}
+      {/* Hero Section */}
       <section 
-        className="relative text-white overflow-hidden min-h-[100vh] flex flex-col"
-        style={{ backgroundColor: '#1a1a1a' }}
+        className="relative text-white overflow-hidden flex flex-col"
+        style={{ 
+          backgroundColor: '#1a1a1a',
+          minHeight: heroPositioning.mobileHeight
+        }}
       >
+        {/* Desktop height override */}
+        <style>{`
+          @media (min-width: 768px) {
+            .hero-section { min-height: ${heroPositioning.desktopHeight} !important; }
+          }
+        `}</style>
+        <div className="hero-section absolute inset-0"></div>
+        
         {/* Desktop Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center hidden md:block"
@@ -144,37 +266,37 @@ const HomePage = () => {
           style={{ backgroundColor: heroContent.overlayColorMobile, opacity: heroContent.overlayOpacityMobile }}
         ></div>
         
-        {/* Spacer to push content to bottom */}
-        <div className="flex-grow"></div>
-        
-        {/* Hero content - positioned at bottom */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 md:pb-20">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              {heroContent.title}{' '}
-              <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
-            </h1>
-            <p className="text-lg md:text-xl mb-6 max-w-2xl" style={{ color: heroContent.descriptionHighlightColor }}>
-              {heroContent.description}
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link 
-                to="/houses" 
-                className="font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
-                style={{ color: colors[600] }}
-              >
-                Browse Houses
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link 
-                to="/contact" 
-                className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-white"
-                onMouseEnter={(e) => e.currentTarget.style.color = colors[600]}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
-              >
-                <Phone className="w-5 h-5" />
-                Contact Us
-              </Link>
+        {/* Content wrapper with alignment */}
+        <div className={`relative flex-1 flex flex-col ${getAlignmentClass(heroPositioning.mobileAlign)} md:${getAlignmentClass(heroPositioning.desktopAlign)}`}>
+          {/* Hero content - aligned left */}
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
+                {heroContent.title}{' '}
+                <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
+              </h1>
+              <p className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
+                {heroContent.description}
+              </p>
+              <div className="flex flex-wrap gap-4 justify-start">
+                <Link 
+                  to="/houses" 
+                  className="font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
+                  style={{ color: colors[600] }}
+                >
+                  Browse Houses
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link 
+                  to="/contact" 
+                  className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-white"
+                  onMouseEnter={(e) => e.currentTarget.style.color = colors[600]}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
+                >
+                  <Phone className="w-5 h-5" />
+                  Contact Us
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -195,6 +317,27 @@ const HomePage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <FeatureCard key={index} feature={feature} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section - Count up animation */}
+      <section 
+        ref={statsRef}
+        className="py-16 md:py-20"
+        style={{ background: `linear-gradient(135deg, ${colors[600]} 0%, ${colors[800]} 100%)` }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {statsSection.title && (
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{statsSection.title}</h2>
+              {statsSection.subtitle && <p className="text-white/80 max-w-2xl mx-auto">{statsSection.subtitle}</p>}
+            </div>
+          )}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <StatItem key={index} stat={stat} isVisible={statsVisible} />
             ))}
           </div>
         </div>
@@ -288,6 +431,66 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* About Us Section */}
+      {(aboutSection.title || aboutSection.content) && (
+        <section className="py-16 md:py-24 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Image Side */}
+              {aboutSection.image && (
+                <div className="relative">
+                  <img 
+                    src={aboutSection.image} 
+                    alt={aboutSection.title || 'About Us'} 
+                    className="w-full h-80 lg:h-96 object-cover rounded-2xl shadow-lg"
+                  />
+                  <div 
+                    className="absolute -bottom-4 -right-4 w-24 h-24 rounded-2xl hidden lg:block"
+                    style={{ backgroundColor: colors[200] }}
+                  ></div>
+                </div>
+              )}
+              
+              {/* Content Side */}
+              <div className={aboutSection.image ? '' : 'lg:col-span-2 max-w-3xl mx-auto text-center'}>
+                {aboutSection.subtitle && (
+                  <span 
+                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                    style={{ backgroundColor: colors[100], color: colors[700] }}
+                  >
+                    {aboutSection.subtitle}
+                  </span>
+                )}
+                {aboutSection.title && (
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                    {aboutSection.title}
+                  </h2>
+                )}
+                {aboutSection.content && (
+                  <div className="space-y-4">
+                    {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
+                      <p key={index} className="text-gray-600 text-lg leading-relaxed">
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-8">
+                  <Link 
+                    to="/contact"
+                    className="inline-flex items-center gap-2 font-semibold hover:gap-3 transition-all"
+                    style={{ color: colors[600] }}
+                  >
+                    Get in Touch
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>

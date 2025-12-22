@@ -51,9 +51,11 @@ const HousesPage = () => {
       if (filters.status) params.append('status', filters.status);
 
       const response = await api.get(`/houses?${params.toString()}`);
-      // Exclude Land from Available Houses - only show houses
-      const housesOnly = (response.data || []).filter(h => h.property_type !== 'land');
-      setHouses(housesOnly);
+      // Exclude Land and houses for sale from Available Houses - only show rental properties
+      const rentalHouses = (response.data || []).filter(h => 
+        h.property_type !== 'land' && h.listing_type !== 'buy'
+      );
+      setHouses(rentalHouses);
     } catch (error) {
       console.error('Error fetching houses:', error);
     } finally {
