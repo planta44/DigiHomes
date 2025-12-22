@@ -3,6 +3,7 @@ import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } 
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
+import { useInView } from '../hooks/useScrollAnimation';
 
 const DigiReelsPage = () => {
   const [reels, setReels] = useState([]);
@@ -10,6 +11,8 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
+  // Hero animation repeats when scrolling back to top
+  const [heroRef, heroVisible] = useInView(0.3, false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -75,6 +78,7 @@ const DigiReelsPage = () => {
     <PublicLayout>
       {/* Hero Section */}
       <div 
+        ref={heroRef}
         className="relative py-20 md:py-28 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${colors[800]} 0%, ${colors[600]} 50%, ${colors[700]} 100%)` }}
       >
@@ -86,14 +90,14 @@ const DigiReelsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h1 className={`text-4xl md:text-6xl font-bold text-white mb-6 transition-all duration-700 delay-100 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             Digi Reels
           </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+          <p className={`text-xl text-white/80 max-w-2xl mx-auto transition-all duration-700 delay-200 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>

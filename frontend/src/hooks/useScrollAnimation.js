@@ -31,6 +31,66 @@ export const useScrollAnimation = (threshold = 0.1, resetOnExit = false) => {
   return [ref, isVisible];
 };
 
+// Hook for detecting when element is visible - can repeat animation on re-entry
+export const useInView = (threshold = 0.3, triggerOnce = false) => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          if (triggerOnce) observer.disconnect();
+        } else {
+          if (!triggerOnce) setIsInView(false);
+        }
+      },
+      { threshold }
+    );
+    
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    
+    return () => observer.disconnect();
+  }, [threshold, triggerOnce]);
+  
+  return [ref, isInView];
+};
+
+// Hook for staggered children animations
+export const useStaggeredAnimation = (itemCount, baseDelay = 0, staggerDelay = 100) => {
+  const [visibleItems, setVisibleItems] = useState([]);
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          for (let i = 0; i < itemCount; i++) {
+            setTimeout(() => {
+              setVisibleItems(prev => [...prev, i]);
+            }, baseDelay + (i * staggerDelay));
+          }
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    
+    return () => observer.disconnect();
+  }, [itemCount, baseDelay, staggerDelay]);
+  
+  return [ref, visibleItems];
+};
+
 export const useCountUp = (end, duration = 2000, isVisible = true) => {
   const [count, setCount] = useState(0);
   const animationRef = useRef(null);

@@ -5,6 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
 import api from '../config/api';
+import { useInView, useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const HousesPage = () => {
   const [searchParams] = useSearchParams();
@@ -64,19 +65,23 @@ const HousesPage = () => {
   };
 
   const availableCount = houses.filter(h => h.vacancy_status === 'available').length;
+  
+  // Animation hooks
+  const [heroRef, heroVisible] = useInView(0.3, false);
+  const [cardsRef, cardsVisible] = useScrollAnimation(0.1);
 
   return (
     <PublicLayout>
       {/* Hero Section with Background Image */}
-      <section className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
+      <section ref={heroRef} className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60')` }}></div>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
+          <div className={`flex items-center justify-center gap-3 mb-4 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Building className="w-8 h-8" />
             <h1 className="text-3xl md:text-4xl font-bold">Available Houses</h1>
           </div>
-          <p className="text-white/80 max-w-2xl mx-auto">
+          <p className={`text-white/80 max-w-2xl mx-auto transition-all duration-700 delay-150 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             Browse our selection of quality rental properties in Nakuru and Nyahururu
           </p>
         </div>
@@ -108,9 +113,15 @@ const HousesPage = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
           </div>
         ) : houses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {houses.map((house) => (
-              <HouseCard key={house.id} house={house} />
+          <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {houses.map((house, index) => (
+              <div
+                key={house.id}
+                className={`transition-all duration-500 ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <HouseCard house={house} />
+              </div>
             ))}
           </div>
         ) : (

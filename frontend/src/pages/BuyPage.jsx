@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { useScrollAnimation, useInView } from '../hooks/useScrollAnimation';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -25,7 +25,8 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  const [heroRef, heroVisible] = useScrollAnimation(0.1, true);
+  // Hero animation repeats when scrolling back to top
+  const [heroRef, heroVisible] = useInView(0.3, false);
   const [contentRef, contentVisible] = useScrollAnimation(0.1, true);
   const [propertiesRef, propertiesVisible] = useScrollAnimation(0.01, true);
 

@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
+import { useInView, useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const ContactPage = () => {
+  // Hero animation repeats when scrolling back to top
+  const [heroRef, heroVisible] = useInView(0.3, false);
+  const [contentRef, contentVisible] = useScrollAnimation(0.1);
+  
   const [settings, setSettings] = useState({
     contact_page: {
       title: 'Get in Touch',
@@ -45,7 +50,7 @@ const ContactPage = () => {
   return (
     <PublicLayout>
       {/* Hero Section with Background Image */}
-      <section className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
+      <section ref={heroRef} className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
         {contact_page.backgroundImage ? (
           <>
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${contact_page.backgroundImage}')` }}></div>
@@ -58,8 +63,8 @@ const ContactPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{contact_page.title}</h1>
-          <p className="text-white/80 max-w-2xl mx-auto">
+          <h1 className={`text-3xl md:text-4xl font-bold mb-4 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>{contact_page.title}</h1>
+          <p className={`text-white/80 max-w-2xl mx-auto transition-all duration-700 delay-150 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {contact_page.subtitle}
           </p>
         </div>
