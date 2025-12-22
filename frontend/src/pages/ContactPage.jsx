@@ -5,9 +5,9 @@ import api from '../config/api';
 import { usePopAnimation } from '../hooks/useAnimations';
 
 const ContactPage = () => {
-  // Animation hooks
-  const [heroRef, heroAnimated] = usePopAnimation();
-  const [contentRef, contentAnimated] = usePopAnimation();
+  // Animation hooks - SAFE: content visible by default
+  const [heroRef, heroAnim] = usePopAnimation(0);
+  const [heroRef2, heroAnim2] = usePopAnimation(1);
   
   const [settings, setSettings] = useState({
     contact_page: {
@@ -63,8 +63,8 @@ const ContactPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className={`text-3xl md:text-4xl font-bold mb-4 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>{contact_page.title}</h1>
-          <p className={`text-white/80 max-w-2xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}>
+          <h1 ref={heroRef} className={`text-3xl md:text-4xl font-bold mb-4 ${heroAnim}`}>{contact_page.title}</h1>
+          <p ref={heroRef2} className={`text-white/80 max-w-2xl mx-auto ${heroAnim2}`}>
             {contact_page.subtitle}
           </p>
         </div>

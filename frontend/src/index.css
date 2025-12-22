@@ -106,39 +106,40 @@
   .animation-delay-400 { animation-delay: 400ms; }
   .animation-delay-500 { animation-delay: 500ms; }
 
-  /* Pop from below animation - initial state */
-  .pop-initial {
-    opacity: 0;
-    transform: translateY(30px);
-  }
+  /* SAFE Animation Classes - Only applied via JavaScript */
+  /* Content is ALWAYS visible by default. These classes are added by JS after mount. */
   
-  /* Pop from below animation - animated state */
-  .pop-animated {
-    opacity: 1;
-    transform: translateY(0);
+  /* Pop animation - ready state (JS adds this first) */
+  .anim-pop-ready {
+    opacity: 0;
+    transform: translateY(20px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
   
-  /* Staggered delay classes for children */
-  .pop-delay-1 { transition-delay: 0ms; }
-  .pop-delay-2 { transition-delay: 100ms; }
-  .pop-delay-3 { transition-delay: 200ms; }
-  .pop-delay-4 { transition-delay: 300ms; }
-  .pop-delay-5 { transition-delay: 400ms; }
-  .pop-delay-6 { transition-delay: 500ms; }
-  .pop-delay-7 { transition-delay: 600ms; }
-  .pop-delay-8 { transition-delay: 700ms; }
-  .pop-delay-9 { transition-delay: 800ms; }
-  
-  /* Card pop animation */
-  .card-pop-initial {
-    opacity: 0;
-    transform: translateY(20px);
+  /* Pop animation - done state (JS adds this when in viewport) */
+  .anim-pop-done {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
   }
   
-  .card-pop-animated {
-    opacity: 1;
-    transform: translateY(0);
+  /* Delay classes for staggered pop animations */
+  .anim-delay-0 { transition-delay: 0ms; }
+  .anim-delay-1 { transition-delay: 100ms; }
+  .anim-delay-2 { transition-delay: 200ms; }
+  .anim-delay-3 { transition-delay: 300ms; }
+  .anim-delay-4 { transition-delay: 400ms; }
+  .anim-delay-5 { transition-delay: 500ms; }
+  
+  /* Staggered item animation - ready state */
+  .anim-item-ready {
+    opacity: 0;
+    transform: translateY(15px);
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+  
+  /* Staggered item animation - done state */
+  .anim-item-done {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
   }
 }

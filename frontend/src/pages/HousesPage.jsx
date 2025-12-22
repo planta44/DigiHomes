@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
 import api from '../config/api';
-import { usePopAnimation } from '../hooks/useAnimations';
+import { usePopAnimation, useStaggerAnimation } from '../hooks/useAnimations';
 
 const HousesPage = () => {
   const [searchParams] = useSearchParams();
@@ -20,9 +20,10 @@ const HousesPage = () => {
     status: ''
   });
 
-  // Animation hooks
-  const [heroRef, heroAnimated] = usePopAnimation();
-  const [cardsRef, cardsAnimated] = usePopAnimation();
+  // Animation hooks - SAFE: content visible by default
+  const [heroRef, heroAnim] = usePopAnimation(0);
+  const [heroRef2, heroAnim2] = usePopAnimation(1);
+  const [cardsRef, getCardClass] = useStaggerAnimation(100);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,15 +74,15 @@ const HousesPage = () => {
   return (
     <PublicLayout>
       {/* Hero Section with Background Image */}
-      <section ref={heroRef} className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
+      <section className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60')` }}></div>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className={`flex items-center justify-center gap-3 mb-4 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>
+          <div ref={heroRef} className={`flex items-center justify-center gap-3 mb-4 ${heroAnim}`}>
             <Building className="w-8 h-8" />
             <h1 className="text-3xl md:text-4xl font-bold">Available Houses</h1>
           </div>
-          <p className={`text-white/80 max-w-2xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}>
+          <p ref={heroRef2} className={`text-white/80 max-w-2xl mx-auto ${heroAnim2}`}>
             Browse our selection of quality rental properties in Nakuru and Nyahururu
           </p>
         </div>
@@ -117,7 +118,8 @@ const HousesPage = () => {
             {houses.map((house, index) => (
               <div
                 key={house.id}
-                className={`card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${cardsAnimated ? 'card-pop-animated' : ''}`}
+                data-anim-item
+                className={getCardClass(index)}
               >
                 <HouseCard house={house} />
               </div>

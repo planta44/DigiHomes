@@ -3,7 +3,7 @@ import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefc
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { usePopAnimation } from '../hooks/useAnimations';
+import { usePopAnimation, useStaggerAnimation } from '../hooks/useAnimations';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
@@ -24,9 +24,10 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  // Animation hooks
-  const [heroRef, heroAnimated] = usePopAnimation();
-  const [sectionsRef, sectionsAnimated] = usePopAnimation();
+  // Animation hooks - SAFE: content visible by default
+  const [heroRef, heroAnim] = usePopAnimation(0);
+  const [heroRef2, heroAnim2] = usePopAnimation(1);
+  const [sectionsRef, getSectionClass] = useStaggerAnimation(150);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -63,12 +64,12 @@ const ServicesPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 
-            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}
+            ref={heroRef} className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 ${heroAnim}`}
           >
             {content.hero.title}
           </h1>
           <p 
-            className={`text-xl md:text-2xl max-w-3xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}
+            ref={heroRef2} className={`text-xl md:text-2xl max-w-3xl mx-auto ${heroAnim2}`}
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -85,7 +86,7 @@ const ServicesPage = () => {
               return (
                 <div 
                   key={index}
-                  className={`bg-gray-50 rounded-2xl p-8 hover:shadow-lg card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${sectionsAnimated ? 'card-pop-animated' : ''}`}
+                  data-anim-item className={`bg-gray-50 rounded-2xl p-8 hover:shadow-lg ${getSectionClass(index)}`}
                 >
                   <div 
                     className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"

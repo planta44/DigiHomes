@@ -11,8 +11,10 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
-  // Animation hooks
-  const [heroRef, heroAnimated] = usePopAnimation();
+  // Animation hooks - SAFE: content visible by default
+  const [heroRef, heroAnim] = usePopAnimation(0);
+  const [heroRef2, heroAnim2] = usePopAnimation(1);
+  const [heroRef3, heroAnim3] = usePopAnimation(2);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -90,14 +92,14 @@ const DigiReelsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>
+          <div ref={heroRef} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6 ${heroAnim}`}>
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 className={`text-4xl md:text-6xl font-bold text-white mb-6 pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}>
+          <h1 ref={heroRef2} className={`text-4xl md:text-6xl font-bold text-white mb-6 ${heroAnim2}`}>
             Digi Reels
           </h1>
-          <p className={`text-xl text-white/80 max-w-2xl mx-auto pop-initial pop-delay-3 ${heroAnimated ? 'pop-animated' : ''}`}>
+          <p ref={heroRef3} className={`text-xl text-white/80 max-w-2xl mx-auto ${heroAnim3}`}>
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>

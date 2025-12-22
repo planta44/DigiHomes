@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { usePopAnimation } from '../hooks/useAnimations';
+import { usePopAnimation, useStaggerAnimation } from '../hooks/useAnimations';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -25,10 +25,13 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Animation hooks
-  const [heroRef, heroAnimated] = usePopAnimation();
-  const [contentRef, contentAnimated] = usePopAnimation();
-  const [propertiesRef, propertiesAnimated] = usePopAnimation();
+  // Animation hooks - SAFE: content visible by default
+  const [heroRef, heroAnim] = usePopAnimation(0);
+  const [heroRef2, heroAnim2] = usePopAnimation(1);
+  const [propertiesRef, propertiesAnim] = usePopAnimation(0);
+  const [propertiesRef2, propertiesAnim2] = usePopAnimation(1);
+  const [cardsRef, getCardClass] = useStaggerAnimation(100);
+  const [contentRef, contentAnim] = usePopAnimation(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -94,12 +97,12 @@ const BuyPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 
-            className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 pop-initial ${heroAnimated ? 'pop-animated' : ''}`}
+            ref={heroRef} className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 ${heroAnim}`}
           >
             {content.hero.title}
           </h1>
           <p 
-            className={`text-xl md:text-2xl max-w-3xl mx-auto pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`}
+            ref={heroRef2} className={`text-xl md:text-2xl max-w-3xl mx-auto ${heroAnim2}`}
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -108,15 +111,15 @@ const BuyPage = () => {
       </section>
 
       {/* Properties For Sale Section */}
-      <section ref={propertiesRef} className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`mb-8 pop-initial ${propertiesAnimated ? 'pop-animated' : ''}`}>
+          <div ref={propertiesRef} className={`mb-8 ${propertiesAnim}`}>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Properties For Sale</h2>
             <p className="text-gray-600">Browse available properties for purchase</p>
           </div>
 
           {/* Filters - Similar to Rent page with More Filters toggle */}
-          <div className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 pop-initial pop-delay-2 ${propertiesAnimated ? 'pop-animated' : ''}`}>
+          <div ref={propertiesRef2} className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 ${propertiesAnim2}`}>
             {/* Main Filters - Always visible */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search */}
@@ -282,9 +285,11 @@ const BuyPage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : filteredProperties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProperties.map((property) => (
-                <HouseCard key={property.id} house={property} />
+            <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProperties.map((property, index) => (
+                <div key={property.id} data-anim-item className={getCardClass(index)}>
+                  <HouseCard house={property} />
+                </div>
               ))}
             </div>
           ) : (
@@ -304,7 +309,7 @@ const BuyPage = () => {
             {content.sections.map((section, index) => (
               <div 
                 key={index}
-                className={`mb-16 last:mb-0 pop-initial pop-delay-${Math.min(index + 1, 5)} ${contentAnimated ? 'pop-animated' : ''}`}
+                className={`mb-16 last:mb-0 ${contentAnim}`}
               >
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
                 <p className="text-gray-600 text-lg mb-8">{section.description}</p>
@@ -313,7 +318,7 @@ const BuyPage = () => {
                     {section.items.map((item, i) => (
                       <div 
                         key={i}
-                        className={`flex items-center gap-3 p-4 bg-gray-50 rounded-lg card-pop-initial pop-delay-${Math.min(i + 2, 9)} ${contentAnimated ? 'card-pop-animated' : ''}`}
+                        className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg"
                       >
                         <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors[100] }}>
                           <Home className="w-5 h-5" style={{ color: colors[600] }} />

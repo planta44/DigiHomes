@@ -57,14 +57,21 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Animation hooks - using new reliable hooks
-  const [heroRef, heroAnimated] = usePopAnimation();
-  const [statsRef, statsAnimated] = usePopAnimation();
-  const [featuresRef, featuresAnimated] = usePopAnimation();
-  const [housesRef, housesAnimated] = usePopAnimation();
-  const [locationsRef, locationsAnimated] = usePopAnimation();
-  const [aboutRef, aboutAnimated] = usePopAnimation();
-  const [ctaRef, ctaAnimated] = usePopAnimation();
+  // Animation hooks - SAFE: content visible by default, animations added via JS
+  const [heroRef, heroAnim] = usePopAnimation(0);
+  const [heroRef2, heroAnim2] = usePopAnimation(1);
+  const [heroRef3, heroAnim3] = usePopAnimation(2);
+  const [statsRef, statsAnim] = usePopAnimation(0);
+  const [featuresRef, featuresAnim] = usePopAnimation(0);
+  const [featuresGridRef, getFeatureClass] = useStaggerAnimation(100);
+  const [housesRef, housesAnim] = usePopAnimation(0);
+  const [housesGridRef, getHouseClass] = useStaggerAnimation(100);
+  const [locationsRef, locationsAnim] = usePopAnimation(0);
+  const [locationsGridRef, getLocationClass] = useStaggerAnimation(150);
+  const [aboutRef, aboutAnim] = usePopAnimation(0);
+  const [ctaRef, ctaAnim] = usePopAnimation(0);
+  const [ctaRef2, ctaAnim2] = usePopAnimation(1);
+  const [ctaRef3, ctaAnim3] = usePopAnimation(2);
 
   useEffect(() => {
     fetchData();
@@ -250,14 +257,14 @@ const HomePage = () => {
         <div className="hero-content-wrapper absolute left-0 right-0 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
-              <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left pop-initial ${heroAnimated ? 'pop-animated' : ''}`}>
+              <h1 ref={heroRef} className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left ${heroAnim}`}>
                 {heroContent.title}{' '}
                 <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
               </h1>
-              <p className={`text-lg md:text-xl mb-6 max-w-2xl text-left pop-initial pop-delay-2 ${heroAnimated ? 'pop-animated' : ''}`} style={{ color: heroContent.descriptionHighlightColor }}>
+              <p ref={heroRef2} className={`text-lg md:text-xl mb-6 max-w-2xl text-left ${heroAnim2}`} style={{ color: heroContent.descriptionHighlightColor }}>
                 {heroContent.description}
               </p>
-              <div className={`flex flex-wrap gap-4 justify-start pop-initial pop-delay-3 ${heroAnimated ? 'pop-animated' : ''}`}>
+              <div ref={heroRef3} className={`flex flex-wrap gap-4 justify-start ${heroAnim3}`}>
                 <Link 
                   to="/houses" 
                   className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
@@ -297,7 +304,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={featuresRef}
-            className={`text-center mb-12 pop-initial ${featuresAnimated ? 'pop-animated' : ''}`}
+            className={`text-center mb-12 ${featuresAnim}`}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
@@ -307,11 +314,12 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div ref={featuresGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <div 
-                key={index} 
-                className={`card-pop-initial pop-delay-${index + 2} ${featuresAnimated ? 'card-pop-animated' : ''}`}
+                key={index}
+                data-anim-item
+                className={getFeatureClass(index)}
               >
                 <FeatureCard feature={feature} />
               </div>
@@ -336,7 +344,7 @@ const HomePage = () => {
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
-                <StatItem key={index} stat={stat} shouldAnimate={statsAnimated} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
+                <StatItem key={index} stat={stat} shouldAnimate={statsAnim.includes('done')} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
               ))}
             </div>
           </div>
@@ -348,7 +356,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={housesRef}
-            className={`flex flex-col md:flex-row md:items-end justify-between mb-10 pop-initial ${housesAnimated ? 'pop-animated' : ''}`}
+            className={`flex flex-col md:flex-row md:items-end justify-between mb-10 ${housesAnim}`}
           >
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -372,11 +380,12 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : featuredHouses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div ref={housesGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredHouses.map((house, index) => (
                 <div 
                   key={house.id}
-                  className={`card-pop-initial pop-delay-${Math.min(index + 1, 9)} ${housesAnimated ? 'card-pop-animated' : ''}`}
+                  data-anim-item
+                  className={getHouseClass(index)}
                 >
                   <HouseCard house={house} />
                 </div>
@@ -395,7 +404,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={locationsRef}
-            className={`text-center mb-12 pop-initial ${locationsAnimated ? 'pop-animated' : ''}`}
+            className={`text-center mb-12 ${locationsAnim}`}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
@@ -405,7 +414,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div ref={locationsGridRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(locationsSection.locations || []).map((loc, index) => {
               const imageUrl = loc.image?.startsWith('http') 
                 ? loc.image 
@@ -415,7 +424,8 @@ const HomePage = () => {
               return (
               <div 
                 key={loc.name || index}
-                className={`relative rounded-2xl overflow-hidden group h-64 card-pop-initial pop-delay-${index + 2} ${locationsAnimated ? 'card-pop-animated' : ''}`}
+                data-anim-item
+                className={`relative rounded-2xl overflow-hidden group h-64 ${getLocationClass(index)}`}
               >
                 <img 
                   src={imageUrl} 
@@ -447,7 +457,7 @@ const HomePage = () => {
       {(aboutSection.title || aboutSection.content) && (
         <section ref={aboutRef} className="py-16 md:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pop-initial ${aboutAnimated ? 'pop-animated' : ''}`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${aboutAnim}`}>
               {/* Image Side */}
               {aboutSection.image && (
                 <div className="relative">
@@ -528,16 +538,16 @@ const HomePage = () => {
       )}
 
       {/* CTA Section */}
-      <section ref={ctaRef} className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
+      <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className={`text-3xl md:text-4xl font-bold text-white mb-4 pop-initial ${ctaAnimated ? 'pop-animated' : ''}`}>
+          <h2 ref={ctaRef} className={`text-3xl md:text-4xl font-bold text-white mb-4 ${ctaAnim}`}>
             Ready to Find Your New Home?
           </h2>
-          <p className={`mb-8 max-w-2xl mx-auto pop-initial pop-delay-2 ${ctaAnimated ? 'pop-animated' : ''}`} style={{ color: colors[100] }}>
+          <p ref={ctaRef2} className={`mb-8 max-w-2xl mx-auto ${ctaAnim2}`} style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div className={`flex flex-wrap justify-center gap-4 pop-initial pop-delay-3 ${ctaAnimated ? 'pop-animated' : ''}`}>
+          <div ref={ctaRef3} className={`flex flex-wrap justify-center gap-4 ${ctaAnim3}`}>
             <Link 
               to="/houses" 
               className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"
