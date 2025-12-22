@@ -80,14 +80,14 @@ const useInView = (threshold = 0.3) => {
 };
 
 // Stat item with count-up animation
-const StatItem = ({ stat, isVisible }) => {
+const StatItem = ({ stat, isVisible, numberColor, textColor }) => {
   const animatedValue = useCountUp(stat.value, 2000, isVisible);
   return (
     <div className="text-center">
-      <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
+      <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>
         {animatedValue || stat.value}
       </div>
-      <div className="text-sm md:text-base text-white/80 font-medium uppercase tracking-wider">
+      <div className="text-sm md:text-base font-medium uppercase tracking-wider" style={{ color: textColor || '#9ca3af' }}>
         {stat.label}
       </div>
     </div>
@@ -326,18 +326,18 @@ const HomePage = () => {
       <section 
         ref={statsRef}
         className="py-16 md:py-20"
-        style={{ background: `linear-gradient(135deg, ${colors[600]} 0%, ${colors[800]} 100%)` }}
+        style={{ backgroundColor: statsSection.backgroundColor || '#1f2937' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {statsSection.title && (
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{statsSection.title}</h2>
-              {statsSection.subtitle && <p className="text-white/80 max-w-2xl mx-auto">{statsSection.subtitle}</p>}
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
+              {statsSection.subtitle && <p className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
             </div>
           )}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <StatItem key={index} stat={stat} isVisible={statsVisible} />
+              <StatItem key={index} stat={stat} isVisible={statsVisible} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
             ))}
           </div>
         </div>
@@ -453,38 +453,51 @@ const HomePage = () => {
               )}
               
               {/* Content Side */}
-              <div className={aboutSection.image ? '' : 'lg:col-span-2 max-w-3xl mx-auto text-center'}>
-                {aboutSection.subtitle && (
-                  <span 
-                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
-                    style={{ backgroundColor: colors[100], color: colors[700] }}
-                  >
-                    {aboutSection.subtitle}
-                  </span>
-                )}
-                {aboutSection.title && (
-                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                    {aboutSection.title}
-                  </h2>
-                )}
-                {aboutSection.content && (
-                  <div className="space-y-4">
-                    {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
-                      <p key={index} className="text-gray-600 text-lg leading-relaxed">
-                        {line}
-                      </p>
-                    ))}
+              <div 
+                className={aboutSection.image ? '' : 'lg:col-span-2 mx-auto'}
+                style={{
+                  width: `${aboutSection.desktopWidth || 60}%`,
+                  textAlign: aboutSection.desktopAlign || 'left'
+                }}
+              >
+                <style>{`
+                  @media (max-width: 768px) {
+                    .about-content-wrapper {
+                      width: ${aboutSection.mobileWidth || 100}% !important;
+                      text-align: ${aboutSection.mobileAlign || 'center'} !important;
+                    }
+                  }
+                `}</style>
+                <div className="about-content-wrapper" style={{ width: '100%', textAlign: 'inherit' }}>
+                  {aboutSection.subtitle && (
+                    <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4 bg-gray-600 text-white">
+                      {aboutSection.subtitle}
+                    </span>
+                  )}
+                  {aboutSection.title && (
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                      {aboutSection.title}
+                    </h2>
+                  )}
+                  {aboutSection.content && (
+                    <div className="space-y-4">
+                      {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
+                        <p key={index} className="text-gray-600 text-lg leading-relaxed">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-8">
+                    <Link 
+                      to="/contact"
+                      className="inline-flex items-center gap-2 font-semibold hover:gap-3 transition-all"
+                      style={{ color: colors[600] }}
+                    >
+                      Get in Touch
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
                   </div>
-                )}
-                <div className="mt-8">
-                  <Link 
-                    to="/contact"
-                    className="inline-flex items-center gap-2 font-semibold hover:gap-3 transition-all"
-                    style={{ color: colors[600] }}
-                  >
-                    Get in Touch
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
                 </div>
               </div>
             </div>

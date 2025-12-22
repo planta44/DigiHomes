@@ -89,10 +89,10 @@ const SiteSettings = () => {
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
     features_section: { title: '', subtitle: '' },
-    stats_section: { title: '', subtitle: '', stats: [{ value: '100+', label: 'Happy Clients' }] },
+    stats_section: { title: '', subtitle: '', stats: [{ value: '100+', label: 'Happy Clients' }], backgroundColor: '#1f2937', textColor: '#9ca3af', numberColor: '#ffffff' },
     houses_section: { title: '', subtitle: '' },
     locations_section: { title: '', subtitle: '', locations: [] },
-    about_section: { title: '', subtitle: '', content: '', image: '' },
+    about_section: { title: '', subtitle: '', content: '', image: '', desktopWidth: '60', mobileWidth: '100', desktopAlign: 'left', mobileAlign: 'center' },
     footer_content: { tagline: '', description: '', quickLinks: [], contactLocations: [], contactPhones: [], contactEmail: '' },
     contact_page: { title: '', subtitle: '', workingHours: [], offices: [], faqs: [] },
     digi_posts: { title: '', subtitle: '', posts: [] }
@@ -726,20 +726,70 @@ const SiteSettings = () => {
                     }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 ))}
-                <div className="flex flex-wrap gap-2">
-                  <button onClick={() => setSettings(prev => ({ 
+                <button onClick={() => setSettings(prev => ({ 
                     ...prev, 
                     stats_section: { 
                       ...prev.stats_section, 
                       stats: [...(prev.stats_section?.stats || []), { value: '', label: '' }] 
                     } 
-                  }))} className="btn-secondary text-sm">
+                  }))} className="btn-secondary text-sm mb-4">
                     <Plus className="w-4 h-4" /> Add Stat
                   </button>
-                  <button onClick={() => handleSave('stats_section', settings.stats_section)} disabled={saving} className="btn-primary text-sm">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Stats
-                  </button>
+
+                {/* Stats Section Colors */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Stats Section Colors</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.stats_section?.backgroundColor || '#1f2937'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, stats_section: { ...prev.stats_section, backgroundColor: e.target.value }
+                          }))} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.stats_section?.backgroundColor || '#1f2937'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, stats_section: { ...prev.stats_section, backgroundColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Number Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.stats_section?.numberColor || '#ffffff'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, stats_section: { ...prev.stats_section, numberColor: e.target.value }
+                          }))} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.stats_section?.numberColor || '#ffffff'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, stats_section: { ...prev.stats_section, numberColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Label Text Color</label>
+                      <div className="flex gap-2">
+                        <input type="color" value={settings.stats_section?.textColor || '#9ca3af'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, stats_section: { ...prev.stats_section, textColor: e.target.value }
+                          }))} className="w-10 h-10 rounded cursor-pointer border" />
+                        <input type="text" value={settings.stats_section?.textColor || '#9ca3af'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, stats_section: { ...prev.stats_section, textColor: e.target.value }
+                          }))} className="input-field flex-1 text-sm" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Preview */}
+                  <div className="mt-4 p-4 rounded-lg text-center" style={{ backgroundColor: settings.stats_section?.backgroundColor || '#1f2937' }}>
+                    <span className="text-3xl font-bold" style={{ color: settings.stats_section?.numberColor || '#ffffff' }}>100+</span>
+                    <p className="text-sm mt-1" style={{ color: settings.stats_section?.textColor || '#9ca3af' }}>Preview Label</p>
+                  </div>
                 </div>
+
+                <button onClick={() => handleSave('stats_section', settings.stats_section)} disabled={saving} className="btn-primary text-sm mt-4">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Stats
+                </button>
               </div>
             )}
 
@@ -857,7 +907,70 @@ const SiteSettings = () => {
                     ...prev, about_section: { ...prev.about_section, image: url }
                   }))} 
                 />
-                <button onClick={() => handleSave('about_section', settings.about_section)} disabled={saving} className="btn-primary">
+
+                {/* Layout Settings */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Content Layout</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Desktop Settings */}
+                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <h5 className="font-medium text-sm text-gray-800">Desktop (Large Screens)</h5>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Width (%)</label>
+                        <input type="range" min="40" max="100" step="5" 
+                          value={settings.about_section?.desktopWidth || '60'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, about_section: { ...prev.about_section, desktopWidth: e.target.value }
+                          }))} className="w-full" />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>40%</span>
+                          <span className="font-medium">{settings.about_section?.desktopWidth || '60'}%</span>
+                          <span>100%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Text Alignment</label>
+                        <select value={settings.about_section?.desktopAlign || 'left'} onChange={(e) => setSettings(prev => ({
+                          ...prev, about_section: { ...prev.about_section, desktopAlign: e.target.value }
+                        }))} className="input-field">
+                          <option value="left">Left</option>
+                          <option value="center">Center</option>
+                          <option value="right">Right</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile Settings */}
+                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <h5 className="font-medium text-sm text-gray-800">Mobile (Small Screens)</h5>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Content Width (%)</label>
+                        <input type="range" min="80" max="100" step="5" 
+                          value={settings.about_section?.mobileWidth || '100'} 
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev, about_section: { ...prev.about_section, mobileWidth: e.target.value }
+                          }))} className="w-full" />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>80%</span>
+                          <span className="font-medium">{settings.about_section?.mobileWidth || '100'}%</span>
+                          <span>100%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Text Alignment</label>
+                        <select value={settings.about_section?.mobileAlign || 'center'} onChange={(e) => setSettings(prev => ({
+                          ...prev, about_section: { ...prev.about_section, mobileAlign: e.target.value }
+                        }))} className="input-field">
+                          <option value="left">Left</option>
+                          <option value="center">Center</option>
+                          <option value="right">Right</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={() => handleSave('about_section', settings.about_section)} disabled={saving} className="btn-primary mt-4">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save About Section
                 </button>
               </div>

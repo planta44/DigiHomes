@@ -117,6 +117,8 @@ const initDatabase = async () => {
       await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS listing_type VARCHAR(20) DEFAULT 'rent'`);
       await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS size_acres DECIMAL(10, 2)`);
       await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS dimensions VARCHAR(50)`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS lease_duration_type VARCHAR(20) DEFAULT 'months'`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS lease_duration INTEGER`);
       console.log('✅ Property columns migration complete');
     } catch (err) {
       console.log('Migration note:', err.message);

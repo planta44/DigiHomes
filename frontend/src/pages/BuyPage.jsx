@@ -316,8 +316,7 @@ const BuyPage = () => {
         <section className="py-16 md:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div 
-              className="text-center p-8 md:p-12 rounded-2xl"
-              style={{ backgroundColor: colors[50] }}
+              className="text-center p-8 md:p-12 rounded-2xl bg-gray-100"
             >
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{content.callToAction.title}</h3>
               <p className="text-gray-600 mb-6">{content.callToAction.description}</p>
