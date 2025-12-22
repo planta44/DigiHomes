@@ -19,6 +19,8 @@ const ManageHouses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLocation, setFilterLocation] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterPropertyType, setFilterPropertyType] = useState('');
+  const [filterListingType, setFilterListingType] = useState('');
   const [deleteModal, setDeleteModal] = useState({ show: false, house: null });
 
   useEffect(() => {
@@ -76,7 +78,9 @@ const ManageHouses = () => {
                          house.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLocation = !filterLocation || house.location === filterLocation;
     const matchesStatus = !filterStatus || house.vacancy_status === filterStatus;
-    return matchesSearch && matchesLocation && matchesStatus;
+    const matchesPropertyType = !filterPropertyType || house.property_type === filterPropertyType;
+    const matchesListingType = !filterListingType || house.listing_type === filterListingType;
+    return matchesSearch && matchesLocation && matchesStatus && matchesPropertyType && matchesListingType;
   });
 
   const getImageUrl = (house) => {
@@ -106,8 +110,8 @@ const ManageHouses = () => {
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="relative sm:col-span-2 lg:col-span-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
@@ -125,6 +129,25 @@ const ManageHouses = () => {
               <option value="">All Locations</option>
               <option value="Nakuru">Nakuru</option>
               <option value="Nyahururu">Nyahururu</option>
+            </select>
+            <select
+              value={filterPropertyType}
+              onChange={(e) => setFilterPropertyType(e.target.value)}
+              className="input-field"
+            >
+              <option value="">All Property Types</option>
+              <option value="house">House</option>
+              <option value="land">Land</option>
+            </select>
+            <select
+              value={filterListingType}
+              onChange={(e) => setFilterListingType(e.target.value)}
+              className="input-field"
+            >
+              <option value="">All Listings</option>
+              <option value="rent">For Rent</option>
+              <option value="buy">For Sale</option>
+              <option value="lease">For Lease</option>
             </select>
             <select
               value={filterStatus}

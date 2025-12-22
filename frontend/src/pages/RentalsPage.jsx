@@ -223,19 +223,22 @@ const RentalsPage = () => {
                   <option value="land">Land</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">House Type</label>
-                <select
-                  value={filters.house_type}
-                  onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">All</option>
-                  {houseTypes.map(type => (
-                    <option key={type.id} value={type.name}>{type.name}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Hide House Type when Land is selected */}
+              {filters.property_type !== 'land' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">House Type</label>
+                  <select
+                    value={filters.house_type}
+                    onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">All</option>
+                    {houseTypes.map(type => (
+                      <option key={type.id} value={type.name}>{type.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">Min Rent (KES)</label>
                 <input

@@ -51,7 +51,9 @@ const HousesPage = () => {
       if (filters.status) params.append('status', filters.status);
 
       const response = await api.get(`/houses?${params.toString()}`);
-      setHouses(response.data);
+      // Exclude Land from Available Houses - only show houses
+      const housesOnly = (response.data || []).filter(h => h.property_type !== 'land');
+      setHouses(housesOnly);
     } catch (error) {
       console.error('Error fetching houses:', error);
     } finally {

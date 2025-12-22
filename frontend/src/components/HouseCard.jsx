@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Bed, Bath, ArrowRight } from 'lucide-react';
+import { MapPin, Bed, Bath, ArrowRight, Ruler, LandPlot, Home, FileCheck } from 'lucide-react';
 
 const HouseCard = ({ house }) => {
   const primaryImage = house.images?.find(img => img.is_primary) || house.images?.[0];
-  // Handle both Cloudinary (full URL) and local uploads (relative path)
   const imageUrl = primaryImage?.image_url 
     ? (primaryImage.image_url.startsWith('http') 
         ? primaryImage.image_url 
@@ -18,6 +17,27 @@ const HouseCard = ({ house }) => {
     }).format(price);
   };
 
+  const isLand = house.property_type === 'land';
+  const isForSale = house.listing_type === 'buy';
+  const isForLease = house.listing_type === 'lease';
+  const isForRent = !isForSale && !isForLease;
+
+  // Price label based on listing type
+  const getPriceLabel = () => {
+    if (isForSale) return '';
+    if (isForLease) return '';
+    return '/mo';
+  };
+
+  // Badge color for listing type
+  const getListingBadge = () => {
+    if (isForLease) return { bg: 'bg-purple-600', text: 'Lease' };
+    if (isForSale) return { bg: 'bg-green-600', text: 'For Sale' };
+    return null;
+  };
+
+  const listingBadge = getListingBadge();
+
   return (
     <div className="card group shadow-lg hover:shadow-xl transition-shadow duration-300">
       {/* Image */}
@@ -26,18 +46,25 @@ const HouseCard = ({ house }) => {
           src={imageUrl}
           alt={house.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
         />
-        <div className="absolute top-3 left-3 flex gap-2">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
             {house.vacancy_status === 'available' ? 'Available' : 'Occupied'}
           </span>
           {house.featured && (
             <span className="badge bg-yellow-100 text-yellow-800">Featured</span>
           )}
+          {isLand && (
+            <span className="badge bg-amber-100 text-amber-800">Land</span>
+          )}
+          {listingBadge && (
+            <span className={`badge ${listingBadge.bg} text-white`}>{listingBadge.text}</span>
+          )}
         </div>
         <div className="absolute bottom-3 right-3">
           <span className="bg-primary-600 text-white px-3 py-1 rounded-lg font-semibold text-sm">
-            {formatPrice(house.rent_price)}/mo
+            {formatPrice(house.rent_price)}{getPriceLabel()}
           </span>
         </div>
       </div>
@@ -49,22 +76,44 @@ const HouseCard = ({ house }) => {
         </h3>
         
         <div className="flex items-center text-gray-500 text-sm mb-3">
-          <MapPin className="w-4 h-4 mr-1" />
-          {house.location}, Kenya
+          <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+          <span className="truncate">{house.location}, Kenya</span>
         </div>
 
-        <div className="flex items-center gap-4 text-gray-600 text-sm mb-4">
-          <div className="flex items-center gap-1">
-            <Bed className="w-4 h-4" />
-            <span>{house.bedrooms} Bed{house.bedrooms > 1 ? 's' : ''}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Bath className="w-4 h-4" />
-            <span>{house.bathrooms} Bath{house.bathrooms > 1 ? 's' : ''}</span>
-          </div>
-          <div className="text-primary-600 font-medium">
-            {house.house_type}
-          </div>
+        {/* Property Details - Different for Land vs House */}
+        <div className="flex items-center gap-3 text-gray-600 text-sm mb-4 flex-wrap">
+          {isLand ? (
+            <>
+              {house.size_acres && (
+                <div className="flex items-center gap-1">
+                  <LandPlot className="w-4 h-4" />
+                  <span>{house.size_acres} Acres</span>
+                </div>
+              )}
+              {house.dimensions && (
+                <div className="flex items-center gap-1">
+                  <Ruler className="w-4 h-4" />
+                  <span>{house.dimensions}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-1">
+                <Bed className="w-4 h-4" />
+                <span>{house.bedrooms} Bed{house.bedrooms > 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Bath className="w-4 h-4" />
+                <span>{house.bathrooms} Bath{house.bathrooms > 1 ? 's' : ''}</span>
+              </div>
+              {house.house_type && (
+                <div className="text-primary-600 font-medium">
+                  {house.house_type}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <Link

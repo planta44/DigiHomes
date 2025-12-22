@@ -18,6 +18,7 @@ const BuyPage = () => {
     location: '', 
     property_type: '',
     house_type: '',
+    listing_type: '', // 'buy' or 'lease'
     min_price: '',
     max_price: '',
     bedrooms: ''
@@ -38,10 +39,10 @@ const BuyPage = () => {
           api.get('/settings/house-types').catch(() => ({ data: [] }))
         ]);
         setPageData(pageRes.data);
-        // Filter to only show properties for sale (listing_type='buy')
+        // Filter to show properties for sale AND lease
         const allProperties = propertiesRes.data || [];
         setProperties(allProperties.filter(p => 
-          (p.listing_type === 'buy' || !p.listing_type) && p.vacancy_status === 'available'
+          (p.listing_type === 'buy' || p.listing_type === 'lease') && p.vacancy_status === 'available'
         ));
         setLocations(locationsRes.data);
         setHouseTypes(typesRes.data);
@@ -62,10 +63,11 @@ const BuyPage = () => {
     const matchesLocation = !filters.location || p.location === filters.location;
     const matchesPropertyType = !filters.property_type || p.property_type === filters.property_type;
     const matchesHouseType = !filters.house_type || p.house_type === filters.house_type;
+    const matchesListingType = !filters.listing_type || p.listing_type === filters.listing_type;
     const matchesMinPrice = !filters.min_price || p.rent_price >= parseFloat(filters.min_price);
     const matchesMaxPrice = !filters.max_price || p.rent_price <= parseFloat(filters.max_price);
     const matchesBedrooms = !filters.bedrooms || p.bedrooms >= parseInt(filters.bedrooms);
-    return matchesSearch && matchesLocation && matchesPropertyType && matchesHouseType && matchesMinPrice && matchesMaxPrice && matchesBedrooms;
+    return matchesSearch && matchesLocation && matchesPropertyType && matchesHouseType && matchesListingType && matchesMinPrice && matchesMaxPrice && matchesBedrooms;
   });
 
   const content = pageData?.content || {
@@ -162,6 +164,20 @@ const BuyPage = () => {
                     <option value="land">Land</option>
                   </select>
                 </div>
+              </div>
+
+              {/* Buy or Lease */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Buy or Lease</label>
+                <select
+                  value={filters.listing_type}
+                  onChange={(e) => setFilters(prev => ({ ...prev, listing_type: e.target.value }))}
+                  className="input-field appearance-none cursor-pointer"
+                >
+                  <option value="">All</option>
+                  <option value="buy">Buy</option>
+                  <option value="lease">Lease</option>
+                </select>
               </div>
 
               {/* House Type - Only show if property_type is house or empty */}

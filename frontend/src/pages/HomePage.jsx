@@ -61,10 +61,11 @@ const HomePage = () => {
   const [featuredHouses, setFeaturedHouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState(null);
-  const [statsRef, statsVisible] = useScrollAnimation(0.8, true);
-  const [featuresRef, featuresVisible] = useScrollAnimation(0.2, true);
-  const [housesRef, housesVisible] = useScrollAnimation(0.1, true);
-  const [locationsRef, locationsVisible] = useScrollAnimation(0.2, true);
+  const [statsRef, statsVisible] = useScrollAnimation(0.3, true);
+  const [featuresRef, featuresVisible] = useScrollAnimation(0.3, true);
+  const [housesRef, housesVisible] = useScrollAnimation(0.3, true);
+  const [locationsRef, locationsVisible] = useScrollAnimation(0.3, true);
+  const [aboutRef, aboutVisible] = useScrollAnimation(0.3, true);
   const [ctaRef, ctaVisible] = useScrollAnimation(0.3, true);
   const { colors } = useTheme();
 
@@ -177,7 +178,7 @@ const HomePage = () => {
           className="absolute inset-0 md:hidden"
           style={{ backgroundColor: heroContent.overlayColorMobile, opacity: heroContent.overlayOpacityMobile }}
         ></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-32 pb-8">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               {heroContent.title}{' '}
@@ -208,27 +209,27 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Stats Section */}
-      <section 
-        ref={statsRef} 
-        className="py-8 md:py-12 backdrop-blur-md relative"
-        style={{ background: statsRibbonBg }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-            {stats.map((stat, index) => (
-              <StatItem 
-                key={index} 
-                value={stat.value} 
-                label={stat.label} 
-                isVisible={statsVisible}
-                index={index}
-                duration={animSettings.duration}
-                labelColor={heroContent.statsLabelColor}
-              />
-            ))}
+        
+        {/* Stats Section - Inside Hero with Blur */}
+        <div 
+          ref={statsRef} 
+          className="relative mt-8 py-6 md:py-8 backdrop-blur-lg"
+          style={{ background: 'rgba(0,0,0,0.3)' }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center text-white">
+              {stats.map((stat, index) => (
+                <StatItem 
+                  key={index} 
+                  value={stat.value} 
+                  label={stat.label} 
+                  isVisible={statsVisible}
+                  index={index}
+                  duration={animSettings.duration}
+                  labelColor={heroContent.statsLabelColor}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -359,24 +360,36 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* About Section with Line-by-Line Animation */}
       {(aboutSection.title || aboutSection.content) && (
-        <section className="py-16 md:py-24 bg-gray-50">
+        <section ref={aboutRef} className="py-16 md:py-24 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             {aboutSection.title && (
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 
+                className={`text-3xl md:text-4xl font-bold text-gray-900 mb-4 transition-all duration-500 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+              >
                 {aboutSection.title}
               </h2>
             )}
             {aboutSection.subtitle && (
-              <p className="text-lg text-primary-600 font-medium mb-6">
+              <p 
+                className={`text-lg text-primary-600 font-medium mb-6 transition-all duration-500 delay-100 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+              >
                 {aboutSection.subtitle}
               </p>
             )}
             {aboutSection.content && (
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line text-left">
-                {aboutSection.content}
-              </p>
+              <div className="text-gray-600 leading-relaxed text-left space-y-3">
+                {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
+                  <p 
+                    key={index}
+                    className={`transition-all duration-500 ${aboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                    style={{ transitionDelay: `${200 + (index * 100)}ms` }}
+                  >
+                    {line}
+                  </p>
+                ))}
+              </div>
             )}
           </div>
         </section>
