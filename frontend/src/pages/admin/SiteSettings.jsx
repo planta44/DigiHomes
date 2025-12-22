@@ -190,11 +190,9 @@ const SiteSettings = () => {
     { id: 'brand', label: 'Brand', icon: Palette },
     { id: 'animation', label: 'Animation', icon: Zap },
     { id: 'hero', label: 'Hero', icon: Image },
-    { id: 'stats', label: 'Stats', icon: BarChart3 },
     { id: 'features', label: 'Features', icon: Star },
     { id: 'houses', label: 'Houses', icon: Home },
     { id: 'locations_display', label: 'Locations', icon: Globe },
-    { id: 'about', label: 'About', icon: FileText },
     { id: 'company', label: 'Company', icon: Building },
     { id: 'footer', label: 'Footer', icon: FileText },
     { id: 'contact', label: 'Contact', icon: Phone },
@@ -681,39 +679,6 @@ const SiteSettings = () => {
               </div>
             )}
 
-            {/* Stats */}
-            {activeTab === 'stats' && (
-              <div className="space-y-4">
-                <h3 className="font-semibold">Hero Statistics</h3>
-                {settings.hero_stats.map((stat, index) => (
-                  <div key={index} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                    <input type="text" value={stat.value} onChange={(e) => {
-                      const newStats = [...settings.hero_stats];
-                      newStats[index].value = e.target.value;
-                      setSettings(prev => ({ ...prev, hero_stats: newStats }));
-                    }} placeholder="100+" className="input-field w-full sm:w-24" />
-                    <input type="text" value={stat.label} onChange={(e) => {
-                      const newStats = [...settings.hero_stats];
-                      newStats[index].label = e.target.value;
-                      setSettings(prev => ({ ...prev, hero_stats: newStats }));
-                    }} placeholder="Label" className="input-field flex-1" />
-                    <button onClick={() => {
-                      const newStats = settings.hero_stats.filter((_, i) => i !== index);
-                      setSettings(prev => ({ ...prev, hero_stats: newStats }));
-                    }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
-                  </div>
-                ))}
-                <div className="flex flex-wrap gap-2">
-                  <button onClick={() => setSettings(prev => ({ ...prev, hero_stats: [...prev.hero_stats, { value: '', label: '' }] }))} className="btn-secondary text-sm">
-                    <Plus className="w-4 h-4" /> Add
-                  </button>
-                  <button onClick={() => handleSave('hero_stats', settings.hero_stats)} disabled={saving} className="btn-primary text-sm">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Features */}
             {activeTab === 'features' && (
               <div className="space-y-4">
@@ -847,41 +812,6 @@ const SiteSettings = () => {
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
                   </button>
                 </div>
-              </div>
-            )}
-
-            {/* About Section */}
-            {activeTab === 'about' && (
-              <div className="space-y-4">
-                <h3 className="font-semibold">About Section</h3>
-                <p className="text-sm text-gray-600">This section appears after Our Locations on the homepage. It's a text-only section for company information.</p>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                  <input type="text" value={settings.about_section?.title || ''} onChange={(e) => setSettings(prev => ({
-                    ...prev, about_section: { ...prev.about_section, title: e.target.value }
-                  }))} className="input-field" placeholder="About Us" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
-                  <input type="text" value={settings.about_section?.subtitle || ''} onChange={(e) => setSettings(prev => ({
-                    ...prev, about_section: { ...prev.about_section, subtitle: e.target.value }
-                  }))} className="input-field" placeholder="Your trusted property partner" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                  <textarea 
-                    value={settings.about_section?.content || ''} 
-                    onChange={(e) => setSettings(prev => ({
-                      ...prev, about_section: { ...prev.about_section, content: e.target.value }
-                    }))} 
-                    className="input-field min-h-[150px]" 
-                    placeholder="Write about your company, mission, values, etc."
-                    rows={6}
-                  />
-                </div>
-                <button onClick={() => handleSave('about_section', settings.about_section)} disabled={saving} className="btn-primary">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
-                </button>
               </div>
             )}
 

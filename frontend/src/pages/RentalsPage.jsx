@@ -320,17 +320,11 @@ const RentalsPage = () => {
         {/* Properties Grid/List */}
         {filteredProperties.length > 0 ? (
           <div className={viewMode === 'grid' 
-            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8' 
+            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' 
             : 'flex flex-col gap-4'
           }>
-            {filteredProperties.map((property, index) => (
-              <HouseCard 
-                key={property.id}
-                house={property}
-                index={index}
-                isVisible={true}
-                animSettings={{ duration: 600, staggerDelay: 100 }}
-              />
+            {filteredProperties.map((property) => (
+              <HouseCard key={property.id} house={property} />
             ))}
           </div>
         ) : (

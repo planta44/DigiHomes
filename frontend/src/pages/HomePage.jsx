@@ -15,39 +15,16 @@ import {
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
-import { useScrollAnimation, useCountUp } from '../hooks/useScrollAnimation';
 import { useTheme } from '../context/ThemeContext';
 
 const iconMap = {
   Building, MapPin, Shield, Clock, Star, Users, Home, CheckCircle
 };
 
-const StatItem = ({ value, label, isVisible, index, duration, labelColor, numberColor }) => {
-  const animatedValue = useCountUp(value, duration || 2000, isVisible);
-  return (
-    <div 
-      className={`transition-all ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-      style={{ transitionDuration: `${duration || 700}ms`, transitionDelay: `${index * 150}ms` }}
-    >
-      <div className="text-3xl md:text-4xl font-bold" style={{ color: numberColor || '#ffffff' }}>{animatedValue}</div>
-      <div className="text-sm" style={{ color: labelColor || '#bfdbfe' }}>{label}</div>
-    </div>
-  );
-};
-
-const FeatureCard = ({ feature, index, isVisible, animSettings }) => {
+const FeatureCard = ({ feature }) => {
   const IconComponent = iconMap[feature.icon] || Building;
-  const duration = animSettings?.duration || 500;
-  const stagger = animSettings?.staggerDelay || 50;
   return (
-    <div 
-      className="text-center p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-opacity h-full flex flex-col"
-      style={{ 
-        transitionDuration: `${duration}ms`, 
-        transitionDelay: `${index * stagger}ms`,
-        opacity: isVisible ? 1 : 0
-      }}
-    >
+    <div className="text-center p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow h-full flex flex-col">
       <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4 flex-shrink-0">
         <IconComponent className="w-7 h-7 text-primary-600" />
       </div>
@@ -61,12 +38,6 @@ const HomePage = () => {
   const [featuredHouses, setFeaturedHouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState(null);
-  const [statsRef, statsVisible] = useScrollAnimation(0.3, true);
-  const [featuresRef, featuresVisible] = useScrollAnimation(0.3, true);
-  const [housesRef, housesVisible] = useScrollAnimation(0.3, true);
-  const [locationsRef, locationsVisible] = useScrollAnimation(0.3, true);
-  const [aboutRef, aboutVisible] = useScrollAnimation(0.3, true);
-  const [ctaRef, ctaVisible] = useScrollAnimation(0.3, true);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -109,32 +80,15 @@ const HomePage = () => {
     }
   };
 
-  // Default stats and features if not configured by admin
-  const defaultStats = [
-    { value: '100+', label: 'Happy Tenants' },
-    { value: '50+', label: 'Properties' },
-    { value: '2', label: 'Locations' },
-    { value: '5+', label: 'Years Experience' }
-  ];
+  // Default features if not configured by admin
   const defaultFeatures = [
     { icon: 'Building', title: 'Quality Homes', description: 'Carefully selected properties that meet our high standards for comfort and safety.' },
     { icon: 'MapPin', title: 'Prime Locations', description: 'Properties in Nakuru and Nyahururu with easy access to amenities and transport.' },
     { icon: 'Shield', title: 'Trusted Agency', description: 'Years of experience helping families find their perfect homes in Kenya.' },
     { icon: 'Clock', title: 'Quick Process', description: 'Streamlined rental process to get you into your new home faster.' }
   ];
-  const stats = settings?.hero_stats?.length > 0 ? settings.hero_stats : defaultStats;
   const features = settings?.features?.length > 0 ? settings.features : defaultFeatures;
   const companyInfo = settings?.company_info || {};
-  const animSettings = settings?.animation_settings || { duration: 700, staggerDelay: 100 };
-  // Helper to convert hex to rgba
-  const hexToRgba = (hex, alpha) => {
-    if (!hex) return `rgba(0,0,0,${alpha})`;
-    if (hex.startsWith('rgba') || hex.startsWith('rgb')) return hex;
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r},${g},${b},${alpha})`;
-  };
 
   const heroContent = {
     title: settings?.hero_content?.title || '',
@@ -147,14 +101,9 @@ const HomePage = () => {
     overlayColor: settings?.hero_content?.overlayColor || '#000000',
     overlayColorMobile: settings?.hero_content?.overlayColorMobile || settings?.hero_content?.overlayColor || '#000000',
     overlayOpacity: settings?.hero_content?.overlayOpacity ?? 0.5,
-    overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6,
-    statsLabelColor: settings?.hero_content?.statsLabelColor || '#bfdbfe',
-    statsNumberColor: settings?.hero_content?.statsNumberColor || '#ffffff',
-    statsRibbonStyle: settings?.hero_content?.statsRibbonStyle || 'rgba(0,0,0,0.7)'
+    overlayOpacityMobile: settings?.hero_content?.overlayOpacityMobile ?? settings?.hero_content?.overlayOpacity ?? 0.6
   };
 
-  // Stats ribbon background - now uses direct CSS value
-  const statsRibbonBg = heroContent.statsRibbonStyle;
   const featuresSection = settings?.features_section || { title: 'Why Choose DIGIHOMES?', subtitle: "We're committed to making your house-hunting experience smooth and successful." };
   const housesSection = settings?.houses_section || { title: 'Available Houses', subtitle: 'Explore our selection of quality rental properties' };
   const locationsSection = settings?.locations_section || {
@@ -162,46 +111,26 @@ const HomePage = () => {
     subtitle: '',
     locations: []
   };
-  const aboutSection = {
-    title: settings?.about_section?.title || '',
-    subtitle: settings?.about_section?.subtitle || '',
-    content: settings?.about_section?.content || ''
-  };
-
-  
-  // Preload hero background image
-  useEffect(() => {
-    if (heroContent.backgroundImage) {
-      const img = new Image();
-      img.src = heroContent.backgroundImage;
-    }
-    if (heroContent.backgroundImageMobile) {
-      const img = new Image();
-      img.src = heroContent.backgroundImageMobile;
-    }
-  }, [heroContent.backgroundImage, heroContent.backgroundImageMobile]);
 
   return (
     <PublicLayout>
-      {/* Hero Section - Use neutral dark background as fallback instead of blue */}
+      {/* Hero Section - Content starts from bottom */}
       <section 
-        className="relative text-white overflow-hidden min-h-[100vh]"
+        className="relative text-white overflow-hidden min-h-[100vh] flex flex-col"
         style={{ backgroundColor: '#1a1a1a' }}
       >
         {/* Desktop Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center hidden md:block transition-opacity duration-500"
+          className="absolute inset-0 bg-cover bg-center hidden md:block"
           style={{ 
-            backgroundImage: heroContent.backgroundImage ? `url('${heroContent.backgroundImage}')` : 'none',
-            opacity: heroContent.backgroundImage ? 1 : 0
+            backgroundImage: heroContent.backgroundImage ? `url('${heroContent.backgroundImage}')` : 'none'
           }}
         ></div>
         {/* Mobile Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center md:hidden transition-opacity duration-500"
+          className="absolute inset-0 bg-cover bg-center md:hidden"
           style={{ 
-            backgroundImage: heroContent.backgroundImageMobile ? `url('${heroContent.backgroundImageMobile}')` : 'none',
-            opacity: heroContent.backgroundImageMobile ? 1 : 0
+            backgroundImage: heroContent.backgroundImageMobile ? `url('${heroContent.backgroundImageMobile}')` : 'none'
           }}
         ></div>
         {/* Desktop Overlay */}
@@ -214,14 +143,18 @@ const HomePage = () => {
           className="absolute inset-0 md:hidden"
           style={{ backgroundColor: heroContent.overlayColorMobile, opacity: heroContent.overlayOpacityMobile }}
         ></div>
-        {/* Hero content - more top padding on mobile for fixed header */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-32 pb-16 md:pb-24">
+        
+        {/* Spacer to push content to bottom */}
+        <div className="flex-grow"></div>
+        
+        {/* Hero content - positioned at bottom */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 md:pb-20">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
               {heroContent.title}{' '}
               <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
             </h1>
-            <p className="text-lg md:text-xl mb-8 max-w-2xl" style={{ color: heroContent.descriptionHighlightColor }}>
+            <p className="text-lg md:text-xl mb-6 max-w-2xl" style={{ color: heroContent.descriptionHighlightColor }}>
               {heroContent.description}
             </p>
             <div className="flex flex-wrap gap-4">
@@ -236,7 +169,6 @@ const HomePage = () => {
               <Link 
                 to="/contact" 
                 className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-white"
-                style={{ '--hover-color': colors[600] }}
                 onMouseEnter={(e) => e.currentTarget.style.color = colors[600]}
                 onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
               >
@@ -249,12 +181,9 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section ref={featuresRef} className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
-            className="text-center mb-12 transition-opacity duration-500"
-            style={{ opacity: featuresVisible ? 1 : 0 }}
-          >
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
             </h2>
@@ -265,61 +194,16 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
-              <FeatureCard 
-                key={index} 
-                feature={feature} 
-                index={index}
-                isVisible={featuresVisible}
-                animSettings={animSettings}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section - New Design Below Features */}
-      <section 
-        ref={statsRef}
-        className="py-16 md:py-20"
-        style={{ background: `linear-gradient(135deg, ${colors[600]} 0%, ${colors[800]} 100%)` }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div 
-                key={index}
-                className="text-center transition-opacity"
-                style={{ 
-                  transitionDuration: `${animSettings.duration}ms`,
-                  transitionDelay: `${index * animSettings.staggerDelay}ms`,
-                  opacity: statsVisible ? 1 : 0
-                }}
-              >
-                <div 
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2"
-                  style={{ color: heroContent.statsNumberColor }}
-                >
-                  {stat.value}
-                </div>
-                <div 
-                  className="text-sm md:text-base font-medium uppercase tracking-wider"
-                  style={{ color: heroContent.statsLabelColor }}
-                >
-                  {stat.label}
-                </div>
-              </div>
+              <FeatureCard key={index} feature={feature} />
             ))}
           </div>
         </div>
       </section>
 
       {/* Featured Houses */}
-      <section ref={housesRef} className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
-            className="flex flex-col md:flex-row md:items-end justify-between mb-10 transition-opacity"
-            style={{ transitionDuration: '500ms', opacity: housesVisible ? 1 : 0 }}
-          >
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                 {housesSection.title}
@@ -342,15 +226,9 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : featuredHouses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredHouses.map((house, index) => (
-                <HouseCard 
-                  key={house.id}
-                  house={house} 
-                  index={index}
-                  isVisible={housesVisible}
-                  animSettings={animSettings}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredHouses.map((house) => (
+                <HouseCard key={house.id} house={house} />
               ))}
             </div>
           ) : (
@@ -362,12 +240,9 @@ const HomePage = () => {
       </section>
 
       {/* Locations Section */}
-      <section ref={locationsRef} className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
-            className="text-center mb-12 transition-opacity duration-500"
-            style={{ opacity: locationsVisible ? 1 : 0 }}
-          >
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
             </h2>
@@ -378,7 +253,6 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(locationsSection.locations || []).map((loc, index) => {
-              // Handle both relative and absolute image URLs
               const imageUrl = loc.image?.startsWith('http') 
                 ? loc.image 
                 : loc.image?.startsWith('/uploads') 
@@ -387,12 +261,7 @@ const HomePage = () => {
               return (
               <div 
                 key={loc.name || index}
-                className="relative rounded-2xl overflow-hidden group transition-opacity h-64"
-                style={{ 
-                  transitionDuration: '500ms', 
-                  transitionDelay: `${index * 100}ms`,
-                  opacity: locationsVisible ? 1 : 0
-                }}
+                className="relative rounded-2xl overflow-hidden group h-64"
               >
                 <img 
                   src={imageUrl} 
@@ -420,144 +289,30 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* About Section - New Modern Split Design */}
-      {(aboutSection.title || aboutSection.content) && (
-        <section ref={aboutRef} className="py-20 md:py-28 bg-white overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              {/* Left Side - Decorative Element */}
-              <div 
-                className="relative transition-opacity"
-                style={{ 
-                  transitionDuration: `${animSettings.duration}ms`,
-                  opacity: aboutVisible ? 1 : 0
-                }}
-              >
-                <div 
-                  className="aspect-square rounded-3xl relative overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${colors[100]} 0%, ${colors[200]} 100%)` }}
-                >
-                  <div 
-                    className="absolute inset-4 rounded-2xl"
-                    style={{ background: `linear-gradient(135deg, ${colors[500]} 0%, ${colors[700]} 100%)` }}
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Building className="w-24 h-24 md:w-32 md:h-32 text-white/30" />
-                    </div>
-                    <div className="absolute bottom-6 left-6 right-6 text-white">
-                      <div className="text-5xl md:text-6xl font-bold mb-1">5+</div>
-                      <div className="text-sm md:text-base opacity-80">Years of Excellence</div>
-                    </div>
-                  </div>
-                </div>
-                {/* Floating accent */}
-                <div 
-                  className="absolute -bottom-4 -right-4 w-24 h-24 rounded-2xl"
-                  style={{ backgroundColor: colors[300] }}
-                ></div>
-              </div>
-
-              {/* Right Side - Content */}
-              <div>
-                {aboutSection.subtitle && (
-                  <div 
-                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4 transition-opacity"
-                    style={{ 
-                      backgroundColor: colors[100], 
-                      color: colors[700],
-                      transitionDuration: `${animSettings.duration}ms`,
-                      opacity: aboutVisible ? 1 : 0
-                    }}
-                  >
-                    {aboutSection.subtitle}
-                  </div>
-                )}
-                {aboutSection.title && (
-                  <h2 
-                    className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 transition-opacity"
-                    style={{ 
-                      transitionDuration: `${animSettings.duration}ms`,
-                      transitionDelay: `${animSettings.staggerDelay}ms`,
-                      opacity: aboutVisible ? 1 : 0
-                    }}
-                  >
-                    {aboutSection.title}
-                  </h2>
-                )}
-                {aboutSection.content && (
-                  <div className="space-y-4">
-                    {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
-                      <p 
-                        key={index}
-                        className="text-gray-600 text-lg leading-relaxed transition-opacity"
-                        style={{ 
-                          transitionDuration: `${animSettings.duration}ms`,
-                          transitionDelay: `${(index + 2) * animSettings.staggerDelay}ms`,
-                          opacity: aboutVisible ? 1 : 0
-                        }}
-                      >
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                )}
-                <div 
-                  className="mt-8 transition-opacity"
-                  style={{ 
-                    transitionDuration: `${animSettings.duration}ms`,
-                    transitionDelay: `${5 * animSettings.staggerDelay}ms`,
-                    opacity: aboutVisible ? 1 : 0
-                  }}
-                >
-                  <Link 
-                    to="/contact"
-                    className="inline-flex items-center gap-2 font-semibold hover:gap-3 transition-all"
-                    style={{ color: colors[600] }}
-                  >
-                    Get in Touch
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* CTA Section */}
-      <section ref={ctaRef} className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
+      <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 
-            className="text-3xl md:text-4xl font-bold text-white mb-4 transition-opacity duration-500"
-            style={{ opacity: ctaVisible ? 1 : 0 }}
-          >
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Find Your New Home?
           </h2>
-          <p 
-            className="mb-8 max-w-2xl mx-auto transition-opacity duration-500" 
-            style={{ color: colors[100], opacity: ctaVisible ? 1 : 0, transitionDelay: '100ms' }}
-          >
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div 
-            className="flex flex-wrap justify-center gap-4 transition-opacity duration-500"
-            style={{ opacity: ctaVisible ? 1 : 0, transitionDelay: '200ms' }}
-          >
+          <div className="flex flex-wrap justify-center gap-4">
             <Link 
               to="/houses" 
-              className="font-medium py-2.5 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 hover:scale-105 animate-pulse-subtle shadow-lg"
+              className="font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"
               style={{ color: colors[600] }}
             >
               Browse Houses
-              <ArrowRight className="w-5 h-5 animate-bounce-x" />
+              <ArrowRight className="w-5 h-5" />
             </Link>
             <a 
               href={`https://wa.me/${companyInfo.whatsapp || '254700000000'}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 hover:bg-white hover:scale-105 animate-pulse-subtle shadow-lg"
-              style={{ animationDelay: '0.5s' }}
+              className="border-2 border-white text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 hover:bg-white shadow-lg"
               onMouseEnter={(e) => e.currentTarget.style.color = colors[600]}
               onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
             >

@@ -106,15 +106,9 @@ const HousesPage = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
           </div>
         ) : houses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {houses.map((house, index) => (
-              <HouseCard 
-                key={house.id} 
-                house={house} 
-                index={index}
-                isVisible={true}
-                animSettings={{ duration: 600, staggerDelay: 100 }}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {houses.map((house) => (
+              <HouseCard key={house.id} house={house} />
             ))}
           </div>
         ) : (
