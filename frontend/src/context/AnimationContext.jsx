@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../config/api';
-import { setAnimationSettings } from '../hooks/useAnimations';
+import { setAnimationSettings } from '../hooks/useNewAnimations';
 
 const AnimationContext = createContext({});
 
@@ -22,11 +22,13 @@ export const AnimationProvider = ({ children }) => {
       try {
         const response = await api.get('/settings/animations');
         if (response.data) {
+          console.log('🎬 Fetched animation settings from API:', response.data);
           setSettings(response.data);
           setAnimationSettings(response.data);
         }
       } catch (error) {
-        console.log('Using default animation settings');
+        console.log('⚠️ Using default animation settings');
+        setAnimationSettings(settings);
       } finally {
         setLoaded(true);
       }

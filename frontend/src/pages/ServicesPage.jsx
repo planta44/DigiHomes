@@ -3,7 +3,7 @@ import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefc
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useStaggerAnimation } from '../hooks/useAnimations';
+import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
@@ -25,10 +25,10 @@ const ServicesPage = () => {
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
   // Hero animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
   // Card animations
-  const sectionsRef = useStaggerAnimation();
+  const sectionsRef = useCardStaggerAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -89,7 +89,7 @@ const ServicesPage = () => {
               return (
                 <div 
                   key={section.title}
-                  data-anim-item
+                  data-card-item
                   className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow"
                 >
                   <div 

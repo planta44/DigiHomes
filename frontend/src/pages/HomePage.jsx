@@ -16,11 +16,17 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useScrollAnimation, useStaggerAnimation, useCountUp, useStatsObserver } from '../hooks/useAnimations';
+import { 
+  useHeroTextAnimation, 
+  useScrollTriggerAnimation, 
+  useCardStaggerAnimation, 
+  useStatsCounter, 
+  useStatsInView 
+} from '../hooks/useNewAnimations';
 
-// Stat item with count-up animation - re-counts when section comes back into view
+// Stat item with count-up animation - MUST visibly count from 0
 const StatItem = ({ stat, isInView, numberColor, textColor }) => {
-  const animatedValue = useCountUp(stat.value, isInView);
+  const animatedValue = useStatsCounter(stat.value, isInView);
   return (
     <div className="text-center">
       <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>
@@ -57,27 +63,27 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Hero animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
-  const heroRef3 = useHeroAnimation(2);
+  // Hero animations - useLayoutEffect for immediate animation on mount
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
+  const heroRef3 = useHeroTextAnimation(2);
   
-  // Stats section
-  const [statsRef, statsInView] = useStatsObserver();
+  // Stats section - MUST count from 0 when visible
+  const [statsRef, statsInView] = useStatsInView();
   
-  // Section animations
-  const featuresRef = useScrollAnimation(0);
-  const featuresGridRef = useStaggerAnimation();
-  const housesRef = useScrollAnimation(0);
-  const housesGridRef = useStaggerAnimation();
-  const locationsRef = useScrollAnimation(0);
-  const locationsGridRef = useStaggerAnimation();
-  const aboutRef = useScrollAnimation(0);
+  // Section animations - trigger on scroll
+  const featuresRef = useScrollTriggerAnimation(0);
+  const featuresGridRef = useCardStaggerAnimation();
+  const housesRef = useScrollTriggerAnimation(0);
+  const housesGridRef = useCardStaggerAnimation();
+  const locationsRef = useScrollTriggerAnimation(0);
+  const locationsGridRef = useCardStaggerAnimation();
+  const aboutRef = useScrollTriggerAnimation(0);
   
   // CTA animations
-  const ctaRef = useScrollAnimation(0);
-  const ctaRef2 = useScrollAnimation(1);
-  const ctaRef3 = useScrollAnimation(2);
+  const ctaRef = useScrollTriggerAnimation(0);
+  const ctaRef2 = useScrollTriggerAnimation(1);
+  const ctaRef3 = useScrollTriggerAnimation(2);
 
   useEffect(() => {
     fetchData();
@@ -324,7 +330,7 @@ const HomePage = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                data-anim-item
+                data-card-item
               >
                 <FeatureCard feature={feature} />
               </div>
@@ -389,7 +395,7 @@ const HomePage = () => {
               {featuredHouses.map((house, index) => (
                 <div 
                   key={house.id}
-                  data-anim-item
+                  data-card-item
                 >
                   <HouseCard house={house} />
                 </div>
@@ -428,7 +434,7 @@ const HomePage = () => {
               return (
               <div 
                 key={loc.name || index}
-                data-anim-item
+                data-card-item
                 className="relative rounded-2xl overflow-hidden group h-64"
               >
                 <img 

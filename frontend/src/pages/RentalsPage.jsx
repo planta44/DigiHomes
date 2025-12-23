@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useStaggerAnimation } from '../hooks/useAnimations';
+import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
 
 const RentalsPage = () => {
   const [properties, setProperties] = useState([]);
@@ -19,10 +19,10 @@ const RentalsPage = () => {
   const { colors } = useTheme();
   
   // Hero animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
   // Card animations
-  const cardsRef = useStaggerAnimation();
+  const cardsRef = useCardStaggerAnimation();
   
   const [filters, setFilters] = useState({
     search: '',
@@ -336,7 +336,7 @@ const RentalsPage = () => {
             }
           >
             {filteredProperties.map((property, index) => (
-              <div key={property.id} data-anim-item>
+              <div key={property.id} data-card-item>
                 <HouseCard house={property} />
               </div>
             ))}

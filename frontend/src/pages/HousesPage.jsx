@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
 import api from '../config/api';
-import { useHeroAnimation, useStaggerAnimation } from '../hooks/useAnimations';
+import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
 
 const HousesPage = () => {
   const [searchParams] = useSearchParams();
@@ -21,10 +21,10 @@ const HousesPage = () => {
   });
 
   // Hero animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
   // Card animations
-  const cardsRef = useStaggerAnimation();
+  const cardsRef = useCardStaggerAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -119,7 +119,7 @@ const HousesPage = () => {
             {houses.map((house, index) => (
               <div
                 key={house.id}
-                data-anim-item
+                data-card-item
               >
                 <HouseCard house={house} />
               </div>
