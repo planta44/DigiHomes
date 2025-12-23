@@ -23,12 +23,10 @@ export const setAnimationSettings = (settings) => {
 export const getAnimationSettings = () => globalAnimationSettings;
 
 // Get animation class based on style setting
-const getAnimClassByStyle = (ready, done) => {
-  if (!globalAnimationSettings.enabled) return '';
+const getAnimClassByStyle = (shouldAnimate) => {
+  if (!globalAnimationSettings.enabled || !shouldAnimate) return '';
   const style = globalAnimationSettings.animationStyle || 'pop';
-  if (done) return `anim-${style}-ready anim-${style}-done`;
-  if (ready) return `anim-${style}-ready`;
-  return '';
+  return `anim-${style}-ready`;
 };
 
 /**
@@ -36,32 +34,28 @@ const getAnimClassByStyle = (ready, done) => {
  * Content always visible, animation is purely visual enhancement
  */
 export const useHeroAnimation = (elementDelay = 0) => {
-  const [ready, setReady] = useState(false);
-  const [done, setDone] = useState(false);
+  const [animate, setAnimate] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    if (!globalAnimationSettings.enabled) return;
-    
-    const element = ref.current;
-    if (!element) return;
+    if (!globalAnimationSettings.enabled) {
+      setAnimate(false);
+      return;
+    }
 
     // Calculate staggered delay for this element
     const delay = globalAnimationSettings.heroTextDelay + 
                   (elementDelay * globalAnimationSettings.baseDelay * globalAnimationSettings.heroStaggerMultiplier);
 
-    // Set ready state immediately (starts animation preparation)
-    setReady(true);
-
     // Trigger animation after delay
     const timer = setTimeout(() => {
-      setDone(true);
+      setAnimate(true);
     }, delay);
 
     return () => clearTimeout(timer);
   }, [elementDelay]);
 
-  return [ref, getAnimClassByStyle(ready, done)];
+  return [ref, getAnimClassByStyle(animate)];
 };
 
 /**
@@ -69,13 +63,15 @@ export const useHeroAnimation = (elementDelay = 0) => {
  * Perfect for sections, paragraphs, buttons - anything that should animate on scroll
  */
 export const useScrollAnimation = (delay = 0) => {
-  const [ready, setReady] = useState(false);
-  const [done, setDone] = useState(false);
+  const [animate, setAnimate] = useState(false);
   const ref = useRef(null);
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (!globalAnimationSettings.enabled) return;
+    if (!globalAnimationSettings.enabled) {
+      setAnimate(false);
+      return;
+    }
     
     const element = ref.current;
     if (!element) return;
@@ -83,9 +79,8 @@ export const useScrollAnimation = (delay = 0) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setReady(true);
           const effectiveDelay = delay * globalAnimationSettings.baseDelay * globalAnimationSettings.sectionStaggerMultiplier;
-          timerRef.current = setTimeout(() => setDone(true), effectiveDelay);
+          timerRef.current = setTimeout(() => setAnimate(true), effectiveDelay);
         }
       },
       { threshold: 0.15, rootMargin: '0px' }
@@ -98,7 +93,7 @@ export const useScrollAnimation = (delay = 0) => {
     };
   }, [delay]);
 
-  return [ref, getAnimClassByStyle(ready, done)];
+  return [ref, getAnimClassByStyle(animate)];
 };
 
 /**
@@ -112,7 +107,10 @@ export const useStaggerAnimation = () => {
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!globalAnimationSettings.enabled) return;
+    if (!globalAnimationSettings.enabled) {
+      setAnimatedItems(new Set());
+      return;
+    }
     
     const element = ref.current;
     if (!element) return;
@@ -145,9 +143,11 @@ export const useStaggerAnimation = () => {
 
   const getItemClass = useCallback((index) => {
     if (!globalAnimationSettings.enabled) return '';
-    const style = globalAnimationSettings.animationStyle || 'pop';
-    if (animatedItems.has(index)) return `anim-${style}-ready anim-${style}-done`;
-    return `anim-${style}-ready`;
+    if (animatedItems.has(index)) {
+      const style = globalAnimationSettings.animationStyle || 'pop';
+      return `anim-${style}-ready`;
+    }
+    return '';
   }, [animatedItems]);
 
   return [ref, getItemClass];
@@ -158,12 +158,15 @@ export const useSectionAnimation = useScrollAnimation;
 export const useCardAnimation = useScrollAnimation;
 
 /**
- * Stats Count-up Hook - Re-counts when scrolling back into view
- * Uses admin-configurable duration
+ * Stats Count-up Hook - Counts up when in view
+ * Shows final value by default (if animations disabled or not in view)
  */
 export const useCountUp = (endValue, isInView = true) => {
-  const [count, setCount] = useState(null);
+  const numericEnd = parseInt(String(endValue).replace(/\D/g, '')) || 0;
+  const suffix = String(endValue).replace(/[0-9]/g, '');
+  const [count, setCount] = useState(numericEnd);
   const animationRef = useRef(null);
+  const hasCountedRef = useRef(false);
   const duration = globalAnimationSettings.statsCountDuration || 2000;
 
   useEffect(() => {
@@ -173,14 +176,23 @@ export const useCountUp = (endValue, isInView = true) => {
       animationRef.current = null;
     }
 
-    if (!isInView) {
-      // Reset to 0 when out of view to prepare for re-count
-      setCount(0);
+    // If animations disabled, just show final value
+    if (!globalAnimationSettings.enabled) {
+      setCount(numericEnd);
       return;
     }
 
-    // Start counting from 0
-    const numericEnd = parseInt(String(endValue).replace(/\D/g, '')) || 0;
+    if (!isInView) {
+      // Show final value when not in view
+      if (hasCountedRef.current) {
+        setCount(numericEnd);
+      }
+      return;
+    }
+
+    // Start counting from 0 when in view
+    hasCountedRef.current = true;
+    setCount(0);
     const startTime = Date.now();
 
     const animate = () => {
@@ -204,11 +216,9 @@ export const useCountUp = (endValue, isInView = true) => {
       clearTimeout(timer);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [endValue, duration, isInView]);
+  }, [endValue, duration, isInView, numericEnd]);
 
-  // Show 0 initially, count up when in view
-  const suffix = String(endValue).replace(/[0-9]/g, '');
-  return (count === null ? 0 : count) + suffix;
+  return count + suffix;
 };
 
 /**
