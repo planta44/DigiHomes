@@ -37,9 +37,23 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/pages', pagesRoutes);
 app.use('/api/reels', reelsRoutes);
 
-// Health check
+// Health check endpoints for uptime monitoring
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'DIGI Homes API is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'DIGI Homes API is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'DIGI Homes API is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // Error handling middleware

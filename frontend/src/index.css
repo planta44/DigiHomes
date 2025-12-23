@@ -109,11 +109,11 @@
   /* SAFE Animation Classes - Only applied via JavaScript */
   /* Content is ALWAYS visible by default. These classes are added by JS after mount. */
   
-  /* Pop animation for hero/section elements */
+  /* POP Animation Style - Rise from below with fade */
   .anim-pop-ready {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
   .anim-pop-done {
@@ -121,16 +121,26 @@
     transform: translateY(0) !important;
   }
   
-  /* Card animation - slightly faster for product cards */
-  .anim-card-ready {
+  /* FADE Animation Style - Simple fade in */
+  .anim-fade-ready {
     opacity: 0;
-    transform: translateY(20px);
+    transition: opacity 0.5s ease-out;
+  }
+  
+  .anim-fade-done {
+    opacity: 1 !important;
+  }
+  
+  /* SLIDE Animation Style - Slide from left with fade */
+  .anim-slide-ready {
+    opacity: 0;
+    transform: translateX(-20px);
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
   }
   
-  .anim-card-done {
+  .anim-slide-done {
     opacity: 1 !important;
-    transform: translateY(0) !important;
+    transform: translateX(0) !important;
   }
   
   /* Delay utility classes */

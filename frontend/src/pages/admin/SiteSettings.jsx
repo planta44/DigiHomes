@@ -84,7 +84,7 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { baseDelay: 100, cardStaggerMultiplier: 1, heroStaggerMultiplier: 1.5, sectionStaggerMultiplier: 1.2, heroTextDelay: 300, statsCountDuration: 2000 },
+    animation_settings: { enabled: true, animationStyle: 'pop', baseDelay: 150, cardStaggerMultiplier: 1, heroStaggerMultiplier: 2, sectionStaggerMultiplier: 1.5, heroTextDelay: 400, statsCountDuration: 2000 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
@@ -1340,62 +1340,103 @@ const SiteSettings = () => {
             {activeTab === 'animations' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-semibold mb-2">Animation Timing Control</h3>
+                  <h3 className="font-semibold mb-2">Animation Settings</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Control how fast or slow animations appear across the website. Higher values = slower/more delayed animations.
+                    Control animations across the website. Elements appear one by one when scrolled into view.
                   </p>
+                </div>
+
+                {/* Master Controls */}
+                <div className="border-b pb-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Master Controls</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border rounded-lg bg-gray-50">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.animation_settings.enabled !== false}
+                          onChange={(e) => setSettings(prev => ({
+                            ...prev,
+                            animation_settings: { ...prev.animation_settings, enabled: e.target.checked }
+                          }))}
+                          className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <div>
+                          <span className="font-medium text-gray-900">Enable Animations</span>
+                          <p className="text-xs text-gray-500">Turn all scroll animations on/off</p>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-gray-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Animation Style</label>
+                      <select
+                        value={settings.animation_settings.animationStyle || 'pop'}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, animationStyle: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="pop">Pop (rise from below)</option>
+                        <option value="fade">Fade (simple fade in)</option>
+                        <option value="slide">Slide (slide from left)</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Choose how elements appear on screen</p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Hero Text Animations */}
                 <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Hero Section Text Animations</h4>
+                  <h4 className="font-medium text-gray-800 mb-4">Hero Section Text</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 border rounded-lg bg-blue-50">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Hero Text Initial Delay: {settings.animation_settings.heroTextDelay || 300}ms
+                        Initial Delay: {settings.animation_settings.heroTextDelay || 400}ms
                       </label>
                       <input
                         type="range"
-                        min="100"
-                        max="1000"
-                        step="50"
-                        value={settings.animation_settings.heroTextDelay || 300}
+                        min="200"
+                        max="1500"
+                        step="100"
+                        value={settings.animation_settings.heroTextDelay || 400}
                         onChange={(e) => setSettings(prev => ({
                           ...prev,
                           animation_settings: { ...prev.animation_settings, heroTextDelay: parseInt(e.target.value) }
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Delay before hero text starts appearing (100-1000ms)</p>
+                      <p className="text-xs text-gray-500 mt-1">Wait before hero text appears on page load</p>
                     </div>
 
                     <div className="p-4 border rounded-lg bg-blue-50">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Hero Text Stagger: {settings.animation_settings.heroStaggerMultiplier || 1.5}x
+                        Stagger Multiplier: {settings.animation_settings.heroStaggerMultiplier || 2}x
                       </label>
                       <input
                         type="range"
                         min="1"
                         max="5"
                         step="0.5"
-                        value={settings.animation_settings.heroStaggerMultiplier || 1.5}
+                        value={settings.animation_settings.heroStaggerMultiplier || 2}
                         onChange={(e) => setSettings(prev => ({
                           ...prev,
                           animation_settings: { ...prev.animation_settings, heroStaggerMultiplier: parseFloat(e.target.value) }
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Delay between each hero text element (1x-5x)</p>
+                      <p className="text-xs text-gray-500 mt-1">Delay between each hero text element</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Stats Counter */}
                 <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Stats Counter Animation</h4>
+                  <h4 className="font-medium text-gray-800 mb-4">Stats Counter</h4>
                   <div className="p-4 border rounded-lg bg-green-50">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stats Count Duration: {(settings.animation_settings.statsCountDuration || 2000) / 1000}s
+                      Count Duration: {(settings.animation_settings.statsCountDuration || 2000) / 1000}s
                     </label>
                     <input
                       type="range"
@@ -1409,31 +1450,31 @@ const SiteSettings = () => {
                       }))}
                       className="w-full"
                     />
-                    <p className="text-xs text-gray-500 mt-1">How long it takes for stats numbers to count up (1-5 seconds)</p>
+                    <p className="text-xs text-gray-500 mt-1">How long stats numbers take to count up when scrolled into view</p>
                   </div>
                 </div>
 
                 {/* Card & Section Animations */}
                 <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Card & Section Animations</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Cards & Sections</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="p-4 border rounded-lg bg-gray-50">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Base Delay: {settings.animation_settings.baseDelay || 100}ms
+                        Base Delay: {settings.animation_settings.baseDelay || 150}ms
                       </label>
                       <input
                         type="range"
                         min="50"
-                        max="300"
+                        max="400"
                         step="25"
-                        value={settings.animation_settings.baseDelay || 100}
+                        value={settings.animation_settings.baseDelay || 150}
                         onChange={(e) => setSettings(prev => ({
                           ...prev,
                           animation_settings: { ...prev.animation_settings, baseDelay: parseInt(e.target.value) }
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Base timing between staggered items (50-300ms)</p>
+                      <p className="text-xs text-gray-500 mt-1">Time between each item</p>
                     </div>
 
                     <div className="p-4 border rounded-lg bg-gray-50">
@@ -1452,26 +1493,26 @@ const SiteSettings = () => {
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Delay multiplier for product cards</p>
+                      <p className="text-xs text-gray-500 mt-1">Product card speed</p>
                     </div>
 
                     <div className="p-4 border rounded-lg bg-gray-50">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Section Stagger: {settings.animation_settings.sectionStaggerMultiplier || 1.2}x
+                        Section Stagger: {settings.animation_settings.sectionStaggerMultiplier || 1.5}x
                       </label>
                       <input
                         type="range"
                         min="0.5"
                         max="3"
                         step="0.1"
-                        value={settings.animation_settings.sectionStaggerMultiplier || 1.2}
+                        value={settings.animation_settings.sectionStaggerMultiplier || 1.5}
                         onChange={(e) => setSettings(prev => ({
                           ...prev,
                           animation_settings: { ...prev.animation_settings, sectionStaggerMultiplier: parseFloat(e.target.value) }
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Delay multiplier for homepage sections</p>
+                      <p className="text-xs text-gray-500 mt-1">Section heading speed</p>
                     </div>
                   </div>
                 </div>
@@ -1481,9 +1522,10 @@ const SiteSettings = () => {
                     <HelpCircle className="w-4 h-4" /> How it works
                   </h4>
                   <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• <strong>Hero Text Delay:</strong> Wait time before hero text starts appearing on page load</li>
-                    <li>• <strong>Stats Count Duration:</strong> How long the counting animation takes</li>
-                    <li>• <strong>Stagger Multipliers:</strong> Control speed between items (higher = slower)</li>
+                    <li>• Elements appear one by one as you scroll down the page</li>
+                    <li>• Higher delay values = slower, more dramatic reveals</li>
+                    <li>• Works on all pages: Homepage, Houses, Services, Buy, Rent, Contact</li>
+                    <li>• Animations are purely visual - content always loads normally</li>
                   </ul>
                 </div>
 

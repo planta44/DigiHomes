@@ -16,7 +16,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useStaggerAnimation, useCountUp, useStatsObserver, useSectionAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useScrollAnimation, useStaggerAnimation, useCountUp, useStatsObserver } from '../hooks/useAnimations';
 
 // Stat item with count-up animation - re-counts when section comes back into view
 const StatItem = ({ stat, isInView, numberColor, textColor }) => {
@@ -65,14 +65,14 @@ const HomePage = () => {
   // Stats section - re-counts when scrolling back into view
   const [statsRef, statsInView] = useStatsObserver();
   
-  // Section animations - re-animate on scroll
-  const [featuresRef, featuresAnim] = useSectionAnimation(0);
+  // Section animations - animate when scrolled into view
+  const [featuresRef, featuresAnim] = useScrollAnimation(0);
   const [featuresGridRef, getFeatureClass] = useStaggerAnimation();
-  const [housesRef, housesAnim] = useSectionAnimation(0);
+  const [housesRef, housesAnim] = useScrollAnimation(0);
   const [housesGridRef, getHouseClass] = useStaggerAnimation();
-  const [locationsRef, locationsAnim] = useSectionAnimation(0);
+  const [locationsRef, locationsAnim] = useScrollAnimation(0);
   const [locationsGridRef, getLocationClass] = useStaggerAnimation();
-  const [aboutRef, aboutAnim] = useSectionAnimation(0);
+  const [aboutRef, aboutAnim] = useScrollAnimation(0);
   
   // CTA animations - re-animate on scroll
   const [ctaRef, ctaAnim] = useHeroAnimation(0);

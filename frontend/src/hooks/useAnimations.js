@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 /**
- * Animation settings context - will be populated from admin settings
+ * SAFE Animation System - Never blocks content, purely visual enhancements
+ * All content is ALWAYS visible. Animations are additive CSS classes only.
  */
+
 let globalAnimationSettings = {
-  baseDelay: 100,
+  enabled: true,
+  baseDelay: 150,
+  heroTextDelay: 400,
   cardStaggerMultiplier: 1,
-  heroStaggerMultiplier: 1.5,
-  sectionStaggerMultiplier: 1.2,
-  heroTextDelay: 300,
-  statsCountDuration: 2000
+  heroStaggerMultiplier: 2,
+  sectionStaggerMultiplier: 1.5,
+  statsCountDuration: 2000,
+  animationStyle: 'pop' // 'pop', 'fade', 'slide'
 };
 
 export const setAnimationSettings = (settings) => {
@@ -18,169 +22,118 @@ export const setAnimationSettings = (settings) => {
 
 export const getAnimationSettings = () => globalAnimationSettings;
 
+// Get animation class based on style setting
+const getAnimClassByStyle = (ready, done) => {
+  if (!globalAnimationSettings.enabled) return '';
+  const style = globalAnimationSettings.animationStyle || 'pop';
+  if (done) return `anim-${style}-ready anim-${style}-done`;
+  if (ready) return `anim-${style}-ready`;
+  return '';
+};
+
 /**
- * Hero Pop Animation - Triggers on page load AND when scrolling back
- * Content always visible by default, animation is purely visual
+ * Hero Animation - Triggers on page load with staggered delay
+ * Content always visible, animation is purely visual enhancement
  */
 export const useHeroAnimation = (elementDelay = 0) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [done, setDone] = useState(false);
   const ref = useRef(null);
-  const initialLoadDone = useRef(false);
 
   useEffect(() => {
+    if (!globalAnimationSettings.enabled) return;
+    
     const element = ref.current;
     if (!element) return;
 
-    // Calculate delay based on element order
+    // Calculate staggered delay for this element
     const delay = globalAnimationSettings.heroTextDelay + 
                   (elementDelay * globalAnimationSettings.baseDelay * globalAnimationSettings.heroStaggerMultiplier);
 
-    // Start with animation ready state
-    setShouldAnimate(true);
+    // Set ready state immediately (starts animation preparation)
+    setReady(true);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          // Animate in with delay
-          setTimeout(() => {
-            setIsVisible(true);
-            initialLoadDone.current = true;
-          }, initialLoadDone.current ? delay / 2 : delay);
-        } else if (initialLoadDone.current) {
-          // Reset when scrolling away - allows re-animation
-          setIsVisible(false);
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px' }
-    );
+    // Trigger animation after delay
+    const timer = setTimeout(() => {
+      setDone(true);
+    }, delay);
 
-    observer.observe(element);
-    return () => observer.disconnect();
+    return () => clearTimeout(timer);
   }, [elementDelay]);
 
-  // Apply animation classes
-  const animClass = !shouldAnimate ? '' :
-                    isVisible ? 'anim-pop-ready anim-pop-done' : 
-                    'anim-pop-ready';
-  
-  return [ref, animClass];
+  return [ref, getAnimClassByStyle(ready, done)];
 };
 
 /**
- * Card Animation Hook - Each card animates individually when 30-40% visible
- * Re-animates when scrolling back into view
+ * Scroll Animation Hook - Triggers when element enters viewport
+ * Perfect for sections, paragraphs, buttons - anything that should animate on scroll
  */
-export const useCardAnimation = (cardIndex = 0) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const useScrollAnimation = (delay = 0) => {
+  const [ready, setReady] = useState(false);
+  const [done, setDone] = useState(false);
   const ref = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
+    if (!globalAnimationSettings.enabled) return;
+    
     const element = ref.current;
     if (!element) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Stagger delay based on card index
-          const delay = cardIndex * globalAnimationSettings.baseDelay * globalAnimationSettings.cardStaggerMultiplier;
-          setTimeout(() => setIsVisible(true), delay);
-        } else {
-          // Reset when leaving viewport - allows re-animation
-          setIsVisible(false);
+          setReady(true);
+          const effectiveDelay = delay * globalAnimationSettings.baseDelay * globalAnimationSettings.sectionStaggerMultiplier;
+          timerRef.current = setTimeout(() => setDone(true), effectiveDelay);
         }
       },
-      { threshold: 0.35, rootMargin: '0px' } // 30-40% visibility threshold
+      { threshold: 0.15, rootMargin: '0px' }
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
-  }, [cardIndex]);
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [delay]);
 
-  const animClass = isVisible ? 'anim-card-ready anim-card-done' : 'anim-card-ready';
-  
-  return [ref, animClass];
+  return [ref, getAnimClassByStyle(ready, done)];
 };
 
 /**
- * Section Animation Hook - For homepage sections, re-animates on scroll
+ * Stagger Animation Hook - For groups of items (cards, list items)
+ * Each child with data-anim-item animates one by one when container is visible
  */
-export const useSectionAnimation = (sectionDelay = 0) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          const delay = sectionDelay * globalAnimationSettings.baseDelay * globalAnimationSettings.sectionStaggerMultiplier;
-          setTimeout(() => {
-            setIsVisible(true);
-            setHasAnimated(true);
-          }, delay);
-        } else if (hasAnimated) {
-          setIsVisible(false);
-        }
-      },
-      { threshold: 0.1, rootMargin: '50px' }
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [sectionDelay, hasAnimated]);
-
-  const animClass = isVisible ? 'anim-pop-ready anim-pop-done' : 
-                    hasAnimated ? 'anim-pop-ready' : '';
-  
-  return [ref, animClass];
-};
-
-/**
- * Stagger Animation Hook for groups - Each item animates when container visible
- * Re-animates when scrolling back into view
- */
-export const useStaggerAnimation = (staggerDelay = null) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const useStaggerAnimation = () => {
   const [animatedItems, setAnimatedItems] = useState(new Set());
   const ref = useRef(null);
   const timeoutsRef = useRef([]);
-
-  const effectiveDelay = staggerDelay ?? globalAnimationSettings.baseDelay;
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
+    if (!globalAnimationSettings.enabled) return;
+    
     const element = ref.current;
     if (!element) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
           const items = element.querySelectorAll('[data-anim-item]');
-          
-          // Clear any existing timeouts
-          timeoutsRef.current.forEach(t => clearTimeout(t));
-          timeoutsRef.current = [];
           
           // Stagger animate each item
           items.forEach((_, index) => {
+            const delay = index * globalAnimationSettings.baseDelay * globalAnimationSettings.cardStaggerMultiplier;
             const timeout = setTimeout(() => {
               setAnimatedItems(prev => new Set([...prev, index]));
-            }, index * effectiveDelay * globalAnimationSettings.cardStaggerMultiplier);
+            }, delay);
             timeoutsRef.current.push(timeout);
           });
-        } else {
-          // Reset when leaving viewport
-          setIsVisible(false);
-          setAnimatedItems(new Set());
-          timeoutsRef.current.forEach(t => clearTimeout(t));
-          timeoutsRef.current = [];
         }
       },
-      { threshold: 0.1, rootMargin: '20px' }
+      { threshold: 0.1, rootMargin: '50px' }
     );
 
     observer.observe(element);
@@ -188,16 +141,21 @@ export const useStaggerAnimation = (staggerDelay = null) => {
       observer.disconnect();
       timeoutsRef.current.forEach(t => clearTimeout(t));
     };
-  }, [effectiveDelay]);
+  }, []);
 
   const getItemClass = useCallback((index) => {
-    if (!isVisible) return ''; // Not in viewport - no animation classes (visible)
-    if (animatedItems.has(index)) return 'anim-card-ready anim-card-done';
-    return 'anim-card-ready';
-  }, [isVisible, animatedItems]);
+    if (!globalAnimationSettings.enabled) return '';
+    const style = globalAnimationSettings.animationStyle || 'pop';
+    if (animatedItems.has(index)) return `anim-${style}-ready anim-${style}-done`;
+    return `anim-${style}-ready`;
+  }, [animatedItems]);
 
   return [ref, getItemClass];
 };
+
+// Alias for backward compatibility
+export const useSectionAnimation = useScrollAnimation;
+export const useCardAnimation = useScrollAnimation;
 
 /**
  * Stats Count-up Hook - Re-counts when scrolling back into view

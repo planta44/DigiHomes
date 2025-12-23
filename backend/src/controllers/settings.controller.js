@@ -138,11 +138,13 @@ const getAnimationSettings = async (req, res) => {
     
     // Default animation settings
     const defaultSettings = {
-      baseDelay: 100,
+      enabled: true,
+      animationStyle: 'pop',
+      baseDelay: 150,
       cardStaggerMultiplier: 1,
-      heroStaggerMultiplier: 1.5,
-      sectionStaggerMultiplier: 1.2,
-      heroTextDelay: 300,
+      heroStaggerMultiplier: 2,
+      sectionStaggerMultiplier: 1.5,
+      heroTextDelay: 400,
       statsCountDuration: 2000
     };
     
@@ -163,14 +165,17 @@ const getAnimationSettings = async (req, res) => {
 // Update animation settings (admin only)
 const updateAnimationSettings = async (req, res) => {
   try {
-    const { baseDelay, cardStaggerMultiplier, heroStaggerMultiplier, sectionStaggerMultiplier, heroTextDelay, statsCountDuration } = req.body;
+    const { enabled, animationStyle, baseDelay, cardStaggerMultiplier, heroStaggerMultiplier, sectionStaggerMultiplier, heroTextDelay, statsCountDuration } = req.body;
     
+    const validStyles = ['pop', 'fade', 'slide'];
     const settings = {
-      baseDelay: Math.max(50, Math.min(500, parseInt(baseDelay) || 100)),
+      enabled: enabled !== false,
+      animationStyle: validStyles.includes(animationStyle) ? animationStyle : 'pop',
+      baseDelay: Math.max(50, Math.min(500, parseInt(baseDelay) || 150)),
       cardStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(cardStaggerMultiplier) || 1)),
-      heroStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(heroStaggerMultiplier) || 1.5)),
-      sectionStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(sectionStaggerMultiplier) || 1.2)),
-      heroTextDelay: Math.max(100, Math.min(2000, parseInt(heroTextDelay) || 300)),
+      heroStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(heroStaggerMultiplier) || 2)),
+      sectionStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(sectionStaggerMultiplier) || 1.5)),
+      heroTextDelay: Math.max(100, Math.min(2000, parseInt(heroTextDelay) || 400)),
       statsCountDuration: Math.max(500, Math.min(5000, parseInt(statsCountDuration) || 2000))
     };
 
