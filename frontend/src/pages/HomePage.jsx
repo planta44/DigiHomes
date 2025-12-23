@@ -57,27 +57,27 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  const [heroRef3, heroAnim3] = useHeroAnimation(2);
+  // Hero animations
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  const heroRef3 = useHeroAnimation(2);
   
-  // Stats section - re-counts when scrolling back into view
+  // Stats section
   const [statsRef, statsInView] = useStatsObserver();
   
-  // Section animations - animate when scrolled into view
-  const [featuresRef, featuresAnim] = useScrollAnimation(0);
-  const [featuresGridRef, getFeatureClass] = useStaggerAnimation();
-  const [housesRef, housesAnim] = useScrollAnimation(0);
-  const [housesGridRef, getHouseClass] = useStaggerAnimation();
-  const [locationsRef, locationsAnim] = useScrollAnimation(0);
-  const [locationsGridRef, getLocationClass] = useStaggerAnimation();
-  const [aboutRef, aboutAnim] = useScrollAnimation(0);
+  // Section animations
+  const featuresRef = useScrollAnimation(0);
+  const featuresGridRef = useStaggerAnimation();
+  const housesRef = useScrollAnimation(0);
+  const housesGridRef = useStaggerAnimation();
+  const locationsRef = useScrollAnimation(0);
+  const locationsGridRef = useStaggerAnimation();
+  const aboutRef = useScrollAnimation(0);
   
-  // CTA animations - re-animate on scroll
-  const [ctaRef, ctaAnim] = useHeroAnimation(0);
-  const [ctaRef2, ctaAnim2] = useHeroAnimation(1);
-  const [ctaRef3, ctaAnim3] = useHeroAnimation(2);
+  // CTA animations
+  const ctaRef = useScrollAnimation(0);
+  const ctaRef2 = useScrollAnimation(1);
+  const ctaRef3 = useScrollAnimation(2);
 
   useEffect(() => {
     fetchData();
@@ -263,14 +263,14 @@ const HomePage = () => {
         <div className="hero-content-wrapper absolute left-0 right-0 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
-              <h1 ref={heroRef} className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left ${heroAnim}`}>
+              <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
                 {heroContent.title}{' '}
                 <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
               </h1>
-              <p ref={heroRef2} className={`text-lg md:text-xl mb-6 max-w-2xl text-left ${heroAnim2}`} style={{ color: heroContent.descriptionHighlightColor }}>
+              <p ref={heroRef2} className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
                 {heroContent.description}
               </p>
-              <div ref={heroRef3} className={`flex flex-wrap gap-4 justify-start ${heroAnim3}`}>
+              <div ref={heroRef3} className="flex flex-wrap gap-4 justify-start">
                 <Link 
                   to="/houses" 
                   className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
@@ -310,7 +310,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={featuresRef}
-            className={`text-center mb-12 ${featuresAnim}`}
+            className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
@@ -325,7 +325,6 @@ const HomePage = () => {
               <div 
                 key={index}
                 data-anim-item
-                className={getFeatureClass(index)}
               >
                 <FeatureCard feature={feature} />
               </div>
@@ -362,7 +361,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={housesRef}
-            className={`flex flex-col md:flex-row md:items-end justify-between mb-10 ${housesAnim}`}
+            className="flex flex-col md:flex-row md:items-end justify-between mb-10"
           >
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -391,7 +390,6 @@ const HomePage = () => {
                 <div 
                   key={house.id}
                   data-anim-item
-                  className={getHouseClass(index)}
                 >
                   <HouseCard house={house} />
                 </div>
@@ -410,7 +408,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div 
             ref={locationsRef}
-            className={`text-center mb-12 ${locationsAnim}`}
+            className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
@@ -431,7 +429,7 @@ const HomePage = () => {
               <div 
                 key={loc.name || index}
                 data-anim-item
-                className={`relative rounded-2xl overflow-hidden group h-64 ${getLocationClass(index)}`}
+                className="relative rounded-2xl overflow-hidden group h-64"
               >
                 <img 
                   src={imageUrl} 
@@ -463,7 +461,7 @@ const HomePage = () => {
       {(aboutSection.title || aboutSection.content) && (
         <section ref={aboutRef} className="py-16 md:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${aboutAnim}`}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Image Side */}
               {aboutSection.image && (
                 <div className="relative">
@@ -546,14 +544,14 @@ const HomePage = () => {
       {/* CTA Section */}
       <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 ref={ctaRef} className={`text-3xl md:text-4xl font-bold text-white mb-4 ${ctaAnim}`}>
+          <h2 ref={ctaRef} className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Find Your New Home?
           </h2>
-          <p ref={ctaRef2} className={`mb-8 max-w-2xl mx-auto ${ctaAnim2}`} style={{ color: colors[100] }}>
+          <p ref={ctaRef2} className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div ref={ctaRef3} className={`flex flex-wrap justify-center gap-4 ${ctaAnim3}`}>
+          <div ref={ctaRef3} className="flex flex-wrap justify-center gap-4">
             <Link 
               to="/houses" 
               className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"

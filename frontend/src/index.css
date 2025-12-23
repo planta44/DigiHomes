@@ -106,60 +106,52 @@
   .animation-delay-400 { animation-delay: 400ms; }
   .animation-delay-500 { animation-delay: 500ms; }
 
-  /* SAFE Animation Classes - Content visible by default, animates when triggered */
-  /* NO classes = visible content. Classes added by JS to trigger animation. */
+  /* NEW ANIMATION SYSTEM - Content always visible, animations applied via JS */
+  /* These classes are ONLY added after element is visible on screen */
   
-  /* POP Animation Style - Rise from below with fade */
-  .anim-pop-ready {
-    animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  
-  @keyframes popIn {
-    from {
+  /* Pop animation - rise from below */
+  @keyframes animPop {
+    0% {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(20px);
     }
-    to {
+    100% {
       opacity: 1;
       transform: translateY(0);
     }
   }
   
-  /* FADE Animation Style - Simple fade in */
-  .anim-fade-ready {
-    animation: fadeIn 0.5s ease-out forwards;
+  .do-anim-pop {
+    animation: animPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   
-  @keyframes fadeIn {
-    from {
+  /* Fade animation - simple fade */
+  @keyframes animFade {
+    0% {
       opacity: 0;
     }
-    to {
+    100% {
       opacity: 1;
     }
   }
   
-  /* SLIDE Animation Style - Slide from left with fade */
-  .anim-slide-ready {
-    animation: slideIn 0.5s ease-out forwards;
+  .do-anim-fade {
+    animation: animFade 0.5s ease-out both;
   }
   
-  @keyframes slideIn {
-    from {
+  /* Slide animation - slide from left */
+  @keyframes animSlide {
+    0% {
       opacity: 0;
       transform: translateX(-20px);
     }
-    to {
+    100% {
       opacity: 1;
       transform: translateX(0);
     }
   }
   
-  /* Delay utility classes for staggered animations */
-  .anim-delay-0 { animation-delay: 0ms !important; }
-  .anim-delay-1 { animation-delay: 100ms !important; }
-  .anim-delay-2 { animation-delay: 200ms !important; }
-  .anim-delay-3 { animation-delay: 300ms !important; }
-  .anim-delay-4 { animation-delay: 400ms !important; }
-  .anim-delay-5 { animation-delay: 500ms !important; }
+  .do-anim-slide {
+    animation: animSlide 0.5s ease-out both;
+  }
 }

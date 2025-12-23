@@ -6,8 +6,8 @@ import { useHeroAnimation } from '../hooks/useAnimations';
 
 const ContactPage = () => {
   // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
   
   const [settings, setSettings] = useState({
     contact_page: {
@@ -63,8 +63,8 @@ const ContactPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 ref={heroRef} className={`text-3xl md:text-4xl font-bold mb-4 ${heroAnim}`}>{contact_page.title}</h1>
-          <p ref={heroRef2} className={`text-white/80 max-w-2xl mx-auto ${heroAnim2}`}>
+          <h1 ref={heroRef} className="text-4xl md:text-5xl font-bold mb-4">{contact_page.title}</h1>
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto text-lg">
             {contact_page.subtitle}
           </p>
         </div>

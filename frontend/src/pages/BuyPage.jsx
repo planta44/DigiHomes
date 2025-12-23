@@ -25,15 +25,13 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  // Section animations
-  const [propertiesRef, propertiesAnim] = useSectionAnimation(0);
-  const [propertiesRef2, propertiesAnim2] = useSectionAnimation(1);
-  // Card animations - re-animate on scroll
-  const [cardsRef, getCardClass] = useStaggerAnimation();
-  const [contentRef, contentAnim] = useSectionAnimation(0);
+  // Hero animations
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  // Content animation
+  const contentRef = useScrollAnimation(0);
+  // Property cards animation
+  const cardsRef = useStaggerAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -98,15 +96,12 @@ const BuyPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 
-            ref={heroRef} className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 ${heroAnim}`}
-          >
-            {content.hero.title}
-          </h1>
-          <p 
-            ref={heroRef2} className={`text-xl md:text-2xl max-w-3xl mx-auto ${heroAnim2}`}
-            style={{ color: colors[100] }}
-          >
+          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
+              {content.hero.title}
+            </h1>
+          </div>
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
             {content.hero.subtitle}
           </p>
         </div>
@@ -115,13 +110,13 @@ const BuyPage = () => {
       {/* Properties For Sale Section */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={propertiesRef} className={`mb-8 ${propertiesAnim}`}>
+          <div ref={contentRef} className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Properties For Sale</h2>
             <p className="text-gray-600">Browse available properties for purchase</p>
           </div>
 
           {/* Filters - Similar to Rent page with More Filters toggle */}
-          <div ref={propertiesRef2} className={`bg-white rounded-xl shadow-md p-4 md:p-6 mb-8 ${propertiesAnim2}`}>
+          <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-8">
             {/* Main Filters - Always visible */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Search */}
@@ -289,7 +284,10 @@ const BuyPage = () => {
           ) : filteredProperties.length > 0 ? (
             <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProperties.map((property, index) => (
-                <div key={property.id} data-anim-item className={getCardClass(index)}>
+                <div
+                  key={property.id}
+                  data-anim-item
+                >
                   <HouseCard house={property} />
                 </div>
               ))}
@@ -311,7 +309,7 @@ const BuyPage = () => {
             {content.sections.map((section, index) => (
               <div 
                 key={index}
-                className={`mb-16 last:mb-0 ${contentAnim}`}
+                className="mb-16 last:mb-0"
               >
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
                 <p className="text-gray-600 text-lg mb-8">{section.description}</p>

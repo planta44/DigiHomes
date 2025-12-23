@@ -20,11 +20,11 @@ const HousesPage = () => {
     status: ''
   });
 
-  // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  // Card animations - re-animate on scroll
-  const [cardsRef, getCardClass] = useStaggerAnimation();
+  // Hero animations
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  // Card animations
+  const cardsRef = useStaggerAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -79,11 +79,11 @@ const HousesPage = () => {
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60')` }}></div>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroRef} className={`flex items-center justify-center gap-3 mb-4 ${heroAnim}`}>
+          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
             <Building className="w-8 h-8" />
             <h1 className="text-3xl md:text-4xl font-bold">Available Houses</h1>
           </div>
-          <p ref={heroRef2} className={`text-white/80 max-w-2xl mx-auto ${heroAnim2}`}>
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
             Browse our selection of quality rental properties in Nakuru and Nyahururu
           </p>
         </div>
@@ -120,7 +120,6 @@ const HousesPage = () => {
               <div
                 key={house.id}
                 data-anim-item
-                className={getCardClass(index)}
               >
                 <HouseCard house={house} />
               </div>

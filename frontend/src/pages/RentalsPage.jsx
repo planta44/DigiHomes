@@ -18,11 +18,11 @@ const RentalsPage = () => {
   const [visibleCards, setVisibleCards] = useState([]);
   const { colors } = useTheme();
   
-  // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  // Card animations - re-animate on scroll
-  const [cardsRef, getCardClass] = useStaggerAnimation();
+  // Hero animations
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  // Card animations
+  const cardsRef = useStaggerAnimation();
   
   const [filters, setFilters] = useState({
     search: '',
@@ -159,10 +159,12 @@ const RentalsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 ref={heroRef} className={`text-4xl md:text-5xl font-bold text-white mb-4 ${heroAnim}`}>
-            Find Your Perfect Rental
-          </h1>
-          <p ref={heroRef2} className={`text-xl text-white/80 max-w-2xl mx-auto mb-8 ${heroAnim2}`}>
+          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
+            <h1 className={`text-4xl md:text-5xl font-bold text-white mb-4`}>
+              Find Your Perfect Rental
+            </h1>
+          </div>
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
             Discover quality rental properties in Nakuru and Nyahururu
           </p>
           
@@ -334,7 +336,7 @@ const RentalsPage = () => {
             }
           >
             {filteredProperties.map((property, index) => (
-              <div key={property.id} data-anim-item className={getCardClass(index)}>
+              <div key={property.id} data-anim-item>
                 <HouseCard house={property} />
               </div>
             ))}

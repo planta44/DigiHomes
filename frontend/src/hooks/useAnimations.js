@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 /**
- * SAFE Animation System - Never blocks content, purely visual enhancements
- * All content is ALWAYS visible. Animations are additive CSS classes only.
+ * NEW SIMPLE ANIMATION SYSTEM
+ * - Content is ALWAYS visible (no CSS hiding)
+ * - Animations triggered by adding CSS class via JS
+ * - Respects admin settings from AnimationContext
  */
 
 let globalAnimationSettings = {
@@ -13,144 +15,111 @@ let globalAnimationSettings = {
   heroStaggerMultiplier: 2,
   sectionStaggerMultiplier: 1.5,
   statsCountDuration: 2000,
-  animationStyle: 'pop' // 'pop', 'fade', 'slide'
+  animationStyle: 'pop'
 };
 
 export const setAnimationSettings = (settings) => {
   globalAnimationSettings = { ...globalAnimationSettings, ...settings };
+  console.log('[Animations] Settings updated:', globalAnimationSettings);
 };
 
 export const getAnimationSettings = () => globalAnimationSettings;
 
-// Get animation class based on style setting
-const getAnimClassByStyle = (shouldAnimate) => {
-  if (!globalAnimationSettings.enabled || !shouldAnimate) return '';
-  const style = globalAnimationSettings.animationStyle || 'pop';
-  return `anim-${style}-ready`;
-};
-
 /**
- * Hero Animation - Triggers on page load with staggered delay
- * Content always visible, animation is purely visual enhancement
+ * Hero Animation - Animates on page load with staggered delays
+ * Uses direct DOM manipulation to add animation class
  */
 export const useHeroAnimation = (elementDelay = 0) => {
-  const [animate, setAnimate] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    if (!globalAnimationSettings.enabled) {
-      setAnimate(false);
-      return;
-    }
+    const element = ref.current;
+    if (!element || !globalAnimationSettings.enabled) return;
 
-    // Calculate staggered delay for this element
+    const style = globalAnimationSettings.animationStyle || 'pop';
     const delay = globalAnimationSettings.heroTextDelay + 
                   (elementDelay * globalAnimationSettings.baseDelay * globalAnimationSettings.heroStaggerMultiplier);
 
-    // Trigger animation after delay
     const timer = setTimeout(() => {
-      setAnimate(true);
+      element.classList.add(`do-anim-${style}`);
     }, delay);
 
     return () => clearTimeout(timer);
   }, [elementDelay]);
 
-  return [ref, getAnimClassByStyle(animate)];
+  return ref;
 };
 
 /**
- * Scroll Animation Hook - Triggers when element enters viewport
- * Perfect for sections, paragraphs, buttons - anything that should animate on scroll
+ * Scroll Animation - Triggers when element scrolls into view
  */
 export const useScrollAnimation = (delay = 0) => {
-  const [animate, setAnimate] = useState(false);
   const ref = useRef(null);
-  const timerRef = useRef(null);
-
-  useEffect(() => {
-    if (!globalAnimationSettings.enabled) {
-      setAnimate(false);
-      return;
-    }
-    
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          const effectiveDelay = delay * globalAnimationSettings.baseDelay * globalAnimationSettings.sectionStaggerMultiplier;
-          timerRef.current = setTimeout(() => setAnimate(true), effectiveDelay);
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px' }
-    );
-
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [delay]);
-
-  return [ref, getAnimClassByStyle(animate)];
-};
-
-/**
- * Stagger Animation Hook - For groups of items (cards, list items)
- * Each child with data-anim-item animates one by one when container is visible
- */
-export const useStaggerAnimation = () => {
-  const [animatedItems, setAnimatedItems] = useState(new Set());
-  const ref = useRef(null);
-  const timeoutsRef = useRef([]);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!globalAnimationSettings.enabled) {
-      setAnimatedItems(new Set());
-      return;
-    }
-    
     const element = ref.current;
-    if (!element) return;
+    if (!element || !globalAnimationSettings.enabled) return;
+
+    const style = globalAnimationSettings.animationStyle || 'pop';
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated.current) {
           hasAnimated.current = true;
-          const items = element.querySelectorAll('[data-anim-item]');
+          const effectiveDelay = delay * globalAnimationSettings.baseDelay * globalAnimationSettings.sectionStaggerMultiplier;
           
-          // Stagger animate each item
-          items.forEach((_, index) => {
+          setTimeout(() => {
+            element.classList.add(`do-anim-${style}`);
+          }, effectiveDelay);
+        }
+      },
+      { threshold: 0.15, rootMargin: '50px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [delay]);
+
+  return ref;
+};
+
+/**
+ * Stagger Animation - Animates child items one by one
+ * Children must have data-anim-item attribute
+ */
+export const useStaggerAnimation = () => {
+  const ref = useRef(null);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    const container = ref.current;
+    if (!container || !globalAnimationSettings.enabled) return;
+
+    const style = globalAnimationSettings.animationStyle || 'pop';
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          const items = container.querySelectorAll('[data-anim-item]');
+          
+          items.forEach((item, index) => {
             const delay = index * globalAnimationSettings.baseDelay * globalAnimationSettings.cardStaggerMultiplier;
-            const timeout = setTimeout(() => {
-              setAnimatedItems(prev => new Set([...prev, index]));
+            setTimeout(() => {
+              item.classList.add(`do-anim-${style}`);
             }, delay);
-            timeoutsRef.current.push(timeout);
           });
         }
       },
       { threshold: 0.1, rootMargin: '50px' }
     );
 
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-      timeoutsRef.current.forEach(t => clearTimeout(t));
-    };
+    observer.observe(container);
+    return () => observer.disconnect();
   }, []);
 
-  const getItemClass = useCallback((index) => {
-    if (!globalAnimationSettings.enabled) return '';
-    if (animatedItems.has(index)) {
-      const style = globalAnimationSettings.animationStyle || 'pop';
-      return `anim-${style}-ready`;
-    }
-    return '';
-  }, [animatedItems]);
-
-  return [ref, getItemClass];
+  return ref;
 };
 
 // Alias for backward compatibility

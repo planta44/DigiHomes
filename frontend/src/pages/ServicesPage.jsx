@@ -24,11 +24,11 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  // Card animations - re-animate on scroll
-  const [sectionsRef, getSectionClass] = useStaggerAnimation();
+  // Hero animations
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  // Card animations
+  const sectionsRef = useStaggerAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -64,13 +64,15 @@ const ServicesPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 
-            ref={heroRef} className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 ${heroAnim}`}
-          >
-            {content.hero.title}
-          </h1>
+          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
+            <h1 
+              className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6`}
+            >
+              {content.hero.title}
+            </h1>
+          </div>
           <p 
-            ref={heroRef2} className={`text-xl md:text-2xl max-w-3xl mx-auto ${heroAnim2}`}
+            ref={heroRef2} className="text-white/80 max-w-2xl mx-auto"
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -86,8 +88,9 @@ const ServicesPage = () => {
               const IconComponent = iconMap[section.icon] || Building;
               return (
                 <div 
-                  key={index}
-                  data-anim-item className={`bg-gray-50 rounded-2xl p-8 hover:shadow-lg ${getSectionClass(index)}`}
+                  key={section.title}
+                  data-anim-item
+                  className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow"
                 >
                   <div 
                     className="w-16 h-16 rounded-xl flex items-center justify-center mb-6"

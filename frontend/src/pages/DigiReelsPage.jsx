@@ -12,9 +12,9 @@ const DigiReelsPage = () => {
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
   // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  const [heroRef3, heroAnim3] = useHeroAnimation(2);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  const heroRef3 = useHeroAnimation(2);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -92,14 +92,14 @@ const DigiReelsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroRef} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6 ${heroAnim}`}>
+          <div ref={heroRef} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6`}>
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 ref={heroRef2} className={`text-4xl md:text-6xl font-bold text-white mb-6 ${heroAnim2}`}>
+          <h1 ref={heroRef2} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Digi Reels
           </h1>
-          <p ref={heroRef3} className={`text-xl text-white/80 max-w-2xl mx-auto ${heroAnim3}`}>
+          <p ref={heroRef3} className={`text-xl text-white/80 max-w-2xl mx-auto`}>
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>
