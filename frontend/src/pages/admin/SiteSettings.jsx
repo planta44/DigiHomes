@@ -141,7 +141,8 @@ const SiteSettings = () => {
   const handleSave = async (key, value) => {
     setSaving(true);
     try {
-      await api.put(`/settings/${key}`, { value });
+      const dataToSave = value || settings[key];
+      await api.put(`/settings/${key}`, dataToSave);
       toast.success('Saved!');
     } catch (error) {
       toast.error('Failed to save');

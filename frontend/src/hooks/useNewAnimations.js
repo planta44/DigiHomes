@@ -108,15 +108,16 @@ export const useScrollTriggerAnimation = (delayMultiplier = 0) => {
 };
 
 /**
- * CARD STAGGER ANIMATION
+ * CARD STAGGER ANIMATION (Reels-style)
  * - Animates cards one by one when entering viewport
  * - Re-animates on scroll back
- * - NEVER disconnects observer
+ * - Uses visibility tracking like Reels page
  */
 export const useCardStaggerAnimation = () => {
   const containerRef = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [visibleCards, setVisibleCards] = useState([]);
+  const timeoutsRef = useRef([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -124,41 +125,63 @@ export const useCardStaggerAnimation = () => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const className = `animate-${settings.cardAnimationStyle}`;
         const cards = container.querySelectorAll('[data-card-item]');
         
         if (entry.isIntersecting) {
-          setHasAnimated(true);
+          // Clear any existing timeouts
+          timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+          timeoutsRef.current = [];
           
+          // Reset visible cards
+          setVisibleCards([]);
+          
+          // Reveal cards one by one
           cards.forEach((card, index) => {
-            const delay = settings.cardBaseDelay + (index * settings.cardStaggerDelay);
-            
-            setTimeout(() => {
-              // Animate text elements if marked, otherwise whole card
-              const textElements = card.querySelectorAll('[data-animate-text]');
-              if (textElements.length > 0) {
-                textElements.forEach(el => el.classList.add(className));
-              } else {
-                card.classList.add(className);
-              }
-            }, delay);
+            const timeout = setTimeout(() => {
+              setVisibleCards(prev => [...prev, index]);
+            }, settings.cardBaseDelay + (index * settings.cardStaggerDelay));
+            timeoutsRef.current.push(timeout);
           });
-        } else if (hasAnimated) {
-          // Remove animations so they can replay
-          setHasAnimated(false);
-          cards.forEach(card => {
-            card.classList.remove(className);
-            const textElements = card.querySelectorAll('[data-animate-text]');
-            textElements.forEach(el => el.classList.remove(className));
-          });
+        } else {
+          // Clear timeouts and reset when leaving viewport
+          timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+          timeoutsRef.current = [];
+          setVisibleCards([]);
         }
       },
       { threshold: 0.1, rootMargin: '50px' }
     );
 
     observer.observe(container);
-    return () => observer.disconnect();
-  }, [loaded, settings.enabled, settings.cardAnimationStyle, settings.cardBaseDelay, settings.cardStaggerDelay, hasAnimated]);
+    return () => {
+      observer.disconnect();
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+    };
+  }, [loaded, settings.enabled, settings.cardBaseDelay, settings.cardStaggerDelay]);
+
+  // Apply animation classes based on visibility
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const className = `animate-${settings.cardAnimationStyle}`;
+    const cards = container.querySelectorAll('[data-card-item]');
+    
+    cards.forEach((card, index) => {
+      if (visibleCards.includes(index)) {
+        const textElements = card.querySelectorAll('[data-animate-text]');
+        if (textElements.length > 0) {
+          textElements.forEach(el => el.classList.add(className));
+        } else {
+          card.classList.add(className);
+        }
+      } else {
+        card.classList.remove(className);
+        const textElements = card.querySelectorAll('[data-animate-text]');
+        textElements.forEach(el => el.classList.remove(className));
+      }
+    });
+  }, [visibleCards, settings.cardAnimationStyle]);
 
   return containerRef;
 };

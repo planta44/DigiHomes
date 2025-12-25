@@ -19,7 +19,7 @@ const getSettings = async (req, res) => {
 const updateSetting = async (req, res) => {
   try {
     const { key } = req.params;
-    const { value } = req.body;
+    const value = req.body.value !== undefined ? req.body.value : req.body;
 
     if (!key || value === undefined) {
       return res.status(400).json({ error: 'Key and value are required' });
