@@ -98,7 +98,7 @@ const HomePage = () => {
   useEffect(() => {
     if (!settingsLoaded) return;
 
-    const heroImage = heroContent.backgroundImage;
+    const heroImage = settings?.hero_content?.backgroundImage || '';
     if (!heroImage) {
       setHeroImageLoaded(true);
       return;
@@ -108,7 +108,7 @@ const HomePage = () => {
     img.onload = () => setHeroImageLoaded(true);
     img.onerror = () => setHeroImageLoaded(true); // Still animate even if image fails
     img.src = heroImage;
-  }, [settingsLoaded, heroContent.backgroundImage]);
+  }, [settingsLoaded, settings?.hero_content?.backgroundImage]);
 
   // Manually trigger hero text animations after image loads
   useEffect(() => {
