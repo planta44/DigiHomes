@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, MapPin, Home, Building, ArrowRight, DollarSign, Ruler, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroTextAnimation, useCardStaggerAnimation, useScrollTriggerAnimation } from '../hooks/useNewAnimations';
+import { useCardStaggerAnimation, useScrollTriggerAnimation } from '../hooks/useNewAnimations';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -25,9 +25,20 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Hero animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
+  // Hero animations - manual trigger
+  const heroRef = useRef(null);
+  const heroRef2 = useRef(null);
+
+  // Trigger hero animations on mount
+  useEffect(() => {
+    const delays = [400, 600];
+    [heroRef.current, heroRef2.current].forEach((element, index) => {
+      if (!element) return;
+      setTimeout(() => {
+        element.classList.add('animate-pop');
+      }, delays[index]);
+    });
+  }, []);
   // Content animation
   const contentRef = useScrollTriggerAnimation(0);
   // Property cards animation

@@ -23,27 +23,16 @@ export const useHeroTextAnimation = (elementIndex = 0) => {
   const { settings, loaded } = useContext(AnimationContext);
   const [hasFirstRun, setHasFirstRun] = useState(false);
 
-  console.log(`🔥 useHeroTextAnimation(${elementIndex}) mounted`);
-  console.log(`   - loaded: ${loaded}`);
-  console.log(`   - enabled: ${settings?.enabled}`);
-  console.log(`   - ref.current:`, ref.current);
-
   // Initial animation on mount - runs AFTER settings load
   useLayoutEffect(() => {
     const element = ref.current;
-    console.log(`🎯 Hero ${elementIndex} useLayoutEffect - element:`, element, 'loaded:', loaded, 'enabled:', settings?.enabled);
-    if (!element || !loaded || !settings.enabled) {
-      console.log(`❌ Hero ${elementIndex} BLOCKED - element:${!!element}, loaded:${loaded}, enabled:${settings?.enabled}`);
-      return;
-    }
+    if (!element || !loaded || !settings.enabled) return;
 
     const delay = settings.heroTextDelay + (elementIndex * settings.baseDelay * settings.heroStaggerMultiplier);
-    console.log(`✅ Hero ${elementIndex} WILL ANIMATE after ${delay}ms with animate-${settings.animationStyle}`);
     
     const timer = setTimeout(() => {
       const className = `animate-${settings.animationStyle}`;
       element.classList.add(className);
-      console.log(`✨ Hero ${elementIndex} CLASS ADDED: ${className} to`, element);
       setHasFirstRun(true);
     }, delay);
 
@@ -90,16 +79,9 @@ export const useScrollTriggerAnimation = (delayMultiplier = 0) => {
   const ref = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
 
-  console.log(`🔥 useScrollTriggerAnimation(${delayMultiplier}) mounted`);
-
   useEffect(() => {
     const element = ref.current;
-    console.log(`🎯 ScrollTrigger ${delayMultiplier} - element:`, element, 'loaded:', loaded, 'enabled:', settings?.enabled);
-    if (!element || !loaded || !settings.enabled) {
-      console.log(`❌ ScrollTrigger ${delayMultiplier} BLOCKED`);
-      return;
-    }
-    console.log(`✅ ScrollTrigger ${delayMultiplier} OBSERVER CREATED`);
+    if (!element || !loaded || !settings.enabled) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -107,13 +89,10 @@ export const useScrollTriggerAnimation = (delayMultiplier = 0) => {
         
         if (entry.isIntersecting) {
           const delay = delayMultiplier * settings.baseDelay * settings.sectionStaggerMultiplier;
-          console.log(`👀 ScrollTrigger ${delayMultiplier} VISIBLE - will animate after ${delay}ms`);
           setTimeout(() => {
             element.classList.add(className);
-            console.log(`✨ ScrollTrigger CLASS ADDED: ${className}`);
           }, delay);
         } else {
-          console.log(`👋 ScrollTrigger ${delayMultiplier} LEFT VIEW - removing class`);
           element.classList.remove(className);
         }
       },
@@ -138,24 +117,16 @@ export const useCardStaggerAnimation = () => {
   const { settings, loaded } = useContext(AnimationContext);
   const [hasAnimated, setHasAnimated] = useState(false);
 
-  console.log(`🔥 useCardStaggerAnimation mounted`);
-
   useEffect(() => {
     const container = containerRef.current;
-    console.log(`🎯 CardStagger - container:`, container, 'loaded:', loaded, 'enabled:', settings?.enabled);
-    if (!container || !loaded || !settings.enabled) {
-      console.log(`❌ CardStagger BLOCKED`);
-      return;
-    }
+    if (!container || !loaded || !settings.enabled) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         const className = `animate-${settings.animationStyle}`;
         const cards = container.querySelectorAll('[data-card-item]');
-        console.log(`🎯 CardStagger found ${cards.length} cards with [data-card-item]`);
         
         if (entry.isIntersecting) {
-          console.log(`👀 CardStagger VISIBLE - animating ${cards.length} cards`);
           setHasAnimated(true);
           
           cards.forEach((card, index) => {
@@ -165,16 +136,13 @@ export const useCardStaggerAnimation = () => {
               // Animate text elements if marked, otherwise whole card
               const textElements = card.querySelectorAll('[data-animate-text]');
               if (textElements.length > 0) {
-                console.log(`✨ Card ${index} animating ${textElements.length} text elements`);
                 textElements.forEach(el => el.classList.add(className));
               } else {
-                console.log(`✨ Card ${index} animating whole card with ${className}`);
                 card.classList.add(className);
               }
             }, delay);
           });
         } else if (hasAnimated) {
-          console.log(`👋 CardStagger LEFT VIEW - removing animations`);
           // Remove animations so they can replay
           cards.forEach(card => {
             card.classList.remove(className);
@@ -207,8 +175,6 @@ export const useStatsCounter = (targetValue, isInView) => {
   const startTimeRef = useRef(null);
 
   useEffect(() => {
-    console.log(`📊 useStatsCounter: ${targetValue}, isInView: ${isInView}, loaded: ${loaded}, enabled: ${settings?.enabled}`);
-    
     // Cancel any running animation
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
@@ -217,14 +183,12 @@ export const useStatsCounter = (targetValue, isInView) => {
 
     // If not loaded or disabled, show final value
     if (!loaded || !settings.enabled) {
-      console.log(`⏸️ Stats counter DISABLED or not loaded`);
       setDisplayValue(targetValue);
       return;
     }
 
     // If not in view, reset to final value (ready for next count)
     if (!isInView) {
-      console.log(`👁️ Stats NOT in view - showing final value`);
       setDisplayValue(targetValue);
       startTimeRef.current = null;
       return;
@@ -233,8 +197,6 @@ export const useStatsCounter = (targetValue, isInView) => {
     // Extract numeric value and suffix
     const numericValue = parseInt(String(targetValue).replace(/\D/g, '')) || 0;
     const suffix = String(targetValue).replace(/[0-9]/g, '');
-
-    console.log(`🎬 Stats COUNTING from 0 to ${targetValue}`);
 
     // Start from 0
     setDisplayValue('0' + suffix);
@@ -261,7 +223,6 @@ export const useStatsCounter = (targetValue, isInView) => {
 
     // Small delay before starting for better UX
     const startTimer = setTimeout(() => {
-      console.log(`🚀 Stats animation STARTED`);
       animationRef.current = requestAnimationFrame(animate);
     }, 200);
 
@@ -286,25 +247,17 @@ export const useStatsInView = () => {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef(null);
 
-  console.log(`🔥 useStatsInView mounted`);
-
   useEffect(() => {
     const element = ref.current;
-    console.log(`🎯 StatsInView - element:`, element);
-    if (!element) {
-      console.log(`❌ StatsInView BLOCKED - no element`);
-      return;
-    }
+    if (!element) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        console.log(`👁️ Stats section visibility: ${entry.isIntersecting}`);
         setIsInView(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
     
-    console.log(`✅ StatsInView OBSERVER CREATED`);
     observer.observe(element);
     return () => observer.disconnect();
   }, []);

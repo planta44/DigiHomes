@@ -61,12 +61,13 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [settings, setSettings] = useState(null);
+  const [heroImageLoaded, setHeroImageLoaded] = useState(false);
   const { colors } = useTheme();
   
-  // Hero animations - useLayoutEffect for immediate animation on mount
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
-  const heroRef3 = useHeroTextAnimation(2);
+  // Hero animations - only start after hero image loads
+  const heroRef = useRef(null);
+  const heroRef2 = useRef(null);
+  const heroRef3 = useRef(null);
   
   // Stats section - MUST count from 0 when visible
   const [statsRef, statsInView] = useStatsInView();
@@ -80,6 +81,10 @@ const HomePage = () => {
   const locationsGridRef = useCardStaggerAnimation();
   const aboutRef = useScrollTriggerAnimation(0);
   
+  // About section heading
+  const aboutHeadingRef = useScrollTriggerAnimation(0);
+  const aboutContentRef = useScrollTriggerAnimation(1);
+  
   // CTA animations
   const ctaRef = useScrollTriggerAnimation(0);
   const ctaRef2 = useScrollTriggerAnimation(1);
@@ -88,6 +93,41 @@ const HomePage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Detect when hero image loads and trigger hero text animations
+  useEffect(() => {
+    if (!settingsLoaded) return;
+
+    const heroImage = heroContent.backgroundImage;
+    if (!heroImage) {
+      setHeroImageLoaded(true);
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => setHeroImageLoaded(true);
+    img.onerror = () => setHeroImageLoaded(true); // Still animate even if image fails
+    img.src = heroImage;
+  }, [settingsLoaded, heroContent.backgroundImage]);
+
+  // Manually trigger hero text animations after image loads
+  useEffect(() => {
+    if (!heroImageLoaded) return;
+
+    const animateHeroText = async () => {
+      const elements = [heroRef.current, heroRef2.current, heroRef3.current];
+      const delays = [400, 600, 800]; // Base delays with stagger
+
+      elements.forEach((element, index) => {
+        if (!element) return;
+        setTimeout(() => {
+          element.classList.add('animate-pop');
+        }, delays[index]);
+      });
+    };
+
+    animateHeroText();
+  }, [heroImageLoaded]);
 
   const fetchData = async () => {
     try {
@@ -235,11 +275,6 @@ const HomePage = () => {
           animation: none;
         }
       `}</style>
-
-      {/* STATIC CSS TEST - This should animate immediately if CSS works */}
-      <div className="fixed top-4 left-4 z-50 bg-red-500 text-white p-4 rounded animate-pop">
-        🧪 STATIC CSS TEST - If you see this animate, CSS works!
-      </div>
 
       {/* Hero Section */}
       <section ref={heroRef} className="hero-container relative text-white overflow-hidden">
@@ -470,7 +505,7 @@ const HomePage = () => {
 
       {/* About Us Section */}
       {(aboutSection.title || aboutSection.content) && (
-        <section ref={aboutRef} className="py-16 md:py-24 bg-gray-50">
+        <section className="py-16 md:py-24 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Image Side */}
@@ -511,13 +546,13 @@ const HomePage = () => {
                     </span>
                   )}
                   {aboutSection.title && (
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                    <h2 ref={aboutHeadingRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                       {aboutSection.title}
                     </h2>
                   )}
                   {/* Desktop Content */}
                   {aboutSection.content && (
-                    <div className="space-y-4 hidden md:block">
+                    <div ref={aboutContentRef} className="space-y-4 hidden md:block">
                       {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
                         <p key={index} className="text-gray-600 text-lg leading-relaxed">
                           {line}

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroTextAnimation } from '../hooks/useNewAnimations';
 
 const DigiReelsPage = () => {
   const [reels, setReels] = useState([]);
@@ -11,10 +10,21 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
-  // Hero animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
-  const heroRef3 = useHeroTextAnimation(2);
+  // Hero animations - manual trigger
+  const heroRef = useRef(null);
+  const heroRef2 = useRef(null);
+  const heroRef3 = useRef(null);
+
+  // Trigger hero animations on mount
+  useEffect(() => {
+    const delays = [400, 600, 800];
+    [heroRef.current, heroRef2.current, heroRef3.current].forEach((element, index) => {
+      if (!element) return;
+      setTimeout(() => {
+        element.classList.add('animate-pop');
+      }, delays[index]);
+    });
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
