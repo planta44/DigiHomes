@@ -236,6 +236,11 @@ const HomePage = () => {
         }
       `}</style>
 
+      {/* STATIC CSS TEST - This should animate immediately if CSS works */}
+      <div className="fixed top-4 left-4 z-50 bg-red-500 text-white p-4 rounded animate-pop">
+        🧪 STATIC CSS TEST - If you see this animate, CSS works!
+      </div>
+
       {/* Hero Section */}
       <section ref={heroRef} className="hero-container relative text-white overflow-hidden">
         {/* Desktop Background */}
