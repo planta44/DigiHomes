@@ -21,42 +21,43 @@ import AnimationContext from '../context/AnimationContext';
 export const useHeroTextAnimation = (elementIndex = 0) => {
   const ref = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
-  const [hasFirstRun, setHasFirstRun] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   // Initial animation on mount - runs AFTER settings load
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element || !loaded || !settings.enabled) return;
 
-    const delay = settings.heroTextDelay + (elementIndex * settings.baseDelay * settings.heroStaggerMultiplier);
+    const delay = settings.heroTextDelay + (elementIndex * settings.heroTextStagger);
     
     const timer = setTimeout(() => {
-      const className = `animate-${settings.animationStyle}`;
+      const className = `animate-${settings.heroAnimationStyle}`;
       element.classList.add(className);
-      setHasFirstRun(true);
+      setHasAnimated(true);
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [loaded, settings.enabled, settings.animationStyle, settings.heroTextDelay, settings.baseDelay, settings.heroStaggerMultiplier, elementIndex]);
+  }, [loaded, settings.enabled, settings.heroAnimationStyle, settings.heroTextDelay, settings.heroTextStagger, elementIndex]);
 
-  // Re-animate on scroll - NEVER disconnect observer
+  // Re-animate on scroll back to top - NEVER disconnect observer
   useEffect(() => {
     const element = ref.current;
-    if (!element || !loaded || !settings.enabled || !hasFirstRun) return;
+    if (!element || !loaded || !settings.enabled) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const className = `animate-${settings.animationStyle}`;
-        
-        if (entry.isIntersecting) {
-          // Re-add animation class with delay
-          const delay = settings.heroTextDelay + (elementIndex * settings.baseDelay * settings.heroStaggerMultiplier);
-          setTimeout(() => {
-            element.classList.add(className);
-          }, delay);
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.9) {
+          if (!hasAnimated) {
+            const delay = settings.heroTextDelay + (elementIndex * settings.heroTextStagger);
+            setTimeout(() => {
+              const className = `animate-${settings.heroAnimationStyle}`;
+              element.classList.add(className);
+            }, delay);
+          }
         } else {
-          // Remove class when out of view so it can replay
+          const className = `animate-${settings.heroAnimationStyle}`;
           element.classList.remove(className);
+          setHasAnimated(false);
         }
       },
       { threshold: 0.1 }
@@ -64,7 +65,7 @@ export const useHeroTextAnimation = (elementIndex = 0) => {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [loaded, settings.enabled, settings.animationStyle, settings.heroTextDelay, settings.baseDelay, settings.heroStaggerMultiplier, elementIndex, hasFirstRun]);
+  }, [loaded, settings.enabled, settings.heroAnimationStyle, settings.heroTextDelay, settings.heroTextStagger, elementIndex, hasAnimated]);
 
   return ref;
 };
@@ -85,10 +86,10 @@ export const useScrollTriggerAnimation = (delayMultiplier = 0) => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const className = `animate-${settings.animationStyle}`;
+        const className = `animate-${settings.sectionAnimationStyle}`;
         
         if (entry.isIntersecting) {
-          const delay = delayMultiplier * settings.baseDelay * settings.sectionStaggerMultiplier;
+          const delay = delayMultiplier * settings.sectionBaseDelay + (delayMultiplier * settings.sectionStaggerDelay);
           setTimeout(() => {
             element.classList.add(className);
           }, delay);
@@ -101,7 +102,7 @@ export const useScrollTriggerAnimation = (delayMultiplier = 0) => {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [loaded, settings.enabled, settings.animationStyle, settings.baseDelay, settings.sectionStaggerMultiplier, delayMultiplier]);
+  }, [loaded, settings.enabled, settings.sectionAnimationStyle, settings.sectionBaseDelay, settings.sectionStaggerDelay, delayMultiplier]);
 
   return ref;
 };
@@ -123,14 +124,14 @@ export const useCardStaggerAnimation = () => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const className = `animate-${settings.animationStyle}`;
+        const className = `animate-${settings.cardAnimationStyle}`;
         const cards = container.querySelectorAll('[data-card-item]');
         
         if (entry.isIntersecting) {
           setHasAnimated(true);
           
           cards.forEach((card, index) => {
-            const delay = index * settings.baseDelay * settings.cardStaggerMultiplier;
+            const delay = settings.cardBaseDelay + (index * settings.cardStaggerDelay);
             
             setTimeout(() => {
               // Animate text elements if marked, otherwise whole card
@@ -144,6 +145,7 @@ export const useCardStaggerAnimation = () => {
           });
         } else if (hasAnimated) {
           // Remove animations so they can replay
+          setHasAnimated(false);
           cards.forEach(card => {
             card.classList.remove(className);
             const textElements = card.querySelectorAll('[data-animate-text]');
@@ -156,7 +158,7 @@ export const useCardStaggerAnimation = () => {
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [loaded, settings.enabled, settings.animationStyle, settings.baseDelay, settings.cardStaggerMultiplier, hasAnimated]);
+  }, [loaded, settings.enabled, settings.cardAnimationStyle, settings.cardBaseDelay, settings.cardStaggerDelay, hasAnimated]);
 
   return containerRef;
 };

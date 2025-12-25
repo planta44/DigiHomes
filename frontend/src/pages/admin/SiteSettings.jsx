@@ -1586,6 +1586,182 @@ const SiteSettings = () => {
           </div>
         </div>
       </div>
+
+      {/* Animation Settings */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-primary-600" />
+          Animation Settings
+        </h2>
+        
+        <div className="space-y-6">
+          {/* Global Animation Toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="font-medium.
+              medium text-gray-900">Enable Animations</label>
+              <p className="text-sm text-gray-500">Turn all animations on or off</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={animationSettings?.enabled || false}
+              onChange={(e) => setAnimationSettings(prev => ({ ...prev, enabled: e.target.checked }))}
+              className="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+            />
+          </div>
+
+          {/* Hero Text Animations */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Hero Text Animations</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
+                <select
+                  value={animationSettings?.heroAnimationStyle || 'pop'}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, heroAnimationStyle: e.target.value }))}
+                  className="input-field"
+                >
+                  <option value="pop">Pop Up</option>
+                  <option value="fade">Fade In</option>
+                  <option value="slide">Slide Up</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Delay (ms)</label>
+                <input
+                  type="number"
+                  value={animationSettings?.heroTextDelay || 400}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, heroTextDelay: parseInt(e.target.value) || 400 }))}
+                  className="input-field"
+                  min="0"
+                  step="100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
+                <input
+                  type="number"
+                  value={animationSettings?.heroTextStagger || 200}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, heroTextStagger: parseInt(e.target.value) || 200 }))}
+                  className="input-field"
+                  min="0"
+                  step="50"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Card Animations */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Property Card Animations</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
+                <select
+                  value={animationSettings?.cardAnimationStyle || 'pop'}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, cardAnimationStyle: e.target.value }))}
+                  className="input-field"
+                >
+                  <option value="pop">Pop Up</option>
+                  <option value="fade">Fade In</option>
+                  <option value="slide">Slide Up</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Base Delay (ms)</label>
+                <input
+                  type="number"
+                  value={animationSettings?.cardBaseDelay || 150}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, cardBaseDelay: parseInt(e.target.value) || 150 }))}
+                  className="input-field"
+                  min="0"
+                  step="50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
+                <input
+                  type="number"
+                  value={animationSettings?.cardStaggerDelay || 100}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, cardStaggerDelay: parseInt(e.target.value) || 100 }))}
+                  className="input-field"
+                  min="0"
+                  step="25"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section Animations */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Section Animations</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
+                <select
+                  value={animationSettings?.sectionAnimationStyle || 'pop'}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, sectionAnimationStyle: e.target.value }))}
+                  className="input-field"
+                >
+                  <option value="pop">Pop Up</option>
+                  <option value="fade">Fade In</option>
+                  <option value="slide">Slide Up</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Base Delay (ms)</label>
+                <input
+                  type="number"
+                  value={animationSettings?.sectionBaseDelay || 200}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, sectionBaseDelay: parseInt(e.target.value) || 200 }))}
+                  className="input-field"
+                  min="0"
+                  step="50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
+                <input
+                  type="number"
+                  value={animationSettings?.sectionStaggerDelay || 150}
+                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, sectionStaggerDelay: parseInt(e.target.value) || 150 }))}
+                  className="input-field"
+                  min="0"
+                  step="25"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Animation */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Stats Counter Animation</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Count Duration (ms)</label>
+              <input
+                type="number"
+                value={animationSettings?.statsCountDuration || 2000}
+                onChange={(e) => setAnimationSettings(prev => ({ ...prev, statsCountDuration: parseInt(e.target.value) || 2000 }))}
+                className="input-field w-full md:w-64"
+                min="500"
+                step="100"
+              />
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="border-t pt-6">
+            <button
+              onClick={handleSaveAnimationSettings}
+              disabled={saving}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {saving ? 'Saving...' : 'Save Animation Settings'}
+            </button>
+          </div>
+        </div>
+      </div>
     </AdminLayout>
   );
 };

@@ -13,12 +13,19 @@ const AnimationContext = createContext({});
 export const AnimationProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     enabled: true,
-    animationStyle: 'pop',
-    baseDelay: 150,
-    cardStaggerMultiplier: 1,
-    heroStaggerMultiplier: 2,
-    sectionStaggerMultiplier: 1.5,
+    // Hero text animations
+    heroAnimationStyle: 'pop',
     heroTextDelay: 400,
+    heroTextStagger: 200,
+    // Card animations
+    cardAnimationStyle: 'pop',
+    cardBaseDelay: 150,
+    cardStaggerDelay: 100,
+    // Section animations
+    sectionAnimationStyle: 'pop',
+    sectionBaseDelay: 200,
+    sectionStaggerDelay: 150,
+    // Stats animation
     statsCountDuration: 2000
   });
   const [loaded, setLoaded] = useState(false);
