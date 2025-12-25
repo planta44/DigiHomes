@@ -16,7 +16,6 @@ import AnimationContext from '../context/AnimationContext';
  * - Animates on mount AFTER settings load
  * - Re-animates when scrolling back to top
  * - Uses useLayoutEffect for immediate trigger
- * - Observers NEVER disconnect for replay capability
  */
 export const useHeroTextAnimation = (elementIndex = 0) => {
   const ref = useRef(null);
@@ -39,7 +38,7 @@ export const useHeroTextAnimation = (elementIndex = 0) => {
     return () => clearTimeout(timer);
   }, [loaded, settings.enabled, settings.animationStyle, settings.heroTextDelay, settings.baseDelay, settings.heroStaggerMultiplier, elementIndex]);
 
-  // Re-animate on scroll - NEVER disconnect observer
+  // Re-animate on scroll (DO NOT disconnect observer)
   useEffect(() => {
     const element = ref.current;
     if (!element || !loaded || !settings.enabled || !hasFirstRun) return;
@@ -163,9 +162,37 @@ export const useCardStaggerAnimation = () => {
 };
 
 /**
+ * STATS IN VIEW OBSERVER
+ * - Detects when stats section enters/exits viewport
+ * - Returns isInView boolean that triggers counter
+ */
+export const useStatsInView = () => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Set to true when entering, false when leaving
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, isInView];
+};
+
+/**
  * STATS COUNTER
  * - Counts from 0 to target when isInView is true
- * - Resets to final value when isInView becomes false
+ * - Resets to 0 when isInView becomes false
  * - Uses requestAnimationFrame for smooth counting
  * - Respects admin-controlled duration
  */
@@ -236,33 +263,4 @@ export const useStatsCounter = (targetValue, isInView) => {
   }, [targetValue, isInView, loaded, settings.enabled, settings.statsCountDuration]);
 
   return displayValue;
-};
-
-/**
- * STATS IN VIEW OBSERVER
- * - Detects when stats section enters/exits viewport
- * - Returns isInView boolean that triggers counter
- * - Observer NEVER disconnects
- */
-export const useStatsInView = () => {
-  const [isInView, setIsInView] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Set to true when entering, false when leaving
-        setIsInView(entry.isIntersecting);
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  return [ref, isInView];
 };

@@ -1,6 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../config/api';
-import { setAnimationSettings } from '../hooks/useNewAnimations';
+
+/**
+ * ANIMATION CONTEXT - Single source of truth for animation settings
+ * - No module-level state
+ * - Settings loaded from API
+ * - `loaded` flag ensures hooks wait for settings
+ */
 
 const AnimationContext = createContext({});
 
@@ -22,14 +28,15 @@ export const AnimationProvider = ({ children }) => {
       try {
         const response = await api.get('/settings/animations');
         if (response.data) {
-          console.log('🎬 Fetched animation settings from API:', response.data);
+          console.log('🎬 Animation settings loaded from API:', response.data);
           setSettings(response.data);
-          setAnimationSettings(response.data);
+        } else {
+          console.log('⚠️ API returned no settings, using defaults');
         }
       } catch (error) {
-        console.log('⚠️ Using default animation settings');
-        setAnimationSettings(settings);
+        console.log('⚠️ Failed to fetch settings, using defaults:', error.message);
       } finally {
+        // CRITICAL: Set loaded to true so hooks can start
         setLoaded(true);
       }
     };
