@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useCardStaggerAnimation } from '../hooks/useNewAnimations';
+import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
@@ -24,22 +24,11 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  // Hero animations - manual trigger
-  const heroRef = useRef(null);
-  const heroRef2 = useRef(null);
+  // Hero text animations
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
   // Service cards animation
   const sectionsRef = useCardStaggerAnimation();
-
-  // Trigger hero animations on mount
-  useEffect(() => {
-    const delays = [400, 600];
-    [heroRef.current, heroRef2.current].forEach((element, index) => {
-      if (!element) return;
-      setTimeout(() => {
-        element.classList.add('animate-pop');
-      }, delays[index]);
-    });
-  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

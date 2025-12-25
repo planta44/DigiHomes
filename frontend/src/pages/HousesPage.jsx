@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Building } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
 import api from '../config/api';
-import { useCardStaggerAnimation } from '../hooks/useNewAnimations';
+import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
 
 const HousesPage = () => {
   const [searchParams] = useSearchParams();
@@ -20,22 +20,11 @@ const HousesPage = () => {
     status: ''
   });
 
-  // Hero animations - manual trigger
-  const heroRef = useRef(null);
-  const heroRef2 = useRef(null);
+  // Hero text animations
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
   // Card animations
   const cardsRef = useCardStaggerAnimation();
-
-  // Trigger hero animations on mount
-  useEffect(() => {
-    const delays = [400, 600];
-    [heroRef.current, heroRef2.current].forEach((element, index) => {
-      if (!element) return;
-      setTimeout(() => {
-        element.classList.add('animate-pop');
-      }, delays[index]);
-    });
-  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

@@ -84,7 +84,7 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { enabled: true, animationStyle: 'pop', baseDelay: 150, cardStaggerMultiplier: 1, heroStaggerMultiplier: 2, sectionStaggerMultiplier: 1.5, heroTextDelay: 400, statsCountDuration: 2000 },
+    animation_settings: { enabled: true, heroAnimationStyle: 'pop', heroTextDelay: 400, heroTextStagger: 200, cardAnimationStyle: 'pop', cardBaseDelay: 150, cardStaggerDelay: 100, sectionAnimationStyle: 'pop', sectionBaseDelay: 200, sectionStaggerDelay: 150, statsCountDuration: 2000 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
@@ -1598,14 +1598,13 @@ const SiteSettings = () => {
           {/* Global Animation Toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <label className="font-medium.
-              medium text-gray-900">Enable Animations</label>
+              <label className="font-medium text-gray-900">Enable Animations</label>
               <p className="text-sm text-gray-500">Turn all animations on or off</p>
             </div>
             <input
               type="checkbox"
-              checked={animationSettings?.enabled || false}
-              onChange={(e) => setAnimationSettings(prev => ({ ...prev, enabled: e.target.checked }))}
+              checked={settings.animation_settings?.enabled || false}
+              onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, enabled: e.target.checked }}))}
               className="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
             />
           </div>
@@ -1617,8 +1616,8 @@ const SiteSettings = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
                 <select
-                  value={animationSettings?.heroAnimationStyle || 'pop'}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, heroAnimationStyle: e.target.value }))}
+                  value={settings.animation_settings?.heroAnimationStyle || 'pop'}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, heroAnimationStyle: e.target.value }}))}
                   className="input-field"
                 >
                   <option value="pop">Pop Up</option>
@@ -1630,8 +1629,8 @@ const SiteSettings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Start Delay (ms)</label>
                 <input
                   type="number"
-                  value={animationSettings?.heroTextDelay || 400}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, heroTextDelay: parseInt(e.target.value) || 400 }))}
+                  value={settings.animation_settings?.heroTextDelay || 400}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, heroTextDelay: parseInt(e.target.value) || 400 }}))}
                   className="input-field"
                   min="0"
                   step="100"
@@ -1641,8 +1640,8 @@ const SiteSettings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
                 <input
                   type="number"
-                  value={animationSettings?.heroTextStagger || 200}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, heroTextStagger: parseInt(e.target.value) || 200 }))}
+                  value={settings.animation_settings?.heroTextStagger || 200}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, heroTextStagger: parseInt(e.target.value) || 200 }}))}
                   className="input-field"
                   min="0"
                   step="50"
@@ -1658,8 +1657,8 @@ const SiteSettings = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
                 <select
-                  value={animationSettings?.cardAnimationStyle || 'pop'}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, cardAnimationStyle: e.target.value }))}
+                  value={settings.animation_settings?.cardAnimationStyle || 'pop'}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, cardAnimationStyle: e.target.value }}))}
                   className="input-field"
                 >
                   <option value="pop">Pop Up</option>
@@ -1671,8 +1670,8 @@ const SiteSettings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Base Delay (ms)</label>
                 <input
                   type="number"
-                  value={animationSettings?.cardBaseDelay || 150}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, cardBaseDelay: parseInt(e.target.value) || 150 }))}
+                  value={settings.animation_settings?.cardBaseDelay || 150}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, cardBaseDelay: parseInt(e.target.value) || 150 }}))}
                   className="input-field"
                   min="0"
                   step="50"
@@ -1682,8 +1681,8 @@ const SiteSettings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
                 <input
                   type="number"
-                  value={animationSettings?.cardStaggerDelay || 100}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, cardStaggerDelay: parseInt(e.target.value) || 100 }))}
+                  value={settings.animation_settings?.cardStaggerDelay || 100}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, cardStaggerDelay: parseInt(e.target.value) || 100 }}))}
                   className="input-field"
                   min="0"
                   step="25"
@@ -1699,8 +1698,8 @@ const SiteSettings = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
                 <select
-                  value={animationSettings?.sectionAnimationStyle || 'pop'}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, sectionAnimationStyle: e.target.value }))}
+                  value={settings.animation_settings?.sectionAnimationStyle || 'pop'}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, sectionAnimationStyle: e.target.value }}))}
                   className="input-field"
                 >
                   <option value="pop">Pop Up</option>
@@ -1712,8 +1711,8 @@ const SiteSettings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Base Delay (ms)</label>
                 <input
                   type="number"
-                  value={animationSettings?.sectionBaseDelay || 200}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, sectionBaseDelay: parseInt(e.target.value) || 200 }))}
+                  value={settings.animation_settings?.sectionBaseDelay || 200}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, sectionBaseDelay: parseInt(e.target.value) || 200 }}))}
                   className="input-field"
                   min="0"
                   step="50"
@@ -1723,8 +1722,8 @@ const SiteSettings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
                 <input
                   type="number"
-                  value={animationSettings?.sectionStaggerDelay || 150}
-                  onChange={(e) => setAnimationSettings(prev => ({ ...prev, sectionStaggerDelay: parseInt(e.target.value) || 150 }))}
+                  value={settings.animation_settings?.sectionStaggerDelay || 150}
+                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, sectionStaggerDelay: parseInt(e.target.value) || 150 }}))}
                   className="input-field"
                   min="0"
                   step="25"
@@ -1740,8 +1739,8 @@ const SiteSettings = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Count Duration (ms)</label>
               <input
                 type="number"
-                value={animationSettings?.statsCountDuration || 2000}
-                onChange={(e) => setAnimationSettings(prev => ({ ...prev, statsCountDuration: parseInt(e.target.value) || 2000 }))}
+                value={settings.animation_settings?.statsCountDuration || 2000}
+                onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, statsCountDuration: parseInt(e.target.value) || 2000 }}))}
                 className="input-field w-full md:w-64"
                 min="500"
                 step="100"
@@ -1752,7 +1751,7 @@ const SiteSettings = () => {
           {/* Save Button */}
           <div className="border-t pt-6">
             <button
-              onClick={handleSaveAnimationSettings}
+              onClick={() => handleSave('animation_settings')}
               disabled={saving}
               className="btn-primary flex items-center gap-2"
             >

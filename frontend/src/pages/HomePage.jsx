@@ -61,13 +61,12 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [settings, setSettings] = useState(null);
-  const [heroImageLoaded, setHeroImageLoaded] = useState(false);
   const { colors } = useTheme();
   
-  // Hero animations - only start after hero image loads
-  const heroRef = useRef(null);
-  const heroRef2 = useRef(null);
-  const heroRef3 = useRef(null);
+  // Hero text animations using hooks
+  const heroRef = useHeroTextAnimation(0);
+  const heroRef2 = useHeroTextAnimation(1);
+  const heroRef3 = useHeroTextAnimation(2);
   
   // Stats section - MUST count from 0 when visible
   const [statsRef, statsInView] = useStatsInView();
@@ -93,41 +92,6 @@ const HomePage = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // Detect when hero image loads and trigger hero text animations
-  useEffect(() => {
-    if (!settingsLoaded) return;
-
-    const heroImage = settings?.hero_content?.backgroundImage || '';
-    if (!heroImage) {
-      setHeroImageLoaded(true);
-      return;
-    }
-
-    const img = new Image();
-    img.onload = () => setHeroImageLoaded(true);
-    img.onerror = () => setHeroImageLoaded(true); // Still animate even if image fails
-    img.src = heroImage;
-  }, [settingsLoaded, settings?.hero_content?.backgroundImage]);
-
-  // Manually trigger hero text animations after image loads
-  useEffect(() => {
-    if (!heroImageLoaded) return;
-
-    const animateHeroText = async () => {
-      const elements = [heroRef.current, heroRef2.current, heroRef3.current];
-      const delays = [400, 600, 800]; // Base delays with stagger
-
-      elements.forEach((element, index) => {
-        if (!element) return;
-        setTimeout(() => {
-          element.classList.add('animate-pop');
-        }, delays[index]);
-      });
-    };
-
-    animateHeroText();
-  }, [heroImageLoaded]);
 
   const fetchData = async () => {
     try {
