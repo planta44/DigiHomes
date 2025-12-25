@@ -134,9 +134,9 @@ const HomePage = () => {
 
   // Default stats
   const defaultStats = [
-    { value: '100+', label: 'Happy Clients' },
-    { value: '50+', label: 'Properties' },
-    { value: '2', label: 'Locations' },
+    { value: '5000+', label: 'Happy Clients' },
+    { value: '200+', label: 'Properties' },
+    { value: '50+', label: 'Locations' },
     { value: '5+', label: 'Years Experience' }
   ];
   

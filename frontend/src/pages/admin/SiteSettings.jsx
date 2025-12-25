@@ -424,32 +424,6 @@ const SiteSettings = () => {
               </div>
             )}
 
-            {/* Animation Settings */}
-            {activeTab === 'animation' && (
-              <div className="space-y-4 max-w-lg">
-                <h3 className="font-semibold">Animation Settings</h3>
-                <p className="text-sm text-gray-600">Control how fast elements appear when scrolling</p>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Animation Duration (ms): {settings.animation_settings.duration}ms</label>
-                  <input type="range" min="200" max="2000" step="100" value={settings.animation_settings.duration}
-                    onChange={(e) => setSettings(prev => ({
-                      ...prev, animation_settings: { ...prev.animation_settings, duration: parseInt(e.target.value) }
-                    }))} className="w-full" />
-                  <div className="flex justify-between text-xs text-gray-500"><span>Fast (200ms)</span><span>Slow (2000ms)</span></div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms): {settings.animation_settings.staggerDelay}ms</label>
-                  <input type="range" min="50" max="500" step="25" value={settings.animation_settings.staggerDelay}
-                    onChange={(e) => setSettings(prev => ({
-                      ...prev, animation_settings: { ...prev.animation_settings, staggerDelay: parseInt(e.target.value) }
-                    }))} className="w-full" />
-                  <div className="flex justify-between text-xs text-gray-500"><span>Quick (50ms)</span><span>Slow (500ms)</span></div>
-                </div>
-                <button onClick={() => handleSave('animation_settings', settings.animation_settings)} disabled={saving} className="btn-primary">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
-                </button>
-              </div>
-            )}
 
             {/* Hero Section */}
             {activeTab === 'hero' && (
@@ -1369,22 +1343,6 @@ const SiteSettings = () => {
                       </label>
                     </div>
 
-                    <div className="p-4 border rounded-lg bg-gray-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Animation Style</label>
-                      <select
-                        value={settings.animation_settings.animationStyle || 'pop'}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          animation_settings: { ...prev.animation_settings, animationStyle: e.target.value }
-                        }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                      >
-                        <option value="pop">Pop (rise from below)</option>
-                        <option value="fade">Fade (simple fade in)</option>
-                        <option value="slide">Slide (slide from left)</option>
-                      </select>
-                      <p className="text-xs text-gray-500 mt-1">Choose how elements appear on screen</p>
-                    </div>
                   </div>
                 </div>
 
@@ -1411,24 +1369,6 @@ const SiteSettings = () => {
                       <p className="text-xs text-gray-500 mt-1">Wait before hero text appears on page load</p>
                     </div>
 
-                    <div className="p-4 border rounded-lg bg-blue-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Stagger Multiplier: {settings.animation_settings.heroStaggerMultiplier || 2}x
-                      </label>
-                      <input
-                        type="range"
-                        min="1"
-                        max="5"
-                        step="0.5"
-                        value={settings.animation_settings.heroStaggerMultiplier || 2}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          animation_settings: { ...prev.animation_settings, heroStaggerMultiplier: parseFloat(e.target.value) }
-                        }))}
-                        className="w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Delay between each hero text element</p>
-                    </div>
                   </div>
                 </div>
 
