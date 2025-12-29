@@ -13,27 +13,36 @@ import AnimationContext from '../context/AnimationContext';
 
 /**
  * HERO TEXT ANIMATION
- * - Animates on mount AFTER settings load
- * - Re-animates when scrolling back to top
- * - Uses useLayoutEffect for immediate trigger
- * - Observers NEVER disconnect for replay capability
+ * - Animates hero text on page load after settings load
+ * - Respects delay and stagger from admin settings
+ * - Re-animates on scroll back to top
  */
 export const useHeroTextAnimation = (elementIndex = 0) => {
   const ref = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
   const [hasAnimated, setHasAnimated] = useState(false);
 
-  // Initial animation on mount - runs AFTER settings load
+  // Animate on mount after settings load
   useLayoutEffect(() => {
     const element = ref.current;
-    if (!element || !loaded || !settings.enabled) return;
+    if (!element || !loaded) {
+      console.log(`🎬 Hero text ${elementIndex} waiting... loaded:`, loaded);
+      return;
+    }
+    
+    if (!settings.enabled) {
+      console.log('🎬 Animations disabled globally');
+      return;
+    }
 
     const delay = settings.heroTextDelay + (elementIndex * settings.heroTextStagger);
+    console.log(`🎬 Hero text ${elementIndex} will animate in ${delay}ms with style: ${settings.heroAnimationStyle}`);
     
     const timer = setTimeout(() => {
       const className = `animate-${settings.heroAnimationStyle}`;
       element.classList.add(className);
       setHasAnimated(true);
+      console.log(`✅ Hero text ${elementIndex} animated with class: ${className}`);
     }, delay);
 
     return () => clearTimeout(timer);

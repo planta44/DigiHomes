@@ -136,15 +136,18 @@ const getAnimationSettings = async (req, res) => {
       "SELECT setting_value FROM site_settings WHERE setting_key = 'animation_settings'"
     );
     
-    // Default animation settings
+    // Default animation settings - NEW STRUCTURE
     const defaultSettings = {
       enabled: true,
-      animationStyle: 'pop',
-      baseDelay: 150,
-      cardStaggerMultiplier: 1,
-      heroStaggerMultiplier: 2,
-      sectionStaggerMultiplier: 1.5,
+      heroAnimationStyle: 'pop',
       heroTextDelay: 400,
+      heroTextStagger: 200,
+      cardAnimationStyle: 'pop',
+      cardBaseDelay: 150,
+      cardStaggerDelay: 100,
+      sectionAnimationStyle: 'pop',
+      sectionBaseDelay: 200,
+      sectionStaggerDelay: 150,
       statsCountDuration: 2000
     };
     
@@ -165,18 +168,21 @@ const getAnimationSettings = async (req, res) => {
 // Update animation settings (admin only)
 const updateAnimationSettings = async (req, res) => {
   try {
-    const { enabled, animationStyle, baseDelay, cardStaggerMultiplier, heroStaggerMultiplier, sectionStaggerMultiplier, heroTextDelay, statsCountDuration } = req.body;
-    
+    const body = req.body;
     const validStyles = ['pop', 'fade', 'slide'];
+    
     const settings = {
-      enabled: enabled !== false,
-      animationStyle: validStyles.includes(animationStyle) ? animationStyle : 'pop',
-      baseDelay: Math.max(50, Math.min(500, parseInt(baseDelay) || 150)),
-      cardStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(cardStaggerMultiplier) || 1)),
-      heroStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(heroStaggerMultiplier) || 2)),
-      sectionStaggerMultiplier: Math.max(0.5, Math.min(5, parseFloat(sectionStaggerMultiplier) || 1.5)),
-      heroTextDelay: Math.max(100, Math.min(2000, parseInt(heroTextDelay) || 400)),
-      statsCountDuration: Math.max(500, Math.min(5000, parseInt(statsCountDuration) || 2000))
+      enabled: body.enabled !== false,
+      heroAnimationStyle: validStyles.includes(body.heroAnimationStyle) ? body.heroAnimationStyle : 'pop',
+      heroTextDelay: Math.max(100, Math.min(2000, parseInt(body.heroTextDelay) || 400)),
+      heroTextStagger: Math.max(50, Math.min(1000, parseInt(body.heroTextStagger) || 200)),
+      cardAnimationStyle: validStyles.includes(body.cardAnimationStyle) ? body.cardAnimationStyle : 'pop',
+      cardBaseDelay: Math.max(0, Math.min(1000, parseInt(body.cardBaseDelay) || 150)),
+      cardStaggerDelay: Math.max(0, Math.min(1000, parseInt(body.cardStaggerDelay) || 100)),
+      sectionAnimationStyle: validStyles.includes(body.sectionAnimationStyle) ? body.sectionAnimationStyle : 'pop',
+      sectionBaseDelay: Math.max(0, Math.min(1000, parseInt(body.sectionBaseDelay) || 200)),
+      sectionStaggerDelay: Math.max(0, Math.min(1000, parseInt(body.sectionStaggerDelay) || 150)),
+      statsCountDuration: Math.max(500, Math.min(5000, parseInt(body.statsCountDuration) || 2000))
     };
 
     await db.query(
