@@ -15,22 +15,17 @@ export const SimpleAnimationProvider = ({ children }) => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        console.log('🎬 Fetching animation settings...');
         const response = await api.get('/settings/animations');
-        console.log('🎬 API Response:', response.data);
         if (response.data) {
           const newSettings = {
             enabled: response.data.enabled !== false,
             style: response.data.style || 'pop',
             delay: response.data.delay || 100
           };
-          console.log('🎬 Animation settings loaded:', newSettings);
           setSettings(newSettings);
           setAnimationSettings(newSettings);
         }
       } catch (error) {
-        console.log('⚠️ Animation settings error:', error.message);
-        console.log('Using default animation settings');
         const defaultSettings = {
           enabled: true,
           style: 'pop',
@@ -40,7 +35,6 @@ export const SimpleAnimationProvider = ({ children }) => {
         setAnimationSettings(defaultSettings);
       } finally {
         setLoaded(true);
-        console.log('✅ Animation system ready');
       }
     };
 
