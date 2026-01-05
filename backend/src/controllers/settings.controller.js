@@ -136,19 +136,11 @@ const getAnimationSettings = async (req, res) => {
       "SELECT setting_value FROM site_settings WHERE setting_key = 'animation_settings'"
     );
     
-    // Default animation settings - NEW STRUCTURE
+    // Simple animation settings
     const defaultSettings = {
       enabled: true,
-      heroAnimationStyle: 'pop',
-      heroTextDelay: 400,
-      heroTextStagger: 200,
-      cardAnimationStyle: 'pop',
-      cardBaseDelay: 150,
-      cardStaggerDelay: 100,
-      sectionAnimationStyle: 'pop',
-      sectionBaseDelay: 200,
-      sectionStaggerDelay: 150,
-      statsCountDuration: 2000
+      style: 'pop',
+      delay: 100
     };
     
     if (result.rows.length > 0 && result.rows[0].setting_value) {
@@ -173,16 +165,8 @@ const updateAnimationSettings = async (req, res) => {
     
     const settings = {
       enabled: body.enabled !== false,
-      heroAnimationStyle: validStyles.includes(body.heroAnimationStyle) ? body.heroAnimationStyle : 'pop',
-      heroTextDelay: Math.max(100, Math.min(2000, parseInt(body.heroTextDelay) || 400)),
-      heroTextStagger: Math.max(50, Math.min(1000, parseInt(body.heroTextStagger) || 200)),
-      cardAnimationStyle: validStyles.includes(body.cardAnimationStyle) ? body.cardAnimationStyle : 'pop',
-      cardBaseDelay: Math.max(0, Math.min(1000, parseInt(body.cardBaseDelay) || 150)),
-      cardStaggerDelay: Math.max(0, Math.min(1000, parseInt(body.cardStaggerDelay) || 100)),
-      sectionAnimationStyle: validStyles.includes(body.sectionAnimationStyle) ? body.sectionAnimationStyle : 'pop',
-      sectionBaseDelay: Math.max(0, Math.min(1000, parseInt(body.sectionBaseDelay) || 200)),
-      sectionStaggerDelay: Math.max(0, Math.min(1000, parseInt(body.sectionStaggerDelay) || 150)),
-      statsCountDuration: Math.max(500, Math.min(5000, parseInt(body.statsCountDuration) || 2000))
+      style: validStyles.includes(body.style) ? body.style : 'pop',
+      delay: Math.max(50, Math.min(500, parseInt(body.delay) || 100))
     };
 
     await db.query(

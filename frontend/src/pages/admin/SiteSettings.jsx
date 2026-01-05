@@ -1537,156 +1537,53 @@ const SiteSettings = () => {
         
         <div className="space-y-6">
           {/* Global Animation Toggle */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <label className="font-medium text-gray-900">Enable Animations</label>
-              <p className="text-sm text-gray-500">Turn all animations on or off</p>
+              <p className="text-sm text-gray-500">Turn all page animations on or off</p>
             </div>
             <input
               type="checkbox"
-              checked={settings.animation_settings?.enabled || false}
+              checked={settings.animation_settings?.enabled !== false}
               onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, enabled: e.target.checked }}))}
               className="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
             />
           </div>
 
-          {/* Hero Text Animations */}
-          <div className="border-t pt-6">
-            <h3 className="font-semibold mb-4">Hero Text Animations</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
-                <select
-                  value={settings.animation_settings?.heroAnimationStyle || 'pop'}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, heroAnimationStyle: e.target.value }}))}
-                  className="input-field"
-                >
-                  <option value="pop">Pop Up</option>
-                  <option value="fade">Fade In</option>
-                  <option value="slide">Slide Up</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Delay (ms)</label>
-                <input
-                  type="number"
-                  value={settings.animation_settings?.heroTextDelay || 400}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, heroTextDelay: parseInt(e.target.value) || 400 }}))}
-                  className="input-field"
-                  min="0"
-                  step="100"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
-                <input
-                  type="number"
-                  value={settings.animation_settings?.heroTextStagger || 200}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, heroTextStagger: parseInt(e.target.value) || 200 }}))}
-                  className="input-field"
-                  min="0"
-                  step="50"
-                />
-              </div>
-            </div>
+          {/* Animation Style */}
+          <div className="p-4 border rounded-lg">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Animation Style</label>
+            <select
+              value={settings.animation_settings?.style || 'pop'}
+              onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, style: e.target.value }}))}
+              className="input-field"
+            >
+              <option value="pop">Pop Up (rise from below)</option>
+              <option value="fade">Fade In (simple fade)</option>
+              <option value="slide">Slide In (from left)</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Choose how elements appear on screen</p>
           </div>
 
-          {/* Card Animations */}
-          <div className="border-t pt-6">
-            <h3 className="font-semibold mb-4">Property Card Animations</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
-                <select
-                  value={settings.animation_settings?.cardAnimationStyle || 'pop'}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, cardAnimationStyle: e.target.value }}))}
-                  className="input-field"
-                >
-                  <option value="pop">Pop Up</option>
-                  <option value="fade">Fade In</option>
-                  <option value="slide">Slide Up</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Base Delay (ms)</label>
-                <input
-                  type="number"
-                  value={settings.animation_settings?.cardBaseDelay || 150}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, cardBaseDelay: parseInt(e.target.value) || 150 }}))}
-                  className="input-field"
-                  min="0"
-                  step="50"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
-                <input
-                  type="number"
-                  value={settings.animation_settings?.cardStaggerDelay || 100}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, cardStaggerDelay: parseInt(e.target.value) || 100 }}))}
-                  className="input-field"
-                  min="0"
-                  step="25"
-                />
-              </div>
+          {/* Animation Delay */}
+          <div className="p-4 border rounded-lg">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Animation Delay: {settings.animation_settings?.delay || 100}ms
+            </label>
+            <input
+              type="range"
+              min="50"
+              max="500"
+              step="50"
+              value={settings.animation_settings?.delay || 100}
+              onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, delay: parseInt(e.target.value) }}))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>Fast (50ms)</span>
+              <span>Slow (500ms)</span>
             </div>
-          </div>
-
-          {/* Section Animations */}
-          <div className="border-t pt-6">
-            <h3 className="font-semibold mb-4">Section Animations</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Animation Style</label>
-                <select
-                  value={settings.animation_settings?.sectionAnimationStyle || 'pop'}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, sectionAnimationStyle: e.target.value }}))}
-                  className="input-field"
-                >
-                  <option value="pop">Pop Up</option>
-                  <option value="fade">Fade In</option>
-                  <option value="slide">Slide Up</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Base Delay (ms)</label>
-                <input
-                  type="number"
-                  value={settings.animation_settings?.sectionBaseDelay || 200}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, sectionBaseDelay: parseInt(e.target.value) || 200 }}))}
-                  className="input-field"
-                  min="0"
-                  step="50"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stagger Delay (ms)</label>
-                <input
-                  type="number"
-                  value={settings.animation_settings?.sectionStaggerDelay || 150}
-                  onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, sectionStaggerDelay: parseInt(e.target.value) || 150 }}))}
-                  className="input-field"
-                  min="0"
-                  step="25"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Animation */}
-          <div className="border-t pt-6">
-            <h3 className="font-semibold mb-4">Stats Counter Animation</h3>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Count Duration (ms)</label>
-              <input
-                type="number"
-                value={settings.animation_settings?.statsCountDuration || 2000}
-                onChange={(e) => setSettings(prev => ({ ...prev, animation_settings: { ...prev.animation_settings, statsCountDuration: parseInt(e.target.value) || 2000 }}))}
-                className="input-field w-full md:w-64"
-                min="500"
-                step="100"
-              />
-            </div>
+            <p className="text-xs text-gray-500 mt-2">Controls the delay between each element's animation</p>
           </div>
 
           {/* Save Button */}
