@@ -112,7 +112,7 @@ export const useStatsInView = () => {
   return [ref, isInView];
 };
 
-// Hook for staggered card animations
+// Hook for staggered card animations - observes individual cards
 export const useCardStagger = () => {
   const containerRef = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
@@ -133,9 +133,11 @@ export const useCardStagger = () => {
       return;
     }
 
-    const animClass = `animate-${settings.cardStyle || 'slideUp'}`;
-    const duration = settings.cardDuration || 600;
-    const stagger = settings.cardStagger || 150;
+    // Detect if mobile
+    const isMobile = window.innerWidth < 768;
+    const animClass = `animate-${isMobile ? (settings.cardStyleMobile || settings.cardStyle || 'slideUp') : (settings.cardStyle || 'slideUp')}`;
+    const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
+    const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 150) : (settings.cardStagger || 150);
 
     // Initially hide cards
     cards.forEach(card => {
@@ -143,30 +145,35 @@ export const useCardStagger = () => {
       card.style.transform = 'translateY(20px)';
     });
 
+    // Observe each card individually
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          cards.forEach((card, index) => {
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const card = entry.target;
             card.style.setProperty('--card-duration', `${duration}ms`);
             
+            // Small delay to ensure smooth animation
             setTimeout(() => {
               card.classList.add(animClass);
-            }, index * stagger);
-          });
-        } else {
-          cards.forEach(card => {
+            }, 50);
+          } else {
+            // Reset when out of view
+            const card = entry.target;
             card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
-          });
-        }
+          }
+        });
       },
-      { threshold: 0.1 }
+      { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
     );
 
-    observer.observe(container);
+    // Observe each card
+    cards.forEach(card => observer.observe(card));
+    
     return () => observer.disconnect();
-  }, [loaded, settings.enabled, settings.cardStyle, settings.cardDuration, settings.cardStagger]);
+  }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;
 };
@@ -192,9 +199,11 @@ export const useLineByLine = () => {
       return;
     }
 
-    const animClass = `animate-${settings.cardStyle || 'slideUp'}`;
-    const duration = settings.cardDuration || 600;
-    const stagger = settings.cardStagger || 150;
+    // Detect if mobile
+    const isMobile = window.innerWidth < 768;
+    const animClass = `animate-${isMobile ? (settings.cardStyleMobile || settings.cardStyle || 'slideUp') : (settings.cardStyle || 'slideUp')}`;
+    const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
+    const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 150) : (settings.cardStagger || 150);
 
     // Initially hide lines
     lines.forEach(line => {
@@ -202,6 +211,7 @@ export const useLineByLine = () => {
       line.style.transform = 'translateY(20px)';
     });
 
+    // Observe container, but stagger lines individually
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -225,7 +235,7 @@ export const useLineByLine = () => {
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [loaded, settings.enabled, settings.cardStyle, settings.cardDuration, settings.cardStagger]);
+  }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;
 };

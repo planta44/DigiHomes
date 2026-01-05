@@ -84,7 +84,7 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { enabled: true, heroStyle: 'slideUp', heroDuration: 800, statsCountDuration: 2000, cardStyle: 'slideUp', cardDuration: 600, cardStagger: 150 },
+    animation_settings: { enabled: true, heroStyle: 'slideUp', heroDuration: 800, statsCountDuration: 2000, cardStyle: 'slideUp', cardDuration: 600, cardStagger: 150, cardStyleMobile: 'slideUp', cardDurationMobile: 400, cardStaggerMobile: 100 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
@@ -1417,9 +1417,9 @@ const SiteSettings = () => {
 
                 {/* Card Stagger Animation Settings */}
                 <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Card & Section Animations</h4>
+                  <h4 className="font-medium text-gray-800 mb-4">Card & Section Animations - Desktop</h4>
                   <p className="text-sm text-gray-600 mb-4">
-                    Controls how cards appear one after another (properties, features, locations, About Us)
+                    Controls how cards appear on desktop (properties, features, locations, About Us)
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="p-4 border rounded-lg bg-purple-50">
@@ -1476,7 +1476,73 @@ const SiteSettings = () => {
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Delay between each card (faster = lower)</p>
+                      <p className="text-xs text-gray-500 mt-1">Not used - cards animate individually</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Card Animation Settings */}
+                <div className="border-b pb-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Card & Section Animations - Mobile</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Controls how cards appear on mobile (screens &lt; 768px)
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg bg-orange-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Card Animation Style (Mobile)
+                      </label>
+                      <select
+                        value={settings.animation_settings.cardStyleMobile || 'slideUp'}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardStyleMobile: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="slideUp">Slide Up</option>
+                        <option value="fadeIn">Fade In</option>
+                        <option value="slideInLeft">Slide In from Left</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">How each card appears on mobile</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-orange-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Card Duration (Mobile): {settings.animation_settings.cardDurationMobile || 400}ms
+                      </label>
+                      <input
+                        type="range"
+                        min="200"
+                        max="1500"
+                        step="50"
+                        value={settings.animation_settings.cardDurationMobile || 400}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardDurationMobile: parseInt(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Faster on mobile for better UX</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-orange-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Stagger Delay (Mobile): {settings.animation_settings.cardStaggerMobile || 100}ms
+                      </label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="300"
+                        step="25"
+                        value={settings.animation_settings.cardStaggerMobile || 100}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardStaggerMobile: parseInt(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Not used - cards animate individually</p>
                     </div>
                   </div>
                 </div>
@@ -1488,7 +1554,9 @@ const SiteSettings = () => {
                   <ul className="text-sm text-blue-700 space-y-1">
                     <li>• Hero text pops from below every time you scroll to a page</li>
                     <li>• Stats count from 0 to their value each time they come into view</li>
-                    <li>• Cards appear one after another with stagger delay</li>
+                    <li>• <strong>Each card animates individually</strong> when it scrolls into view</li>
+                    <li>• Cards only animate when visible on screen (not all at once)</li>
+                    <li>• Mobile uses different, faster settings for better performance</li>
                     <li>• All animations repeat whenever sections scroll into view</li>
                     <li>• Works on: Properties, Features, Locations, About Us sections</li>
                   </ul>
