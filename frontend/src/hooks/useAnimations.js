@@ -117,22 +117,11 @@ export const useCardStagger = () => {
   const containerRef = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
   const animatedCardsRef = useRef(new Set());
+  const observerRef = useRef(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !loaded) return;
-
-    const cards = container.querySelectorAll('[data-animate-card]');
-    if (cards.length === 0) return;
-
-    // If animations disabled, ensure cards are visible
-    if (!settings.enabled) {
-      cards.forEach(card => {
-        card.style.opacity = '1';
-        card.style.transform = 'none';
-      });
-      return;
-    }
 
     // Detect if mobile
     const isMobile = window.innerWidth < 768;
@@ -140,75 +129,113 @@ export const useCardStagger = () => {
     const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
     const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 100) : (settings.cardStagger || 150);
 
-    // Initially hide cards
-    cards.forEach(card => {
-      if (!card.classList.contains(animClass)) {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
+    const setupCards = () => {
+      const cards = container.querySelectorAll('[data-animate-card]');
+      if (cards.length === 0) return;
+
+      // If animations disabled, ensure cards are visible
+      if (!settings.enabled) {
+        cards.forEach(card => {
+          card.style.opacity = '1';
+          card.style.transform = 'none';
+        });
+        return;
       }
+
+      // Initially hide cards that haven't been animated
+      cards.forEach(card => {
+        if (!card.classList.contains(animClass)) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+        }
+      });
+
+      // Clean up old observer if exists
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+
+      if (isMobile) {
+        // Mobile: Observe each card individually (no stagger)
+        observerRef.current = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                const card = entry.target;
+                card.style.setProperty('--card-duration', `${duration}ms`);
+                
+                setTimeout(() => {
+                  card.classList.add(animClass);
+                  card.style.opacity = '1';
+                  card.style.transform = 'translateY(0)';
+                }, 50);
+              } else {
+                const card = entry.target;
+                card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+        );
+
+        cards.forEach(card => observerRef.current.observe(card));
+      } else {
+        // Desktop: Observe each card but animate with stagger when it appears
+        observerRef.current = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting && !animatedCardsRef.current.has(entry.target)) {
+                const card = entry.target;
+                const allCards = container.querySelectorAll('[data-animate-card]');
+                const index = Array.from(allCards).indexOf(card);
+                
+                card.style.setProperty('--card-duration', `${duration}ms`);
+                animatedCardsRef.current.add(card);
+                
+                // Stagger delay for desktop
+                setTimeout(() => {
+                  card.classList.add(animClass);
+                  card.style.opacity = '1';
+                  card.style.transform = 'translateY(0)';
+                }, index * stagger);
+              } else if (!entry.isIntersecting) {
+                const card = entry.target;
+                card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                animatedCardsRef.current.delete(card);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+        );
+
+        cards.forEach(card => observerRef.current.observe(card));
+      }
+    };
+
+    // Initial setup
+    setupCards();
+
+    // Watch for dynamically added cards
+    const mutationObserver = new MutationObserver(() => {
+      setupCards();
     });
 
-    if (isMobile) {
-      // Mobile: Observe each card individually (no stagger)
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const card = entry.target;
-              card.style.setProperty('--card-duration', `${duration}ms`);
-              
-              setTimeout(() => {
-                card.classList.add(animClass);
-              }, 50);
-            } else {
-              const card = entry.target;
-              card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
-              card.style.opacity = '0';
-              card.style.transform = 'translateY(20px)';
-            }
-          });
-        },
-        { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
-      );
+    mutationObserver.observe(container, {
+      childList: true,
+      subtree: true
+    });
 
-      cards.forEach(card => observer.observe(card));
-      return () => observer.disconnect();
-    } else {
-      // Desktop: Observe each card but animate with stagger when it appears
-      let cardIndex = 0;
-      
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && !animatedCardsRef.current.has(entry.target)) {
-              const card = entry.target;
-              const index = Array.from(cards).indexOf(card);
-              
-              card.style.setProperty('--card-duration', `${duration}ms`);
-              animatedCardsRef.current.add(card);
-              
-              // Stagger delay for desktop
-              setTimeout(() => {
-                card.classList.add(animClass);
-              }, index * stagger);
-            } else if (!entry.isIntersecting) {
-              const card = entry.target;
-              card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
-              card.style.opacity = '0';
-              card.style.transform = 'translateY(20px)';
-              animatedCardsRef.current.delete(card);
-            }
-          });
-        },
-        { threshold: 0.15, rootMargin: '0px 0px -100px 0px' }
-      );
-
-      cards.forEach(card => observer.observe(card));
-      return () => {
-        observer.disconnect();
-        animatedCardsRef.current.clear();
-      };
-    }
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      mutationObserver.disconnect();
+      animatedCardsRef.current.clear();
+    };
   }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;
@@ -218,22 +245,11 @@ export const useCardStagger = () => {
 export const useLineByLine = () => {
   const containerRef = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
+  const observerRef = useRef(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !loaded) return;
-
-    const lines = container.querySelectorAll('[data-animate-line]');
-    if (lines.length === 0) return;
-
-    // If animations disabled, ensure lines are visible
-    if (!settings.enabled) {
-      lines.forEach(line => {
-        line.style.opacity = '1';
-        line.style.transform = 'none';
-      });
-      return;
-    }
 
     // Detect if mobile
     const isMobile = window.innerWidth < 768;
@@ -241,36 +257,78 @@ export const useLineByLine = () => {
     const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
     const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 150) : (settings.cardStagger || 150);
 
-    // Initially hide lines
-    lines.forEach(line => {
-      line.style.opacity = '0';
-      line.style.transform = 'translateY(20px)';
+    const setupLines = () => {
+      const lines = container.querySelectorAll('[data-animate-line]');
+      if (lines.length === 0) return;
+
+      // If animations disabled, ensure lines are visible
+      if (!settings.enabled) {
+        lines.forEach(line => {
+          line.style.opacity = '1';
+          line.style.transform = 'none';
+        });
+        return;
+      }
+
+      // Initially hide lines
+      lines.forEach(line => {
+        if (!line.classList.contains(animClass)) {
+          line.style.opacity = '0';
+          line.style.transform = 'translateY(20px)';
+        }
+      });
+
+      // Clean up old observer if exists
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+
+      // Observe container, but stagger lines individually
+      observerRef.current = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            lines.forEach((line, index) => {
+              line.style.setProperty('--card-duration', `${duration}ms`);
+              
+              setTimeout(() => {
+                line.classList.add(animClass);
+                line.style.opacity = '1';
+                line.style.transform = 'translateY(0)';
+              }, index * stagger);
+            });
+          } else {
+            lines.forEach(line => {
+              line.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+              line.style.opacity = '0';
+              line.style.transform = 'translateY(20px)';
+            });
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observerRef.current.observe(container);
+    };
+
+    // Initial setup
+    setupLines();
+
+    // Watch for dynamically added lines
+    const mutationObserver = new MutationObserver(() => {
+      setupLines();
     });
 
-    // Observe container, but stagger lines individually
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          lines.forEach((line, index) => {
-            line.style.setProperty('--card-duration', `${duration}ms`);
-            
-            setTimeout(() => {
-              line.classList.add(animClass);
-            }, index * stagger);
-          });
-        } else {
-          lines.forEach(line => {
-            line.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
-            line.style.opacity = '0';
-            line.style.transform = 'translateY(20px)';
-          });
-        }
-      },
-      { threshold: 0.15 }
-    );
+    mutationObserver.observe(container, {
+      childList: true,
+      subtree: true
+    });
 
-    observer.observe(container);
-    return () => observer.disconnect();
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      mutationObserver.disconnect();
+    };
   }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;

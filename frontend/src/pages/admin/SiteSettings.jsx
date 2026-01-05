@@ -1514,7 +1514,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="200"
-                        max="3000"
+                        max="5000"
                         step="50"
                         value={settings.animation_settings.cardDurationMobile || 400}
                         onChange={(e) => setSettings(prev => ({
