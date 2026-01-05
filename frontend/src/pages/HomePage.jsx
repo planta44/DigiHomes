@@ -17,12 +17,12 @@ import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 import { 
-  useHeroTextAnimation, 
-  useScrollTriggerAnimation, 
-  useCardStaggerAnimation, 
+  useHeroAnimation, 
+  useScrollAnimation, 
+  useCardStagger, 
   useStatsCounter, 
   useStatsInView 
-} from '../hooks/useNewAnimations';
+} from '../hooks/useSimpleAnimations';
 
 // Stat item with count-up animation - MUST visibly count from 0
 const StatItem = ({ stat, isInView, numberColor, textColor }) => {
@@ -64,9 +64,9 @@ const HomePage = () => {
   const { colors } = useTheme();
   
   // Hero text animations using hooks - wait for image load
-  const [heroRef, setHeroImageLoaded] = useHeroTextAnimation(0, true);
-  const [heroRef2] = useHeroTextAnimation(1, true);
-  const [heroRef3] = useHeroTextAnimation(2, true);
+  const [heroRef, setHeroImageLoaded] = useHeroAnimation(0, true);
+  const [heroRef2] = useHeroAnimation(1, true);
+  const [heroRef3] = useHeroAnimation(2, true);
   
   // Detect hero image load
   useEffect(() => {
@@ -88,28 +88,28 @@ const HomePage = () => {
   const [statsRef, statsInView] = useStatsInView();
   
   // Section animations - trigger on scroll
-  const featuresTitleRef = useScrollTriggerAnimation(0);
-  const featuresSubtitleRef = useScrollTriggerAnimation(1);
-  const featuresGridRef = useCardStaggerAnimation();
+  const featuresTitleRef = useScrollAnimation(0);
+  const featuresSubtitleRef = useScrollAnimation(1);
+  const featuresGridRef = useCardStagger();
   
-  const statsHeadingRef = useScrollTriggerAnimation(0);
-  const statsSubtitleRef = useScrollTriggerAnimation(1);
+  const statsHeadingRef = useScrollAnimation(0);
+  const statsSubtitleRef = useScrollAnimation(1);
   
-  const housesTitleRef = useScrollTriggerAnimation(0);
-  const housesSubtitleRef = useScrollTriggerAnimation(1);
-  const housesGridRef = useCardStaggerAnimation();
+  const housesTitleRef = useScrollAnimation(0);
+  const housesSubtitleRef = useScrollAnimation(1);
+  const housesGridRef = useCardStagger();
   
-  const locationsTitleRef = useScrollTriggerAnimation(0);
-  const locationsSubtitleRef = useScrollTriggerAnimation(1);
-  const locationsGridRef = useCardStaggerAnimation();
+  const locationsTitleRef = useScrollAnimation(0);
+  const locationsSubtitleRef = useScrollAnimation(1);
+  const locationsGridRef = useCardStagger();
   
-  const aboutHeadingRef = useScrollTriggerAnimation(0);
-  const aboutContentRef = useScrollTriggerAnimation(1);
+  const aboutHeadingRef = useScrollAnimation(0);
+  const aboutContentRef = useScrollAnimation(1);
   
   // CTA animations
-  const ctaTitleRef = useScrollTriggerAnimation(0);
-  const ctaTextRef = useScrollTriggerAnimation(1);
-  const ctaButtonsRef = useScrollTriggerAnimation(2);
+  const ctaTitleRef = useScrollAnimation(0);
+  const ctaTextRef = useScrollAnimation(1);
+  const ctaButtonsRef = useScrollAnimation(2);
 
   useEffect(() => {
     fetchData();

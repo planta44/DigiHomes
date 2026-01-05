@@ -30,7 +30,7 @@ export const useHeroAnimation = (index = 0, waitForImage = false) => {
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || !imageLoaded || !animationSettings.enabled) return;
+    if (!element || !imageLoaded || !animationSettings || animationSettings.enabled === false) return;
 
     const delay = animationSettings.delay + (index * animationSettings.delay);
     
@@ -54,7 +54,7 @@ export const useScrollAnimation = (index = 0) => {
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || !animationSettings.enabled) return;
+    if (!element || !animationSettings || animationSettings.enabled === false) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -90,7 +90,7 @@ export const useCardStagger = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !animationSettings.enabled) return;
+    if (!container || !animationSettings || animationSettings.enabled === false) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -159,7 +159,7 @@ export const useStatsCounter = (targetValue, isInView) => {
       animationRef.current = null;
     }
 
-    if (!animationSettings.enabled || !isInView) {
+    if (!animationSettings || animationSettings.enabled === false || !isInView) {
       setDisplayValue(targetValue);
       startTimeRef.current = null;
       return;

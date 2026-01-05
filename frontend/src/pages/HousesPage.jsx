@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
 import api from '../config/api';
-import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useSimpleAnimations';
 
 const HousesPage = () => {
   const [searchParams] = useSearchParams();
@@ -21,10 +21,10 @@ const HousesPage = () => {
   });
 
   // Hero text animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
   // Card animations
-  const cardsRef = useCardStaggerAnimation();
+  const cardsRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);

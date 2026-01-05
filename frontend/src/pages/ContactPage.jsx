@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
-import { useHeroTextAnimation } from '../hooks/useNewAnimations';
+import { useHeroAnimation } from '../hooks/useSimpleAnimations';
 
 const ContactPage = () => {
   // Hero text animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
   
   const [settings, setSettings] = useState({
     contact_page: {

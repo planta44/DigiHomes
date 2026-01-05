@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroTextAnimation, useCardStaggerAnimation, useScrollTriggerAnimation } from '../hooks/useNewAnimations';
+import { useHeroAnimation, useCardStagger, useScrollAnimation } from '../hooks/useSimpleAnimations';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -26,12 +26,12 @@ const BuyPage = () => {
   });
   const { colors } = useTheme();
   // Hero text animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
   // Content animation
-  const contentRef = useScrollTriggerAnimation(0);
+  const contentRef = useScrollAnimation(0);
   // Property cards animation
-  const cardsRef = useCardStaggerAnimation();
+  const cardsRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);

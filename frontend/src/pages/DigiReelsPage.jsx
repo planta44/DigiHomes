@@ -3,7 +3,7 @@ import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } 
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroTextAnimation } from '../hooks/useNewAnimations';
+import { useHeroAnimation } from '../hooks/useSimpleAnimations';
 
 const DigiReelsPage = () => {
   const [reels, setReels] = useState([]);
@@ -12,9 +12,9 @@ const DigiReelsPage = () => {
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
   // Hero text animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
-  const heroRef3 = useHeroTextAnimation(2);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
+  const heroRef3 = useHeroAnimation(2);
 
   useEffect(() => {
     window.scrollTo(0, 0);

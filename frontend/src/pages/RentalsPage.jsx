@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroTextAnimation, useCardStaggerAnimation } from '../hooks/useNewAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useSimpleAnimations';
 
 const RentalsPage = () => {
   const [properties, setProperties] = useState([]);
@@ -19,10 +19,10 @@ const RentalsPage = () => {
   const { colors } = useTheme();
   
   // Hero text animations
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
+  const heroRef = useHeroAnimation(0);
+  const heroRef2 = useHeroAnimation(1);
   // Card animations
-  const cardsRef = useCardStaggerAnimation();
+  const cardsRef = useCardStagger();
   
   const [filters, setFilters] = useState({
     search: '',
