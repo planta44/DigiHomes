@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
-import { useHeroAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -26,6 +26,7 @@ const ServicesPage = () => {
   const { colors } = useTheme();
   const heroRef = useHeroAnimation();
   const heroRef2 = useHeroAnimation();
+  const servicesRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -81,13 +82,13 @@ const ServicesPage = () => {
       {/* Services Sections */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div ref={servicesRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {content.sections?.map((section, index) => {
               const IconComponent = iconMap[section.icon] || Building;
               return (
                 <div 
                   key={section.title}
-                  data-card-item
+                  data-animate-card
                   className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow"
                 >
                   <div 
