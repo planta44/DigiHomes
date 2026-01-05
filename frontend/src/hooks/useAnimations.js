@@ -9,12 +9,19 @@ export const useHeroAnimation = () => {
     const element = ref.current;
     if (!element || !loaded || !settings.enabled) return;
 
+    // Apply animation duration dynamically
+    const duration = settings.heroDuration || 800;
+    element.style.setProperty('--hero-duration', `${duration}ms`);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          element.classList.add('animate-hero');
+          // Apply the correct animation class based on style setting
+          const animClass = `animate-${settings.heroStyle || 'slideUp'}`;
+          element.classList.add(animClass);
         } else {
-          element.classList.remove('animate-hero');
+          // Remove all possible animation classes when out of view
+          element.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
         }
       },
       { threshold: 0.2 }
@@ -22,7 +29,7 @@ export const useHeroAnimation = () => {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [loaded, settings.enabled]);
+  }, [loaded, settings.enabled, settings.heroStyle, settings.heroDuration]);
 
   return ref;
 };

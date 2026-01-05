@@ -58,6 +58,9 @@ const HomePage = () => {
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
+  const heroTitleRef = useHeroAnimation();
+  const heroDescRef = useHeroAnimation();
+  const heroButtonsRef = useHeroAnimation();
 
   useEffect(() => {
     fetchData();
@@ -243,14 +246,14 @@ const HomePage = () => {
         <div className="hero-content-wrapper absolute left-0 right-0 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
+              <h1 ref={heroTitleRef} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
                 {heroContent.title}{' '}
                 <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
               </h1>
-              <p className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
+              <p ref={heroDescRef} className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
                 {heroContent.description}
               </p>
-              <div className="flex flex-wrap gap-4 justify-start">
+              <div ref={heroButtonsRef} className="flex flex-wrap gap-4 justify-start">
                 <Link 
                   to="/houses" 
                   className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"

@@ -1378,7 +1378,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="300"
-                        max="2000"
+                        max="5000"
                         step="100"
                         value={settings.animation_settings.heroDuration || 800}
                         onChange={(e) => setSettings(prev => ({
@@ -1387,7 +1387,7 @@ const SiteSettings = () => {
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">How long the animation takes</p>
+                      <p className="text-xs text-gray-500 mt-1">How long the animation takes (300ms - 5000ms)</p>
                     </div>
                   </div>
                 </div>
