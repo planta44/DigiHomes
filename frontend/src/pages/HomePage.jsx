@@ -63,31 +63,53 @@ const HomePage = () => {
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
   
-  // Hero text animations using hooks
-  const heroRef = useHeroTextAnimation(0);
-  const heroRef2 = useHeroTextAnimation(1);
-  const heroRef3 = useHeroTextAnimation(2);
+  // Hero text animations using hooks - wait for image load
+  const [heroRef, setHeroImageLoaded] = useHeroTextAnimation(0, true);
+  const [heroRef2] = useHeroTextAnimation(1, true);
+  const [heroRef3] = useHeroTextAnimation(2, true);
+  
+  // Detect hero image load
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    
+    const heroImage = settings?.hero_content?.backgroundImage || '';
+    if (!heroImage) {
+      setHeroImageLoaded(true);
+      return;
+    }
+    
+    const img = new Image();
+    img.onload = () => setHeroImageLoaded(true);
+    img.onerror = () => setHeroImageLoaded(true);
+    img.src = heroImage;
+  }, [settingsLoaded, settings?.hero_content?.backgroundImage, setHeroImageLoaded]);
   
   // Stats section - MUST count from 0 when visible
   const [statsRef, statsInView] = useStatsInView();
   
   // Section animations - trigger on scroll
-  const featuresRef = useScrollTriggerAnimation(0);
+  const featuresTitleRef = useScrollTriggerAnimation(0);
+  const featuresSubtitleRef = useScrollTriggerAnimation(1);
   const featuresGridRef = useCardStaggerAnimation();
-  const housesRef = useScrollTriggerAnimation(0);
-  const housesGridRef = useCardStaggerAnimation();
-  const locationsRef = useScrollTriggerAnimation(0);
-  const locationsGridRef = useCardStaggerAnimation();
-  const aboutRef = useScrollTriggerAnimation(0);
   
-  // About section heading
+  const statsHeadingRef = useScrollTriggerAnimation(0);
+  const statsSubtitleRef = useScrollTriggerAnimation(1);
+  
+  const housesTitleRef = useScrollTriggerAnimation(0);
+  const housesSubtitleRef = useScrollTriggerAnimation(1);
+  const housesGridRef = useCardStaggerAnimation();
+  
+  const locationsTitleRef = useScrollTriggerAnimation(0);
+  const locationsSubtitleRef = useScrollTriggerAnimation(1);
+  const locationsGridRef = useCardStaggerAnimation();
+  
   const aboutHeadingRef = useScrollTriggerAnimation(0);
   const aboutContentRef = useScrollTriggerAnimation(1);
   
   // CTA animations
-  const ctaRef = useScrollTriggerAnimation(0);
-  const ctaRef2 = useScrollTriggerAnimation(1);
-  const ctaRef3 = useScrollTriggerAnimation(2);
+  const ctaTitleRef = useScrollTriggerAnimation(0);
+  const ctaTextRef = useScrollTriggerAnimation(1);
+  const ctaButtonsRef = useScrollTriggerAnimation(2);
 
   useEffect(() => {
     fetchData();
@@ -318,14 +340,11 @@ const HomePage = () => {
       {/* Features Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
-            ref={featuresRef}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-12">
+            <h2 ref={featuresTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-left md:text-center">
+            <p ref={featuresSubtitleRef} className="text-gray-600 max-w-2xl mx-auto text-left md:text-center">
               {featuresSection.subtitle}
             </p>
           </div>
@@ -353,8 +372,8 @@ const HomePage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {statsSection.title && (
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
-                {statsSection.subtitle && <p className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
+                <h2 ref={statsHeadingRef} className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
+                {statsSection.subtitle && <p ref={statsSubtitleRef} className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
               </div>
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -369,15 +388,12 @@ const HomePage = () => {
       {/* Featured Houses */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
-            ref={housesRef}
-            className="flex flex-col md:flex-row md:items-end justify-between mb-10"
-          >
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              <h2 ref={housesTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                 {housesSection.title}
               </h2>
-              <p className="text-gray-600">
+              <p ref={housesSubtitleRef} className="text-gray-600">
                 {housesSection.subtitle}
               </p>
             </div>
@@ -416,14 +432,11 @@ const HomePage = () => {
       {/* Locations Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
-            ref={locationsRef}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-12">
+            <h2 ref={locationsTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p ref={locationsSubtitleRef} className="text-gray-600 max-w-2xl mx-auto">
               {locationsSection.subtitle}
             </p>
           </div>
@@ -554,14 +567,14 @@ const HomePage = () => {
       {/* CTA Section */}
       <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 ref={ctaRef} className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 ref={ctaTitleRef} className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Find Your New Home?
           </h2>
-          <p ref={ctaRef2} className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
+          <p ref={ctaTextRef} className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div ref={ctaRef3} className="flex flex-wrap justify-center gap-4">
+          <div ref={ctaButtonsRef} className="flex flex-wrap justify-center gap-4">
             <Link 
               to="/houses" 
               className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"

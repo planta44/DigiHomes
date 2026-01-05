@@ -16,37 +16,35 @@ import AnimationContext from '../context/AnimationContext';
  * - Animates hero text on page load after settings load
  * - Respects delay and stagger from admin settings
  * - Re-animates on scroll back to top
+ * - Can wait for image load before animating
  */
-export const useHeroTextAnimation = (elementIndex = 0) => {
+export const useHeroTextAnimation = (elementIndex = 0, waitForImageLoad = false) => {
   const ref = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(!waitForImageLoad);
 
-  // Animate on mount after settings load
+  // Animate on mount after settings load AND image load (if required)
   useLayoutEffect(() => {
     const element = ref.current;
-    if (!element || !loaded) {
-      console.log(`🎬 Hero text ${elementIndex} waiting... loaded:`, loaded);
+    if (!element || !loaded || !imageLoaded) {
       return;
     }
     
     if (!settings.enabled) {
-      console.log('🎬 Animations disabled globally');
       return;
     }
 
     const delay = settings.heroTextDelay + (elementIndex * settings.heroTextStagger);
-    console.log(`🎬 Hero text ${elementIndex} will animate in ${delay}ms with style: ${settings.heroAnimationStyle}`);
     
     const timer = setTimeout(() => {
       const className = `animate-${settings.heroAnimationStyle}`;
       element.classList.add(className);
       setHasAnimated(true);
-      console.log(`✅ Hero text ${elementIndex} animated with class: ${className}`);
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [loaded, settings.enabled, settings.heroAnimationStyle, settings.heroTextDelay, settings.heroTextStagger, elementIndex]);
+  }, [loaded, imageLoaded, settings.enabled, settings.heroAnimationStyle, settings.heroTextDelay, settings.heroTextStagger, elementIndex]);
 
   // Re-animate on scroll back to top - NEVER disconnect observer
   useEffect(() => {
@@ -76,7 +74,7 @@ export const useHeroTextAnimation = (elementIndex = 0) => {
     return () => observer.disconnect();
   }, [loaded, settings.enabled, settings.heroAnimationStyle, settings.heroTextDelay, settings.heroTextStagger, elementIndex, hasAnimated]);
 
-  return ref;
+  return waitForImageLoad ? [ref, setImageLoaded] : ref;
 };
 
 /**
