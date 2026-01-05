@@ -1533,7 +1533,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="50"
-                        max="500"
+                        max="1000"
                         step="25"
                         value={settings.animation_settings.cardStaggerMobile || 100}
                         onChange={(e) => setSettings(prev => ({

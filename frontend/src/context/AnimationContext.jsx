@@ -8,7 +8,13 @@ export const AnimationProvider = ({ children }) => {
     enabled: true,
     heroStyle: 'slideUp',
     heroDuration: 800,
-    statsCountDuration: 2000
+    statsCountDuration: 2000,
+    cardStyle: 'slideUp',
+    cardDuration: 600,
+    cardStagger: 150,
+    cardStyleMobile: 'slideUp',
+    cardDurationMobile: 400,
+    cardStaggerMobile: 100
   });
   const [loaded, setLoaded] = useState(false);
 
