@@ -1,4 +1,4 @@
-import { useRef, useEffect, useContext, useState } from 'react';
+import { useRef, useEffect, useContext, useState, useCallback } from 'react';
 import { AnimationContext } from '../context/AnimationContext';
 
 export const useHeroAnimation = () => {
@@ -114,13 +114,19 @@ export const useStatsInView = () => {
 
 // Hook for staggered card animations
 export const useCardStagger = () => {
-  const containerRef = useRef(null);
+  const [container, setContainer] = useState(null);
   const { settings, loaded } = useContext(AnimationContext);
   const animatedCardsRef = useRef(new Set());
   const observerRef = useRef(null);
 
+  // Callback ref to detect when container is attached
+  const containerRef = useCallback((node) => {
+    if (node) {
+      setContainer(node);
+    }
+  }, []);
+
   useEffect(() => {
-    const container = containerRef.current;
     if (!container || !loaded) return;
 
     // Detect if mobile
@@ -236,19 +242,25 @@ export const useCardStagger = () => {
       mutationObserver.disconnect();
       animatedCardsRef.current.clear();
     };
-  }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
+  }, [container, loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;
 };
 
 // Hook for line-by-line animations (About Us section)
 export const useLineByLine = () => {
-  const containerRef = useRef(null);
+  const [container, setContainer] = useState(null);
   const { settings, loaded } = useContext(AnimationContext);
   const observerRef = useRef(null);
 
+  // Callback ref to detect when container is attached
+  const containerRef = useCallback((node) => {
+    if (node) {
+      setContainer(node);
+    }
+  }, []);
+
   useEffect(() => {
-    const container = containerRef.current;
     if (!container || !loaded) return;
 
     // Detect if mobile
@@ -329,7 +341,7 @@ export const useLineByLine = () => {
       }
       mutationObserver.disconnect();
     };
-  }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
+  }, [container, loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;
 };
