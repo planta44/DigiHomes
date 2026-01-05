@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
+import { useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 
 const ContactPage = () => {
@@ -21,6 +22,8 @@ const ContactPage = () => {
   });
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
+  const heroRef = useHeroAnimation();
+  const heroRef2 = useHeroAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,8 +62,8 @@ const ContactPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{contact_page.title}</h1>
-          <p className="text-white/80 max-w-2xl mx-auto text-lg">
+          <h1 ref={heroRef} className="text-4xl md:text-5xl font-bold mb-4">{contact_page.title}</h1>
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto text-lg">
             {contact_page.subtitle}
           </p>
         </div>

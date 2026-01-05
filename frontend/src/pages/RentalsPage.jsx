@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, MapPin, Home, Building, BedDouble, Bath, Grid, List, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
+import { useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -16,6 +17,8 @@ const RentalsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCards, setVisibleCards] = useState([]);
   const { colors } = useTheme();
+  const heroRef = useHeroAnimation();
+  const heroRef2 = useHeroAnimation();
   
   const [filters, setFilters] = useState({
     search: '',
@@ -153,11 +156,11 @@ const RentalsPage = () => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 className={`text-4xl md:text-5xl font-bold text-white mb-4`}>
+            <h1 ref={heroRef} className={`text-4xl md:text-5xl font-bold text-white mb-4`}>
               Find Your Perfect Rental
             </h1>
           </div>
-          <p className="text-white/80 max-w-2xl mx-auto">
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
             Discover quality rental properties in Nakuru and Nyahururu
           </p>
           

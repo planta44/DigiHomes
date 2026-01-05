@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AnimationProvider } from './context/AnimationContext';
 
 // Public Pages
 import HomePage from './pages/HomePage';
@@ -30,12 +31,13 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Router
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
+        <AnimationProvider>
+          <Router
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
             <Toaster 
               position="top-right"
               toastOptions={{
@@ -100,7 +102,8 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
-        </Router>
+          </Router>
+        </AnimationProvider>
       </ThemeProvider>
     </AuthProvider>
   );

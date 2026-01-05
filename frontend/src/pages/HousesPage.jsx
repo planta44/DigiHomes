@@ -4,6 +4,7 @@ import { Building } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
+import { useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 
 const HousesPage = () => {

@@ -14,15 +14,19 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
+import { useStatsCounter, useStatsInView, useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
-// Stat item
+// Stat item with counter animation
 const StatItem = ({ stat, numberColor, textColor }) => {
+  const [ref, isInView] = useStatsInView();
+  const displayValue = useStatsCounter(stat.value, isInView);
+  
   return (
-    <div className="text-center">
+    <div ref={ref} className="text-center">
       <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>
-        {stat.value}
+        {displayValue}
       </div>
       <div className="text-sm md:text-base font-medium uppercase tracking-wider" style={{ color: textColor || '#9ca3af' }}>
         {stat.label}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
+import { useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -10,6 +11,8 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
+  const heroRef = useHeroAnimation();
+  const heroRef2 = useHeroAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -90,10 +93,10 @@ const DigiReelsPage = () => {
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Digi Reels
           </h1>
-          <p className={`text-xl text-white/80 max-w-2xl mx-auto`}>
+          <p ref={heroRef2} className={`text-xl text-white/80 max-w-2xl mx-auto`}>
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>

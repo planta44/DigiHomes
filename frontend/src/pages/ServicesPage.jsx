@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
+import { useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -23,6 +24,8 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
+  const heroRef = useHeroAnimation();
+  const heroRef2 = useHeroAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,12 +62,14 @@ const ServicesPage = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <h1 
+              ref={heroRef}
               className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6`}
             >
               {content.hero.title}
             </h1>
           </div>
           <p 
+            ref={heroRef2}
             className="text-white/80 max-w-2xl mx-auto"
             style={{ color: colors[100] }}
           >

@@ -137,5 +137,36 @@ module.exports = {
   deleteLocation,
   getHouseTypes,
   addHouseType,
-  deleteHouseType
+  deleteHouseType,
+  getAnimationSettings: async (req, res) => {
+    try {
+      const result = await db.query(
+        "SELECT setting_value FROM site_settings WHERE setting_key = 'animation_settings'"
+      );
+      if (result.rows.length === 0) {
+        return res.json({ enabled: true, heroStyle: 'slideUp', heroDuration: 800, statsCountDuration: 2000 });
+      }
+      res.json(result.rows[0].setting_value);
+    } catch (error) {
+      console.error('Get animation settings error:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  },
+  updateAnimationSettings: async (req, res) => {
+    try {
+      const value = req.body;
+      const result = await db.query(
+        `INSERT INTO site_settings (setting_key, setting_value, updated_at) 
+         VALUES ('animation_settings', $1, CURRENT_TIMESTAMP)
+         ON CONFLICT (setting_key) 
+         DO UPDATE SET setting_value = $1, updated_at = CURRENT_TIMESTAMP
+         RETURNING *`,
+        [JSON.stringify(value)]
+      );
+      res.json(result.rows[0].setting_value);
+    } catch (error) {
+      console.error('Update animation settings error:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
 };

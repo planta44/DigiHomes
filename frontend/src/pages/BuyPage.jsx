@@ -3,6 +3,7 @@ import { Search, MapPin, Home, Building, ArrowRight, DollarSign, Ruler, ChevronD
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
+import { useHeroAnimation } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -24,6 +25,8 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
+  const heroRef = useHeroAnimation();
+  const heroRef2 = useHeroAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -88,11 +91,11 @@ const BuyPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
+            <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold">
               {content.hero.title}
             </h1>
           </div>
-          <p className="text-white/80 max-w-2xl mx-auto">
+          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
             {content.hero.subtitle}
           </p>
         </div>
