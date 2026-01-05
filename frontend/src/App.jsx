@@ -30,13 +30,12 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <SimpleAnimationProvider>
-          <Router
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true
-            }}
-          >
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
             <Toaster 
               position="top-right"
               toastOptions={{
