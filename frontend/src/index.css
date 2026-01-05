@@ -108,15 +108,22 @@
   
   /* Hero text animations with dynamic duration */
   .animate-slideUp {
-    animation: slideUp var(--hero-duration, 800ms) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideUp var(--hero-duration, var(--card-duration, 800ms)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
   .animate-fadeIn {
-    animation: fadeIn var(--hero-duration, 800ms) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeIn var(--hero-duration, var(--card-duration, 800ms)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
   .animate-slideInLeft {
-    animation: slideInLeft var(--hero-duration, 800ms) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideInLeft var(--hero-duration, var(--card-duration, 800ms)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  /* Initial state for animated cards and lines */
+  [data-animate-card],
+  [data-animate-line] {
+    opacity: 0;
+    transform: translateY(20px);
   }
   
   @keyframes slideUp {

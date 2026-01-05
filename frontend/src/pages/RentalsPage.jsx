@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, MapPin, Home, Building, BedDouble, Bath, Grid, List, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
-import { useHeroAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -19,6 +19,7 @@ const RentalsPage = () => {
   const { colors } = useTheme();
   const heroRef = useHeroAnimation();
   const heroRef2 = useHeroAnimation();
+  const propertiesGridRef = useCardStagger();
   
   const [filters, setFilters] = useState({
     search: '',
@@ -325,13 +326,14 @@ const RentalsPage = () => {
         {/* Properties Grid/List */}
         {filteredProperties.length > 0 ? (
           <div 
+            ref={propertiesGridRef}
             className={viewMode === 'grid' 
               ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' 
               : 'flex flex-col gap-4'
             }
           >
             {filteredProperties.map((property, index) => (
-              <div key={property.id} data-card-item>
+              <div key={property.id} data-animate-card>
                 <HouseCard house={property} />
               </div>
             ))}

@@ -3,7 +3,7 @@ import { Search, MapPin, Home, Building, ArrowRight, DollarSign, Ruler, ChevronD
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
-import { useHeroAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -27,6 +27,7 @@ const BuyPage = () => {
   const { colors } = useTheme();
   const heroRef = useHeroAnimation();
   const heroRef2 = useHeroAnimation();
+  const propertiesGridRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -276,11 +277,11 @@ const BuyPage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : filteredProperties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div ref={propertiesGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProperties.map((property, index) => (
                 <div
                   key={property.id}
-                  data-card-item
+                  data-animate-card
                 >
                   <HouseCard house={property} />
                 </div>

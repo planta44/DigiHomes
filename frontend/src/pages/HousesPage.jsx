@@ -4,7 +4,7 @@ import { Building } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import HouseFilters from '../components/HouseFilters';
-import { useHeroAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 import api from '../config/api';
 
 const HousesPage = () => {
@@ -112,11 +112,11 @@ const HousesPage = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
           </div>
         ) : houses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div ref={housesGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {houses.map((house, index) => (
               <div
                 key={house.id}
-                data-card-item
+                data-animate-card
               >
                 <HouseCard house={house} />
               </div>

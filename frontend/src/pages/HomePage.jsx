@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
-import { useStatsCounter, useStatsInView, useHeroAnimation } from '../hooks/useAnimations';
+import { useStatsCounter, useStatsInView, useHeroAnimation, useCardStagger, useLineByLine } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -61,6 +61,11 @@ const HomePage = () => {
   const heroTitleRef = useHeroAnimation();
   const heroDescRef = useHeroAnimation();
   const heroButtonsRef = useHeroAnimation();
+  const featuresRef = useCardStagger();
+  const housesRef = useCardStagger();
+  const locationsRef = useCardStagger();
+  const aboutDesktopRef = useLineByLine();
+  const aboutMobileRef = useLineByLine();
 
   useEffect(() => {
     fetchData();
@@ -300,11 +305,11 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div ref={featuresRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <div 
                 key={index}
-                data-card-item
+                data-animate-card
               >
                 <FeatureCard feature={feature} />
               </div>
@@ -361,11 +366,11 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : featuredHouses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div ref={housesRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredHouses.map((house, index) => (
                 <div 
                   key={house.id}
-                  data-card-item
+                  data-animate-card
                 >
                   <HouseCard house={house} />
                 </div>
@@ -391,7 +396,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div ref={locationsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(locationsSection.locations || []).map((loc, index) => {
               const imageUrl = loc.image?.startsWith('http') 
                 ? loc.image 
@@ -401,7 +406,7 @@ const HomePage = () => {
               return (
               <div 
                 key={loc.name || index}
-                data-card-item
+                data-animate-card
                 className="relative rounded-2xl overflow-hidden group h-64"
               >
                 <img 
@@ -479,9 +484,9 @@ const HomePage = () => {
                   )}
                   {/* Desktop Content */}
                   {aboutSection.content && (
-                    <div className="space-y-4 hidden md:block">
+                    <div ref={aboutDesktopRef} className="space-y-4 hidden md:block">
                       {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
-                        <p key={index} className="text-gray-600 text-lg leading-relaxed">
+                        <p key={index} data-animate-line className="text-gray-600 text-lg leading-relaxed">
                           {line}
                         </p>
                       ))}
@@ -489,9 +494,9 @@ const HomePage = () => {
                   )}
                   {/* Mobile Content - fallback to desktop if not set */}
                   {(aboutSection.contentMobile || aboutSection.content) && (
-                    <div className="space-y-4 md:hidden">
+                    <div ref={aboutMobileRef} className="space-y-4 md:hidden">
                       {(aboutSection.contentMobile || aboutSection.content).split('\n').filter(line => line.trim()).map((line, index) => (
-                        <p key={index} className="text-gray-600 text-lg leading-relaxed">
+                        <p key={index} data-animate-line className="text-gray-600 text-lg leading-relaxed">
                           {line}
                         </p>
                       ))}

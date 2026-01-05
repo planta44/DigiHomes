@@ -111,3 +111,90 @@ export const useStatsInView = () => {
 
   return [ref, isInView];
 };
+
+// Hook for staggered card animations
+export const useCardStagger = () => {
+  const containerRef = useRef(null);
+  const { settings, loaded } = useContext(AnimationContext);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !loaded || !settings.enabled) return;
+
+    const cards = container.querySelectorAll('[data-animate-card]');
+    if (cards.length === 0) return;
+
+    const animClass = `animate-${settings.cardStyle || 'slideUp'}`;
+    const duration = settings.cardDuration || 600;
+    const stagger = settings.cardStagger || 150;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          cards.forEach((card, index) => {
+            // Set duration for each card
+            card.style.setProperty('--card-duration', `${duration}ms`);
+            
+            // Apply animation with stagger delay
+            setTimeout(() => {
+              card.classList.add(animClass);
+            }, index * stagger);
+          });
+        } else {
+          // Remove animations when out of view
+          cards.forEach(card => {
+            card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+          });
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [loaded, settings.enabled, settings.cardStyle, settings.cardDuration, settings.cardStagger]);
+
+  return containerRef;
+};
+
+// Hook for line-by-line animations (About Us section)
+export const useLineByLine = () => {
+  const containerRef = useRef(null);
+  const { settings, loaded } = useContext(AnimationContext);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !loaded || !settings.enabled) return;
+
+    const lines = container.querySelectorAll('[data-animate-line]');
+    if (lines.length === 0) return;
+
+    const animClass = `animate-${settings.cardStyle || 'slideUp'}`;
+    const duration = settings.cardDuration || 600;
+    const stagger = settings.cardStagger || 150;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          lines.forEach((line, index) => {
+            line.style.setProperty('--card-duration', `${duration}ms`);
+            
+            setTimeout(() => {
+              line.classList.add(animClass);
+            }, index * stagger);
+          });
+        } else {
+          lines.forEach(line => {
+            line.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+          });
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [loaded, settings.enabled, settings.cardStyle, settings.cardDuration, settings.cardStagger]);
+
+  return containerRef;
+};

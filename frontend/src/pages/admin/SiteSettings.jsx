@@ -84,7 +84,7 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { enabled: true, heroStyle: 'slideUp', heroDuration: 800, statsCountDuration: 2000 },
+    animation_settings: { enabled: true, heroStyle: 'slideUp', heroDuration: 800, statsCountDuration: 2000, cardStyle: 'slideUp', cardDuration: 600, cardStagger: 150 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
@@ -1415,6 +1415,72 @@ const SiteSettings = () => {
                   </div>
                 </div>
 
+                {/* Card Stagger Animation Settings */}
+                <div className="border-b pb-4">
+                  <h4 className="font-medium text-gray-800 mb-4">Card & Section Animations</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Controls how cards appear one after another (properties, features, locations, About Us)
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg bg-purple-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Card Animation Style
+                      </label>
+                      <select
+                        value={settings.animation_settings.cardStyle || 'slideUp'}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardStyle: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="slideUp">Slide Up</option>
+                        <option value="fadeIn">Fade In</option>
+                        <option value="slideInLeft">Slide In from Left</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">How each card appears</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-purple-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Card Duration: {settings.animation_settings.cardDuration || 600}ms
+                      </label>
+                      <input
+                        type="range"
+                        min="200"
+                        max="2000"
+                        step="50"
+                        value={settings.animation_settings.cardDuration || 600}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardDuration: parseInt(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">How long each card animation takes</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg bg-purple-50">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Stagger Delay: {settings.animation_settings.cardStagger || 150}ms
+                      </label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="500"
+                        step="25"
+                        value={settings.animation_settings.cardStagger || 150}
+                        onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          animation_settings: { ...prev.animation_settings, cardStagger: parseInt(e.target.value) }
+                        }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Delay between each card (faster = lower)</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
                     <HelpCircle className="w-4 h-4" /> How it works
@@ -1422,8 +1488,9 @@ const SiteSettings = () => {
                   <ul className="text-sm text-blue-700 space-y-1">
                     <li>• Hero text pops from below every time you scroll to a page</li>
                     <li>• Stats count from 0 to their value each time they come into view</li>
-                    <li>• Animations repeat whenever sections scroll into view</li>
-                    <li>• Works on: Houses, Services, Buy, Rent, Reels, Contact pages</li>
+                    <li>• Cards appear one after another with stagger delay</li>
+                    <li>• All animations repeat whenever sections scroll into view</li>
+                    <li>• Works on: Properties, Features, Locations, About Us sections</li>
                   </ul>
                 </div>
 
