@@ -17,9 +17,9 @@ const RentalsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCards, setVisibleCards] = useState([]);
   const { colors } = useTheme();
-  const heroRef = useHeroAnimation();
-  const heroRef2 = useHeroAnimation();
-  const propertiesGridRef = useCardStagger();
+  const heroTitleRef = useHeroAnimation();
+  const heroDescRef = useHeroAnimation();
+  const propertiesGridRef = useCardStagger('properties');
   
   const [filters, setFilters] = useState({
     search: '',

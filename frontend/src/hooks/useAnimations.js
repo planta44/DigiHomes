@@ -112,8 +112,8 @@ export const useStatsInView = () => {
   return [ref, isInView];
 };
 
-// Hook for staggered card animations
-export const useCardStagger = () => {
+// Hook for staggered card animations with section-specific settings
+export const useCardStagger = (sectionName = 'properties') => {
   const [container, setContainer] = useState(null);
   const { settings, loaded } = useContext(AnimationContext);
   const animatedCardsRef = useRef(new Set());
@@ -129,18 +129,22 @@ export const useCardStagger = () => {
   useEffect(() => {
     if (!container || !loaded) return;
 
+    // Get section-specific settings or fall back to global
+    const sectionSettings = settings.sections?.[sectionName] || {};
+    const isEnabled = sectionSettings.enabled !== undefined ? sectionSettings.enabled : settings.enabled;
+
     // Detect if mobile
     const isMobile = window.innerWidth < 768;
-    const animClass = `animate-${isMobile ? (settings.cardStyleMobile || settings.cardStyle || 'slideUp') : (settings.cardStyle || 'slideUp')}`;
-    const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
-    const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 100) : (settings.cardStagger || 150);
+    const animClass = `animate-${isMobile ? (sectionSettings.styleMobile || sectionSettings.style || 'slideUp') : (sectionSettings.style || 'slideUp')}`;
+    const duration = isMobile ? (sectionSettings.durationMobile || sectionSettings.duration || 600) : (sectionSettings.duration || 600);
+    const stagger = isMobile ? (sectionSettings.staggerMobile || sectionSettings.stagger || 100) : (sectionSettings.stagger || 150);
 
     const setupCards = () => {
       const cards = container.querySelectorAll('[data-animate-card]');
       if (cards.length === 0) return;
 
       // If animations disabled, ensure cards are visible
-      if (!settings.enabled) {
+      if (!isEnabled) {
         cards.forEach(card => {
           card.style.opacity = '1';
           card.style.transform = 'none';
@@ -242,13 +246,13 @@ export const useCardStagger = () => {
       mutationObserver.disconnect();
       animatedCardsRef.current.clear();
     };
-  }, [container, loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
+  }, [container, loaded, settings.enabled, settings.sections, sectionName]);
 
   return containerRef;
 };
 
-// Hook for line-by-line animations (About Us section)
-export const useLineByLine = () => {
+// Hook for line-by-line animations with section-specific settings
+export const useLineByLine = (sectionName = 'about') => {
   const [container, setContainer] = useState(null);
   const { settings, loaded } = useContext(AnimationContext);
   const observerRef = useRef(null);
@@ -263,18 +267,22 @@ export const useLineByLine = () => {
   useEffect(() => {
     if (!container || !loaded) return;
 
+    // Get section-specific settings or fall back to global
+    const sectionSettings = settings.sections?.[sectionName] || {};
+    const isEnabled = sectionSettings.enabled !== undefined ? sectionSettings.enabled : settings.enabled;
+
     // Detect if mobile
     const isMobile = window.innerWidth < 768;
-    const animClass = `animate-${isMobile ? (settings.cardStyleMobile || settings.cardStyle || 'slideUp') : (settings.cardStyle || 'slideUp')}`;
-    const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
-    const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 150) : (settings.cardStagger || 150);
+    const animClass = `animate-${isMobile ? (sectionSettings.styleMobile || sectionSettings.style || 'slideUp') : (sectionSettings.style || 'slideUp')}`;
+    const duration = isMobile ? (sectionSettings.durationMobile || sectionSettings.duration || 600) : (sectionSettings.duration || 600);
+    const stagger = isMobile ? (sectionSettings.staggerMobile || sectionSettings.stagger || 150) : (sectionSettings.stagger || 150);
 
     const setupLines = () => {
       const lines = container.querySelectorAll('[data-animate-line]');
       if (lines.length === 0) return;
 
       // If animations disabled, ensure lines are visible
-      if (!settings.enabled) {
+      if (!isEnabled) {
         lines.forEach(line => {
           line.style.opacity = '1';
           line.style.transform = 'none';
@@ -341,7 +349,7 @@ export const useLineByLine = () => {
       }
       mutationObserver.disconnect();
     };
-  }, [container, loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
+  }, [container, loaded, settings.enabled, settings.sections, sectionName]);
 
   return containerRef;
 };

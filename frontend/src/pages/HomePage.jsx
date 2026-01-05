@@ -61,11 +61,11 @@ const HomePage = () => {
   const heroTitleRef = useHeroAnimation();
   const heroDescRef = useHeroAnimation();
   const heroButtonsRef = useHeroAnimation();
-  const featuresRef = useCardStagger();
-  const housesRef = useCardStagger();
-  const locationsRef = useCardStagger();
-  const aboutDesktopRef = useLineByLine();
-  const aboutMobileRef = useLineByLine();
+  const featuresRef = useCardStagger('features');
+  const housesRef = useCardStagger('houses');
+  const locationsRef = useCardStagger('locations');
+  const aboutDesktopRef = useLineByLine('about');
+  const aboutMobileRef = useLineByLine('about');
 
   useEffect(() => {
     fetchData();

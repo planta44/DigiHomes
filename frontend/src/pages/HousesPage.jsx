@@ -22,7 +22,7 @@ const HousesPage = () => {
 
   const heroTitleRef = useHeroAnimation();
   const heroDescRef = useHeroAnimation();
-  const housesGridRef = useCardStagger();
+  const housesGridRef = useCardStagger('properties');
 
   useEffect(() => {
     window.scrollTo(0, 0);

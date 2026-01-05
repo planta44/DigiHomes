@@ -24,9 +24,9 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  const heroRef = useHeroAnimation();
-  const heroRef2 = useHeroAnimation();
-  const servicesRef = useCardStagger();
+  const heroTitleRef = useHeroAnimation();
+  const heroDescRef = useHeroAnimation();
+  const servicesRef = useCardStagger('properties');
 
   useEffect(() => {
     window.scrollTo(0, 0);

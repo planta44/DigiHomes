@@ -25,7 +25,7 @@ const RentPage = () => {
   const { colors } = useTheme();
   const heroRef = useHeroAnimation();
   const heroRef2 = useHeroAnimation();
-  const housesRef = useCardStagger();
+  const housesRef = useCardStagger('properties');
 
   useEffect(() => {
     window.scrollTo(0, 0);

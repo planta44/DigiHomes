@@ -9,12 +9,54 @@ export const AnimationProvider = ({ children }) => {
     heroStyle: 'slideUp',
     heroDuration: 800,
     statsCountDuration: 2000,
-    cardStyle: 'slideUp',
-    cardDuration: 600,
-    cardStagger: 150,
-    cardStyleMobile: 'slideUp',
-    cardDurationMobile: 400,
-    cardStaggerMobile: 100
+    // Section-specific animation settings
+    sections: {
+      features: {
+        enabled: true,
+        style: 'slideUp',
+        duration: 600,
+        stagger: 150,
+        styleMobile: 'slideUp',
+        durationMobile: 400,
+        staggerMobile: 100
+      },
+      houses: {
+        enabled: true,
+        style: 'slideUp',
+        duration: 600,
+        stagger: 150,
+        styleMobile: 'slideUp',
+        durationMobile: 400,
+        staggerMobile: 100
+      },
+      locations: {
+        enabled: true,
+        style: 'slideUp',
+        duration: 600,
+        stagger: 150,
+        styleMobile: 'slideUp',
+        durationMobile: 400,
+        staggerMobile: 100
+      },
+      about: {
+        enabled: true,
+        style: 'slideUp',
+        duration: 600,
+        stagger: 150,
+        styleMobile: 'slideUp',
+        durationMobile: 400,
+        staggerMobile: 100
+      },
+      properties: {
+        enabled: true,
+        style: 'slideUp',
+        duration: 600,
+        stagger: 150,
+        styleMobile: 'slideUp',
+        durationMobile: 400,
+        staggerMobile: 100
+      }
+    }
   });
   const [loaded, setLoaded] = useState(false);
 

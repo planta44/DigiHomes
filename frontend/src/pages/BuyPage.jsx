@@ -25,9 +25,9 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  const heroRef = useHeroAnimation();
-  const heroRef2 = useHeroAnimation();
-  const propertiesGridRef = useCardStagger();
+  const heroTitleRef = useHeroAnimation();
+  const heroDescRef = useHeroAnimation();
+  const propertiesGridRef = useCardStagger('properties');
 
   useEffect(() => {
     window.scrollTo(0, 0);
