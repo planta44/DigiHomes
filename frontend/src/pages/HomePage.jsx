@@ -70,17 +70,26 @@ const HomePage = () => {
   
   // Detect hero image load
   useEffect(() => {
+    console.log('🖼️ Image load check:', { settingsLoaded, hasImage: !!settings?.hero_content?.backgroundImage });
     if (!settingsLoaded) return;
     
     const heroImage = settings?.hero_content?.backgroundImage || '';
     if (!heroImage) {
+      console.log('🖼️ No hero image, triggering animations immediately');
       setHeroImageLoaded(true);
       return;
     }
     
+    console.log('🖼️ Loading hero image:', heroImage);
     const img = new Image();
-    img.onload = () => setHeroImageLoaded(true);
-    img.onerror = () => setHeroImageLoaded(true);
+    img.onload = () => {
+      console.log('✅ Hero image loaded successfully');
+      setHeroImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.log('⚠️ Hero image failed to load, triggering animations anyway');
+      setHeroImageLoaded(true);
+    };
     img.src = heroImage;
   }, [settingsLoaded, settings?.hero_content?.backgroundImage, setHeroImageLoaded]);
   

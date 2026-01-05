@@ -107,54 +107,54 @@
   .animation-delay-500 { animation-delay: 500ms; }
 
   /* ===================================
-     BRAND NEW ANIMATION SYSTEM
-     Content is ALWAYS visible by default
-     Animations applied via JS classes only
+     SIMPLE ANIMATION SYSTEM
+     Content visible by default
+     Animations are visual effects only
      =================================== */
   
   /* Pop animation - rise from below */
   @keyframes popAnimation {
-    from {
+    0% {
       opacity: 0;
       transform: translateY(30px);
     }
-    to {
+    100% {
       opacity: 1;
       transform: translateY(0);
     }
   }
   
   .animate-pop {
-    animation: popAnimation 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: popAnimation 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   
   /* Fade animation - simple opacity fade */
   @keyframes fadeAnimation {
-    from {
+    0% {
       opacity: 0;
     }
-    to {
+    100% {
       opacity: 1;
     }
   }
   
   .animate-fade {
-    animation: fadeAnimation 0.5s ease-out forwards;
+    animation: fadeAnimation 0.5s ease-out both;
   }
   
   /* Slide animation - slide in from left */
   @keyframes slideAnimation {
-    from {
+    0% {
       opacity: 0;
       transform: translateX(-30px);
     }
-    to {
+    100% {
       opacity: 1;
       transform: translateX(0);
     }
   }
   
   .animate-slide {
-    animation: slideAnimation 0.5s ease-out forwards;
+    animation: slideAnimation 0.5s ease-out both;
   }
 }
