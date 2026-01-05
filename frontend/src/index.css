@@ -119,12 +119,7 @@
     animation: slideInLeft var(--hero-duration, var(--card-duration, 800ms)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
-  /* Initial state for animated cards and lines */
-  [data-animate-card],
-  [data-animate-line] {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+  /* Cards and lines are visible by default - animations will handle hiding/showing */
   
   @keyframes slideUp {
     from {

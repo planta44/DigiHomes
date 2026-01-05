@@ -119,31 +119,45 @@ export const useCardStagger = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !loaded || !settings.enabled) return;
+    if (!container || !loaded) return;
 
     const cards = container.querySelectorAll('[data-animate-card]');
     if (cards.length === 0) return;
+
+    // If animations disabled, ensure cards are visible
+    if (!settings.enabled) {
+      cards.forEach(card => {
+        card.style.opacity = '1';
+        card.style.transform = 'none';
+      });
+      return;
+    }
 
     const animClass = `animate-${settings.cardStyle || 'slideUp'}`;
     const duration = settings.cardDuration || 600;
     const stagger = settings.cardStagger || 150;
 
+    // Initially hide cards
+    cards.forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+    });
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           cards.forEach((card, index) => {
-            // Set duration for each card
             card.style.setProperty('--card-duration', `${duration}ms`);
             
-            // Apply animation with stagger delay
             setTimeout(() => {
               card.classList.add(animClass);
             }, index * stagger);
           });
         } else {
-          // Remove animations when out of view
           cards.forEach(card => {
             card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
           });
         }
       },
@@ -164,14 +178,29 @@ export const useLineByLine = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !loaded || !settings.enabled) return;
+    if (!container || !loaded) return;
 
     const lines = container.querySelectorAll('[data-animate-line]');
     if (lines.length === 0) return;
 
+    // If animations disabled, ensure lines are visible
+    if (!settings.enabled) {
+      lines.forEach(line => {
+        line.style.opacity = '1';
+        line.style.transform = 'none';
+      });
+      return;
+    }
+
     const animClass = `animate-${settings.cardStyle || 'slideUp'}`;
     const duration = settings.cardDuration || 600;
     const stagger = settings.cardStagger || 150;
+
+    // Initially hide lines
+    lines.forEach(line => {
+      line.style.opacity = '0';
+      line.style.transform = 'translateY(20px)';
+    });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -186,6 +215,8 @@ export const useLineByLine = () => {
         } else {
           lines.forEach(line => {
             line.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+            line.style.opacity = '0';
+            line.style.transform = 'translateY(20px)';
           });
         }
       },
