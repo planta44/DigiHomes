@@ -84,7 +84,6 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { enabled: true, style: 'pop', delay: 100 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
@@ -116,7 +115,6 @@ const SiteSettings = () => {
       setSettings(prev => ({
         ...prev,
         brand_settings: { ...prev.brand_settings, ...data.brand_settings },
-        animation_settings: { ...prev.animation_settings, ...data.animation_settings },
         features: data.features || prev.features,
         company_info: { ...prev.company_info, ...data.company_info },
         hero_content: { ...prev.hero_content, ...data.hero_content },
@@ -198,7 +196,6 @@ const SiteSettings = () => {
     { id: 'company', label: 'Company', icon: Building },
     { id: 'footer', label: 'Footer', icon: FileText },
     { id: 'contact', label: 'Contact', icon: Phone },
-    { id: 'animations', label: 'Animations', icon: Zap },
     { id: 'dropdown_options', label: 'Options', icon: MapPin }
   ];
 
@@ -1307,171 +1304,6 @@ const SiteSettings = () => {
 
                 <button onClick={() => handleSave('contact_page', settings.contact_page)} disabled={saving} className="btn-primary">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Contact Page
-                </button>
-              </div>
-            )}
-
-            {/* Animation Settings */}
-            {activeTab === 'animations' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Animation Settings</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Control animations across the website. Elements appear one by one when scrolled into view.
-                  </p>
-                </div>
-
-                {/* Master Controls */}
-                <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Master Controls</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 border rounded-lg bg-gray-50">
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.animation_settings.enabled !== false}
-                          onChange={(e) => setSettings(prev => ({
-                            ...prev,
-                            animation_settings: { ...prev.animation_settings, enabled: e.target.checked }
-                          }))}
-                          className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                        />
-                        <div>
-                          <span className="font-medium text-gray-900">Enable Animations</span>
-                          <p className="text-xs text-gray-500">Turn all scroll animations on/off</p>
-                        </div>
-                      </label>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* Hero Text Animations */}
-                <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Hero Section Text</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 border rounded-lg bg-blue-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Initial Delay: {settings.animation_settings.heroTextDelay || 400}ms
-                      </label>
-                      <input
-                        type="range"
-                        min="200"
-                        max="1500"
-                        step="100"
-                        value={settings.animation_settings.heroTextDelay || 400}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          animation_settings: { ...prev.animation_settings, heroTextDelay: parseInt(e.target.value) }
-                        }))}
-                        className="w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Wait before hero text appears on page load</p>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* Stats Counter */}
-                <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Stats Counter</h4>
-                  <div className="p-4 border rounded-lg bg-green-50">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Count Duration: {(settings.animation_settings.statsCountDuration || 2000) / 1000}s
-                    </label>
-                    <input
-                      type="range"
-                      min="1000"
-                      max="5000"
-                      step="250"
-                      value={settings.animation_settings.statsCountDuration || 2000}
-                      onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        animation_settings: { ...prev.animation_settings, statsCountDuration: parseInt(e.target.value) }
-                      }))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">How long stats numbers take to count up when scrolled into view</p>
-                  </div>
-                </div>
-
-                {/* Card & Section Animations */}
-                <div className="border-b pb-4">
-                  <h4 className="font-medium text-gray-800 mb-4">Cards & Sections</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 border rounded-lg bg-gray-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Base Delay: {settings.animation_settings.baseDelay || 150}ms
-                      </label>
-                      <input
-                        type="range"
-                        min="50"
-                        max="400"
-                        step="25"
-                        value={settings.animation_settings.baseDelay || 150}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          animation_settings: { ...prev.animation_settings, baseDelay: parseInt(e.target.value) }
-                        }))}
-                        className="w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Time between each item</p>
-                    </div>
-
-                    <div className="p-4 border rounded-lg bg-gray-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Card Stagger: {settings.animation_settings.cardStaggerMultiplier || 1}x
-                      </label>
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="3"
-                        step="0.1"
-                        value={settings.animation_settings.cardStaggerMultiplier || 1}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          animation_settings: { ...prev.animation_settings, cardStaggerMultiplier: parseFloat(e.target.value) }
-                        }))}
-                        className="w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Product card speed</p>
-                    </div>
-
-                    <div className="p-4 border rounded-lg bg-gray-50">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Section Stagger: {settings.animation_settings.sectionStaggerMultiplier || 1.5}x
-                      </label>
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="3"
-                        step="0.1"
-                        value={settings.animation_settings.sectionStaggerMultiplier || 1.5}
-                        onChange={(e) => setSettings(prev => ({
-                          ...prev,
-                          animation_settings: { ...prev.animation_settings, sectionStaggerMultiplier: parseFloat(e.target.value) }
-                        }))}
-                        className="w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Section heading speed</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
-                    <HelpCircle className="w-4 h-4" /> How it works
-                  </h4>
-                  <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• Elements appear one by one as you scroll down the page</li>
-                    <li>• Higher delay values = slower, more dramatic reveals</li>
-                    <li>• Works on all pages: Homepage, Houses, Services, Buy, Rent, Contact</li>
-                    <li>• Animations are purely visual - content always loads normally</li>
-                  </ul>
-                </div>
-
-                <button onClick={() => handleSave('animation_settings', settings.animation_settings)} disabled={saving} className="btn-primary">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Animation Settings
                 </button>
               </div>
             )}
