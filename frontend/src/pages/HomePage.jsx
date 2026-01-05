@@ -16,21 +16,13 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { 
-  useHeroAnimation, 
-  useScrollAnimation, 
-  useCardStagger, 
-  useStatsCounter, 
-  useStatsInView 
-} from '../hooks/useSimpleAnimations';
 
-// Stat item with count-up animation - MUST visibly count from 0
-const StatItem = ({ stat, isInView, numberColor, textColor }) => {
-  const animatedValue = useStatsCounter(stat.value, isInView);
+// Stat item
+const StatItem = ({ stat, numberColor, textColor }) => {
   return (
     <div className="text-center">
       <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2" style={{ color: numberColor || '#ffffff' }}>
-        {animatedValue}
+        {stat.value}
       </div>
       <div className="text-sm md:text-base font-medium uppercase tracking-wider" style={{ color: textColor || '#9ca3af' }}>
         {stat.label}
@@ -62,54 +54,6 @@ const HomePage = () => {
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [settings, setSettings] = useState(null);
   const { colors } = useTheme();
-  
-  // Hero text animations using hooks - wait for image load
-  const [heroRef, setHeroImageLoaded] = useHeroAnimation(0, true);
-  const [heroRef2] = useHeroAnimation(1, true);
-  const [heroRef3] = useHeroAnimation(2, true);
-  
-  // Detect hero image load
-  useEffect(() => {
-    if (!settingsLoaded) return;
-    
-    const heroImage = settings?.hero_content?.backgroundImage || '';
-    if (!heroImage) {
-      setHeroImageLoaded(true);
-      return;
-    }
-    
-    const img = new Image();
-    img.onload = () => setHeroImageLoaded(true);
-    img.onerror = () => setHeroImageLoaded(true);
-    img.src = heroImage;
-  }, [settingsLoaded, settings?.hero_content?.backgroundImage, setHeroImageLoaded]);
-  
-  // Stats section - MUST count from 0 when visible
-  const [statsRef, statsInView] = useStatsInView();
-  
-  // Section animations - trigger on scroll
-  const featuresTitleRef = useScrollAnimation(0);
-  const featuresSubtitleRef = useScrollAnimation(1);
-  const featuresGridRef = useCardStagger();
-  
-  const statsHeadingRef = useScrollAnimation(0);
-  const statsSubtitleRef = useScrollAnimation(1);
-  
-  const housesTitleRef = useScrollAnimation(0);
-  const housesSubtitleRef = useScrollAnimation(1);
-  const housesGridRef = useCardStagger();
-  
-  const locationsTitleRef = useScrollAnimation(0);
-  const locationsSubtitleRef = useScrollAnimation(1);
-  const locationsGridRef = useCardStagger();
-  
-  const aboutHeadingRef = useScrollAnimation(0);
-  const aboutContentRef = useScrollAnimation(1);
-  
-  // CTA animations
-  const ctaTitleRef = useScrollAnimation(0);
-  const ctaTextRef = useScrollAnimation(1);
-  const ctaButtonsRef = useScrollAnimation(2);
 
   useEffect(() => {
     fetchData();
@@ -263,7 +207,7 @@ const HomePage = () => {
       `}</style>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="hero-container relative text-white overflow-hidden">
+      <section className="hero-container relative text-white overflow-hidden">
         {/* Desktop Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center hidden md:block"
@@ -295,14 +239,14 @@ const HomePage = () => {
         <div className="hero-content-wrapper absolute left-0 right-0 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
-              <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-left">
                 {heroContent.title}{' '}
                 <span style={{ color: heroContent.highlightColor }}>{heroContent.highlight}</span>
               </h1>
-              <p ref={heroRef2} className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
+              <p className="text-lg md:text-xl mb-6 max-w-2xl text-left" style={{ color: heroContent.descriptionHighlightColor }}>
                 {heroContent.description}
               </p>
-              <div ref={heroRef3} className="flex flex-wrap gap-4 justify-start">
+              <div className="flex flex-wrap gap-4 justify-start">
                 <Link 
                   to="/houses" 
                   className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100"
@@ -341,15 +285,15 @@ const HomePage = () => {
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 ref={featuresTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {featuresSection.title}
             </h2>
-            <p ref={featuresSubtitleRef} className="text-gray-600 max-w-2xl mx-auto text-left md:text-center">
+            <p className="text-gray-600 max-w-2xl mx-auto text-left md:text-center">
               {featuresSection.subtitle}
             </p>
           </div>
 
-          <div ref={featuresGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <div 
                 key={index}
@@ -365,20 +309,19 @@ const HomePage = () => {
       {/* Stats Section - Count up animation - only render when settings loaded to prevent flash */}
       {settingsLoaded && (
         <section 
-          ref={statsRef}
           className="py-16 md:py-20 transition-opacity duration-300"
           style={{ backgroundColor: statsSection.backgroundColor || '#1f2937' }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {statsSection.title && (
               <div className="text-center mb-12">
-                <h2 ref={statsHeadingRef} className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
-                {statsSection.subtitle && <p ref={statsSubtitleRef} className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
+                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: statsSection.numberColor || '#ffffff' }}>{statsSection.title}</h2>
+                {statsSection.subtitle && <p className="max-w-2xl mx-auto" style={{ color: statsSection.textColor || '#9ca3af' }}>{statsSection.subtitle}</p>}
               </div>
             )}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
-                <StatItem key={index} stat={stat} isInView={statsInView} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
+                <StatItem key={index} stat={stat} numberColor={statsSection.numberColor} textColor={statsSection.textColor} />
               ))}
             </div>
           </div>
@@ -390,10 +333,10 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
-              <h2 ref={housesTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                 {housesSection.title}
               </h2>
-              <p ref={housesSubtitleRef} className="text-gray-600">
+              <p className="text-gray-600">
                 {housesSection.subtitle}
               </p>
             </div>
@@ -411,7 +354,7 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : featuredHouses.length > 0 ? (
-            <div ref={housesGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredHouses.map((house, index) => (
                 <div 
                   key={house.id}
@@ -433,15 +376,15 @@ const HomePage = () => {
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 ref={locationsTitleRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               {locationsSection.title}
             </h2>
-            <p ref={locationsSubtitleRef} className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl mx-auto">
               {locationsSection.subtitle}
             </p>
           </div>
 
-          <div ref={locationsGridRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(locationsSection.locations || []).map((loc, index) => {
               const imageUrl = loc.image?.startsWith('http') 
                 ? loc.image 
@@ -523,13 +466,13 @@ const HomePage = () => {
                     </span>
                   )}
                   {aboutSection.title && (
-                    <h2 ref={aboutHeadingRef} className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                       {aboutSection.title}
                     </h2>
                   )}
                   {/* Desktop Content */}
                   {aboutSection.content && (
-                    <div ref={aboutContentRef} className="space-y-4 hidden md:block">
+                    <div className="space-y-4 hidden md:block">
                       {aboutSection.content.split('\n').filter(line => line.trim()).map((line, index) => (
                         <p key={index} className="text-gray-600 text-lg leading-relaxed">
                           {line}
@@ -567,14 +510,14 @@ const HomePage = () => {
       {/* CTA Section */}
       <section className="py-16 md:py-24" style={{ backgroundColor: colors[600] }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 ref={ctaTitleRef} className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Find Your New Home?
           </h2>
-          <p ref={ctaTextRef} className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: colors[100] }}>
             Contact us today and let us help you find the perfect rental property 
             that fits your needs and budget.
           </p>
-          <div ref={ctaButtonsRef} className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link 
               to="/houses" 
               className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"

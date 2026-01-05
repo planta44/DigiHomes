@@ -3,7 +3,6 @@ import { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefc
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useCardStagger } from '../hooks/useSimpleAnimations';
 
 const iconMap = { Building, Home, Users, Shield, MapPin, Clock, Star, CheckCircle, Briefcase };
 
@@ -24,11 +23,6 @@ const ServicesPage = () => {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
-  // Hero text animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
-  // Service cards animation
-  const sectionsRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,7 +47,6 @@ const ServicesPage = () => {
     <PublicLayout>
       {/* Hero Section */}
       <section 
-        ref={heroRef}
         className="relative py-20 md:py-32 text-white overflow-hidden"
         style={{ background: `linear-gradient(to bottom right, ${colors[600]}, ${colors[700]}, ${colors[800]})` }}
       >
@@ -64,7 +57,7 @@ const ServicesPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <h1 
               className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6`}
             >
@@ -72,7 +65,7 @@ const ServicesPage = () => {
             </h1>
           </div>
           <p 
-            ref={heroRef2} className="text-white/80 max-w-2xl mx-auto"
+            className="text-white/80 max-w-2xl mx-auto"
             style={{ color: colors[100] }}
           >
             {content.hero.subtitle}
@@ -81,7 +74,7 @@ const ServicesPage = () => {
       </section>
 
       {/* Services Sections */}
-      <section ref={sectionsRef} className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {content.sections?.map((section, index) => {

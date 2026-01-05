@@ -2,12 +2,8 @@ import { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
-import { useHeroAnimation } from '../hooks/useSimpleAnimations';
 
 const ContactPage = () => {
-  // Hero text animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
   
   const [settings, setSettings] = useState({
     contact_page: {
@@ -50,7 +46,7 @@ const ContactPage = () => {
   return (
     <PublicLayout>
       {/* Hero Section with Background Image */}
-      <section ref={heroRef} className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
+      <section className="relative py-16 md:py-20 text-white overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
         {contact_page.backgroundImage ? (
           <>
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${contact_page.backgroundImage}')` }}></div>
@@ -63,8 +59,8 @@ const ContactPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 ref={heroRef} className="text-4xl md:text-5xl font-bold mb-4">{contact_page.title}</h1>
-          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto text-lg">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{contact_page.title}</h1>
+          <p className="text-white/80 max-w-2xl mx-auto text-lg">
             {contact_page.subtitle}
           </p>
         </div>

@@ -5,7 +5,6 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useCardStagger, useScrollAnimation } from '../hooks/useSimpleAnimations';
 
 const BuyPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -25,13 +24,6 @@ const BuyPage = () => {
     bedrooms: ''
   });
   const { colors } = useTheme();
-  // Hero text animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
-  // Content animation
-  const contentRef = useScrollAnimation(0);
-  // Property cards animation
-  const cardsRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -85,7 +77,6 @@ const BuyPage = () => {
     <PublicLayout>
       {/* Hero Section */}
       <section 
-        ref={heroRef}
         className="relative py-20 md:py-32 text-white overflow-hidden"
         style={{ background: `linear-gradient(to bottom right, ${colors[600]}, ${colors[700]}, ${colors[800]})` }}
       >
@@ -96,12 +87,12 @@ const BuyPage = () => {
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
               {content.hero.title}
             </h1>
           </div>
-          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
+          <p className="text-white/80 max-w-2xl mx-auto">
             {content.hero.subtitle}
           </p>
         </div>
@@ -110,7 +101,7 @@ const BuyPage = () => {
       {/* Properties For Sale Section */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={contentRef} className="max-w-3xl mx-auto text-center mb-12">
+          <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Properties For Sale</h2>
             <p className="text-gray-600">Browse available properties for purchase</p>
           </div>
@@ -282,7 +273,7 @@ const BuyPage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
             </div>
           ) : filteredProperties.length > 0 ? (
-            <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProperties.map((property, index) => (
                 <div
                   key={property.id}
@@ -304,7 +295,7 @@ const BuyPage = () => {
 
       {/* Content Sections */}
       {content.sections?.length > 0 && (
-        <section ref={contentRef} className="py-16 md:py-24 bg-white">
+        <section className="py-16 md:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {content.sections.map((section, index) => (
               <div 

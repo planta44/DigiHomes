@@ -3,7 +3,6 @@ import { Play, Image as ImageIcon, ChevronLeft, ChevronRight, X, ExternalLink } 
 import PublicLayout from '../components/layout/PublicLayout';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation } from '../hooks/useSimpleAnimations';
 
 const DigiReelsPage = () => {
   const [reels, setReels] = useState([]);
@@ -11,10 +10,6 @@ const DigiReelsPage = () => {
   const [selectedReel, setSelectedReel] = useState(null);
   const [visibleReels, setVisibleReels] = useState([]);
   const { colors } = useTheme();
-  // Hero text animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
-  const heroRef3 = useHeroAnimation(2);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -80,7 +75,6 @@ const DigiReelsPage = () => {
     <PublicLayout>
       {/* Hero Section */}
       <div 
-        ref={heroRef}
         className="relative py-20 md:py-28 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${colors[800]} 0%, ${colors[600]} 50%, ${colors[700]} 100%)` }}
       >
@@ -92,14 +86,14 @@ const DigiReelsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroRef} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6`}>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm mb-6`}>
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 ref={heroRef2} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Digi Reels
           </h1>
-          <p ref={heroRef3} className={`text-xl text-white/80 max-w-2xl mx-auto`}>
+          <p className={`text-xl text-white/80 max-w-2xl mx-auto`}>
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { SimpleAnimationProvider } from './context/SimpleAnimationContext';
 
 // Public Pages
 import HomePage from './pages/HomePage';
@@ -102,8 +101,7 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
-          </Router>
-        </SimpleAnimationProvider>
+        </Router>
       </ThemeProvider>
     </AuthProvider>
   );

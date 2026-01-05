@@ -5,7 +5,6 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useCardStagger } from '../hooks/useSimpleAnimations';
 
 const RentalsPage = () => {
   const [properties, setProperties] = useState([]);
@@ -17,12 +16,6 @@ const RentalsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCards, setVisibleCards] = useState([]);
   const { colors } = useTheme();
-  
-  // Hero text animations
-  const heroRef = useHeroAnimation(0);
-  const heroRef2 = useHeroAnimation(1);
-  // Card animations
-  const cardsRef = useCardStagger();
   
   const [filters, setFilters] = useState({
     search: '',
@@ -159,12 +152,12 @@ const RentalsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div ref={heroRef} className="flex items-center justify-center gap-3 mb-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <h1 className={`text-4xl md:text-5xl font-bold text-white mb-4`}>
               Find Your Perfect Rental
             </h1>
           </div>
-          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
+          <p className="text-white/80 max-w-2xl mx-auto">
             Discover quality rental properties in Nakuru and Nyahururu
           </p>
           
@@ -329,7 +322,6 @@ const RentalsPage = () => {
         {/* Properties Grid/List */}
         {filteredProperties.length > 0 ? (
           <div 
-            ref={cardsRef}
             className={viewMode === 'grid' 
               ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' 
               : 'flex flex-col gap-4'

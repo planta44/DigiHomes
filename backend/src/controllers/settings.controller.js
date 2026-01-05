@@ -129,61 +129,6 @@ const deleteHouseType = async (req, res) => {
   }
 };
 
-// Get animation settings (public)
-const getAnimationSettings = async (req, res) => {
-  try {
-    const result = await db.query(
-      "SELECT setting_value FROM site_settings WHERE setting_key = 'animation_settings'"
-    );
-    
-    // Simple animation settings
-    const defaultSettings = {
-      enabled: true,
-      style: 'pop',
-      delay: 100
-    };
-    
-    if (result.rows.length > 0 && result.rows[0].setting_value) {
-      const stored = typeof result.rows[0].setting_value === 'string' 
-        ? JSON.parse(result.rows[0].setting_value) 
-        : result.rows[0].setting_value;
-      res.json({ ...defaultSettings, ...stored });
-    } else {
-      res.json(defaultSettings);
-    }
-  } catch (error) {
-    console.error('Get animation settings error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
-// Update animation settings (admin only)
-const updateAnimationSettings = async (req, res) => {
-  try {
-    const body = req.body;
-    const validStyles = ['pop', 'fade', 'slide'];
-    
-    const settings = {
-      enabled: body.enabled !== false,
-      style: validStyles.includes(body.style) ? body.style : 'pop',
-      delay: Math.max(50, Math.min(500, parseInt(body.delay) || 100))
-    };
-
-    await db.query(
-      `INSERT INTO site_settings (setting_key, setting_value, updated_at) 
-       VALUES ('animation_settings', $1, CURRENT_TIMESTAMP)
-       ON CONFLICT (setting_key) 
-       DO UPDATE SET setting_value = $1, updated_at = CURRENT_TIMESTAMP`,
-      [JSON.stringify(settings)]
-    );
-
-    res.json(settings);
-  } catch (error) {
-    console.error('Update animation settings error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
 module.exports = {
   getSettings,
   updateSetting,
@@ -192,7 +137,5 @@ module.exports = {
   deleteLocation,
   getHouseTypes,
   addHouseType,
-  deleteHouseType,
-  getAnimationSettings,
-  updateAnimationSettings
+  deleteHouseType
 };
