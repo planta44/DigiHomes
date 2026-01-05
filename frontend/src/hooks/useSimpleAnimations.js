@@ -15,10 +15,15 @@ let animationSettings = {
 };
 
 export const setAnimationSettings = (settings) => {
+  console.log('🔧 Setting animation settings:', settings);
   animationSettings = { ...animationSettings, ...settings };
+  console.log('🔧 Animation settings now:', animationSettings);
 };
 
 export const getAnimationSettings = () => animationSettings;
+
+// Initialize with defaults immediately
+console.log('🎬 Animation hooks initialized with defaults:', animationSettings);
 
 /**
  * HERO TEXT ANIMATION - Pop from below on page load
@@ -30,12 +35,18 @@ export const useHeroAnimation = (index = 0, waitForImage = false) => {
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || !imageLoaded || !animationSettings || animationSettings.enabled === false) return;
+    if (!element || !imageLoaded || !animationSettings || animationSettings.enabled === false) {
+      console.log('🎬 Hero animation blocked:', { element: !!element, imageLoaded, settings: animationSettings });
+      return;
+    }
 
     const delay = animationSettings.delay + (index * animationSettings.delay);
+    console.log(`🎬 Hero ${index} will animate in ${delay}ms with style: ${animationSettings.style}`);
     
     const timer = setTimeout(() => {
-      element.classList.add(`animate-${animationSettings.style}`);
+      const className = `animate-${animationSettings.style}`;
+      element.classList.add(className);
+      console.log(`✅ Hero ${index} animated with class: ${className}`);
     }, delay);
 
     return () => clearTimeout(timer);
@@ -54,17 +65,25 @@ export const useScrollAnimation = (index = 0) => {
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || !animationSettings || animationSettings.enabled === false) return;
+    if (!element || !animationSettings || animationSettings.enabled === false) {
+      console.log('🎬 Scroll animation blocked:', { element: !!element, settings: animationSettings });
+      return;
+    }
 
+    console.log(`🎬 Scroll animation ${index} observer created`);
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           const delay = index * animationSettings.delay;
+          console.log(`🎬 Scroll ${index} entering viewport, animating in ${delay}ms`);
           setTimeout(() => {
-            element.classList.add(`animate-${animationSettings.style}`);
+            const className = `animate-${animationSettings.style}`;
+            element.classList.add(className);
+            console.log(`✅ Scroll ${index} animated with class: ${className}`);
             setHasAnimated(true);
           }, delay);
         } else if (hasAnimated) {
+          console.log(`🔄 Scroll ${index} leaving viewport, resetting`);
           element.classList.remove(`animate-${animationSettings.style}`);
           setHasAnimated(false);
         }

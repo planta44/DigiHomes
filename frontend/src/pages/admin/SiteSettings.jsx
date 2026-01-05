@@ -84,7 +84,7 @@ const SiteSettings = () => {
   
   const [settings, setSettings] = useState({
     brand_settings: { name: 'DIGIHOMES', splitPosition: 4, primaryColor: '#2563eb', secondaryColor: '#dc2626', logo: '', themeColor: '#2563eb', hamburgerMenuBg: '#ffffff', hamburgerMenuOpacity: 0.9, hamburgerMenuTextColor: '#374151' },
-    animation_settings: { enabled: true, heroAnimationStyle: 'pop', heroTextDelay: 400, heroTextStagger: 200, cardAnimationStyle: 'pop', cardBaseDelay: 150, cardStaggerDelay: 100, sectionAnimationStyle: 'pop', sectionBaseDelay: 200, sectionStaggerDelay: 150, statsCountDuration: 2000 },
+    animation_settings: { enabled: true, style: 'pop', delay: 100 },
     features: [],
     company_info: { name: 'DIGIHOMES AGENCIES', tagline: '', phone: '', phone2: '', email: '', whatsapp: '', facebook: '', instagram: '', twitter: '', logo: '' },
     hero_content: { title: '', highlight: '', description: '', backgroundImage: '', desktopHeight: '100vh', mobileHeight: '100vh', desktopAlign: 'bottom', mobileAlign: 'bottom' },
