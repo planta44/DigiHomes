@@ -5,7 +5,7 @@ import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { useHeroAnimation, useStaggerAnimation, useSectionAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 
 const RentPage = () => {
   const [pageData, setPageData] = useState(null);
@@ -23,14 +23,9 @@ const RentPage = () => {
   const [locations, setLocations] = useState([]);
   const [houseTypes, setHouseTypes] = useState([]);
   const { colors } = useTheme();
-  // Hero animations - re-animate when scrolling back to top
-  const [heroRef, heroAnim] = useHeroAnimation(0);
-  const [heroRef2, heroAnim2] = useHeroAnimation(1);
-  // Section animations
-  const [housesRef, housesAnim] = useSectionAnimation(0);
-  const [housesRef2, housesAnim2] = useSectionAnimation(1);
-  // Card animations - re-animate on scroll
-  const [cardsRef, getCardClass] = useStaggerAnimation();
+  const heroRef = useHeroAnimation();
+  const heroRef2 = useHeroAnimation();
+  const housesRef = useCardStagger();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -257,12 +252,11 @@ const RentPage = () => {
           </div>
 
           {filteredHouses.length > 0 ? (
-            <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div ref={housesRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredHouses.map((house, index) => (
                 <div 
                   key={house.id}
-                  data-anim-item
-                  className={getCardClass(index)}
+                  data-animate-card
                 >
                   <HouseCard house={house} />
                 </div>

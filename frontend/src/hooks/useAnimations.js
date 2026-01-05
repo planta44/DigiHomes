@@ -112,10 +112,11 @@ export const useStatsInView = () => {
   return [ref, isInView];
 };
 
-// Hook for staggered card animations - observes individual cards
+// Hook for staggered card animations
 export const useCardStagger = () => {
   const containerRef = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
+  const animatedCardsRef = useRef(new Set());
 
   useEffect(() => {
     const container = containerRef.current;
@@ -137,42 +138,77 @@ export const useCardStagger = () => {
     const isMobile = window.innerWidth < 768;
     const animClass = `animate-${isMobile ? (settings.cardStyleMobile || settings.cardStyle || 'slideUp') : (settings.cardStyle || 'slideUp')}`;
     const duration = isMobile ? (settings.cardDurationMobile || settings.cardDuration || 600) : (settings.cardDuration || 600);
-    const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 150) : (settings.cardStagger || 150);
+    const stagger = isMobile ? (settings.cardStaggerMobile || settings.cardStagger || 100) : (settings.cardStagger || 150);
 
     // Initially hide cards
     cards.forEach(card => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(20px)';
+      if (!card.classList.contains(animClass)) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+      }
     });
 
-    // Observe each card individually
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const card = entry.target;
-            card.style.setProperty('--card-duration', `${duration}ms`);
-            
-            // Small delay to ensure smooth animation
-            setTimeout(() => {
-              card.classList.add(animClass);
-            }, 50);
-          } else {
-            // Reset when out of view
-            const card = entry.target;
-            card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-          }
-        });
-      },
-      { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
-    );
+    if (isMobile) {
+      // Mobile: Observe each card individually (no stagger)
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const card = entry.target;
+              card.style.setProperty('--card-duration', `${duration}ms`);
+              
+              setTimeout(() => {
+                card.classList.add(animClass);
+              }, 50);
+            } else {
+              const card = entry.target;
+              card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(20px)';
+            }
+          });
+        },
+        { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
+      );
 
-    // Observe each card
-    cards.forEach(card => observer.observe(card));
-    
-    return () => observer.disconnect();
+      cards.forEach(card => observer.observe(card));
+      return () => observer.disconnect();
+    } else {
+      // Desktop: Observe each card but animate with stagger when it appears
+      let cardIndex = 0;
+      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !animatedCardsRef.current.has(entry.target)) {
+              const card = entry.target;
+              const index = Array.from(cards).indexOf(card);
+              
+              card.style.setProperty('--card-duration', `${duration}ms`);
+              animatedCardsRef.current.add(card);
+              
+              // Stagger delay for desktop
+              setTimeout(() => {
+                card.classList.add(animClass);
+              }, index * stagger);
+            } else if (!entry.isIntersecting) {
+              const card = entry.target;
+              card.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(20px)';
+              animatedCardsRef.current.delete(card);
+            }
+          });
+        },
+        { threshold: 0.15, rootMargin: '0px 0px -100px 0px' }
+      );
+
+      cards.forEach(card => observer.observe(card));
+      return () => {
+        observer.disconnect();
+        animatedCardsRef.current.clear();
+      };
+    }
   }, [loaded, settings.enabled, settings.cardStyle, settings.cardStyleMobile, settings.cardDuration, settings.cardDurationMobile, settings.cardStagger, settings.cardStaggerMobile]);
 
   return containerRef;

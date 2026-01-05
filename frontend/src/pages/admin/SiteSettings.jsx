@@ -1448,7 +1448,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="200"
-                        max="2000"
+                        max="5000"
                         step="50"
                         value={settings.animation_settings.cardDuration || 600}
                         onChange={(e) => setSettings(prev => ({
@@ -1467,7 +1467,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="50"
-                        max="500"
+                        max="1000"
                         step="25"
                         value={settings.animation_settings.cardStagger || 150}
                         onChange={(e) => setSettings(prev => ({
@@ -1476,7 +1476,7 @@ const SiteSettings = () => {
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Not used - cards animate individually</p>
+                      <p className="text-xs text-gray-500 mt-1">Delay between each card appearing (Desktop only)</p>
                     </div>
                   </div>
                 </div>
@@ -1514,7 +1514,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="200"
-                        max="1500"
+                        max="3000"
                         step="50"
                         value={settings.animation_settings.cardDurationMobile || 400}
                         onChange={(e) => setSettings(prev => ({
@@ -1533,7 +1533,7 @@ const SiteSettings = () => {
                       <input
                         type="range"
                         min="50"
-                        max="300"
+                        max="500"
                         step="25"
                         value={settings.animation_settings.cardStaggerMobile || 100}
                         onChange={(e) => setSettings(prev => ({
@@ -1542,7 +1542,7 @@ const SiteSettings = () => {
                         }))}
                         className="w-full"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Not used - cards animate individually</p>
+                      <p className="text-xs text-gray-500 mt-1">Not used on mobile - instant animation</p>
                     </div>
                   </div>
                 </div>
