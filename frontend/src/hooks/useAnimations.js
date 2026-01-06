@@ -353,3 +353,37 @@ export const useLineByLine = (sectionName = 'about') => {
 
   return containerRef;
 };
+
+// Hook for button animations from left and right
+export const useButtonSlide = (direction = 'left') => {
+  const ref = useRef(null);
+  const { settings, loaded } = useContext(AnimationContext);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !loaded || !settings.enabled) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          element.style.animation = `slideIn${direction === 'left' ? 'Left' : 'Right'} ${settings.heroDuration || 800}ms ease-out forwards`;
+        } else {
+          element.style.animation = 'none';
+          element.style.opacity = '0';
+          element.style.transform = direction === 'left' ? 'translateX(-100px)' : 'translateX(100px)';
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    // Initially hide
+    element.style.opacity = '0';
+    element.style.transform = direction === 'left' ? 'translateX(-100px)' : 'translateX(100px)';
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [loaded, settings.enabled, settings.heroDuration, direction]);
+
+  return ref;
+};

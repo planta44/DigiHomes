@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
-import { useHeroAnimation } from '../hooks/useAnimations';
+import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 import api from '../config/api';
 
 const ContactPage = () => {
@@ -24,6 +24,8 @@ const ContactPage = () => {
   const [openFaq, setOpenFaq] = useState(null);
   const heroRef = useHeroAnimation();
   const heroRef2 = useHeroAnimation();
+  const contactCardsRef = useCardStagger('contact');
+  const officesRef = useCardStagger('contact');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -71,8 +73,8 @@ const ContactPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Contact Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white rounded-xl shadow-md p-6 text-center">
+        <div ref={contactCardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div data-animate-card className="bg-white rounded-xl shadow-md p-6 text-center">
             <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Phone className="w-7 h-7 text-primary-600" />
             </div>
@@ -88,7 +90,7 @@ const ContactPage = () => {
               )}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6 text-center">
+          <div data-animate-card className="bg-white rounded-xl shadow-md p-6 text-center">
             <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Mail className="w-7 h-7 text-primary-600" />
             </div>
@@ -99,7 +101,7 @@ const ContactPage = () => {
               </a>
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6 text-center">
+          <div data-animate-card className="bg-white rounded-xl shadow-md p-6 text-center">
             <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Clock className="w-7 h-7 text-primary-600" />
             </div>
@@ -139,9 +141,9 @@ const ContactPage = () => {
         {(contact_page.offices || []).length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Our Offices</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div ref={officesRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {contact_page.offices.map((office, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden">
+                <div key={index} data-animate-card className="bg-white rounded-xl shadow-md overflow-hidden">
                   {office.mapEmbed && (
                     <div className="h-48 bg-gray-200">
                       <iframe

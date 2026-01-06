@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
-import { useStatsCounter, useStatsInView, useHeroAnimation, useCardStagger, useLineByLine } from '../hooks/useAnimations';
+import { useStatsCounter, useStatsInView, useHeroAnimation, useCardStagger, useLineByLine, useButtonSlide } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
@@ -66,6 +66,8 @@ const HomePage = () => {
   const locationsRef = useCardStagger('locations');
   const aboutDesktopRef = useLineByLine('about');
   const aboutMobileRef = useLineByLine('about');
+  const browseButtonRef = useButtonSlide('left');
+  const whatsappButtonRef = useButtonSlide('right');
 
   useEffect(() => {
     fetchData();
@@ -531,6 +533,7 @@ const HomePage = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link 
+              ref={browseButtonRef}
               to="/houses" 
               className="btn-animate font-medium py-2.5 px-5 rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 shadow-lg"
               style={{ color: colors[600] }}
@@ -539,6 +542,7 @@ const HomePage = () => {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a 
+              ref={whatsappButtonRef}
               href={`https://wa.me/${companyInfo.whatsapp || '254700000000'}`} 
               target="_blank" 
               rel="noopener noreferrer"

@@ -1427,7 +1427,8 @@ const SiteSettings = () => {
                     { key: 'houses', label: 'Available Houses', color: 'blue' },
                     { key: 'locations', label: 'Our Locations', color: 'green' },
                     { key: 'about', label: 'About Us', color: 'orange' },
-                    { key: 'properties', label: 'Properties Pages (Buy/Rent/Houses)', color: 'pink' }
+                    { key: 'properties', label: 'Properties Pages (Buy/Rent/Houses)', color: 'pink' },
+                    { key: 'contact', label: 'Contact Page Cards', color: 'indigo' }
                   ].map(section => {
                     const sectionSettings = settings.animation_settings?.sections?.[section.key] || {
                       enabled: true, style: 'slideUp', duration: 600, stagger: 150,

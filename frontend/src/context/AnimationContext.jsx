@@ -55,6 +55,15 @@ export const AnimationProvider = ({ children }) => {
         styleMobile: 'slideUp',
         durationMobile: 400,
         staggerMobile: 100
+      },
+      contact: {
+        enabled: true,
+        style: 'slideUp',
+        duration: 600,
+        stagger: 150,
+        styleMobile: 'slideUp',
+        durationMobile: 400,
+        staggerMobile: 100
       }
     }
   });
