@@ -173,15 +173,21 @@ const DigiReelsPage = () => {
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); navigateReel('prev'); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft 
+                  className="w-6 h-6" 
+                  style={{ animation: 'pulseArrow 2s ease-in-out infinite' }}
+                />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); navigateReel('next'); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight 
+                  className="w-6 h-6" 
+                  style={{ animation: 'pulseArrow 2s ease-in-out infinite 1s' }}
+                />
               </button>
             </>
           )}
