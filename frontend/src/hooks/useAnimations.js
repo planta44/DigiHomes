@@ -4,31 +4,46 @@ import { AnimationContext } from '../context/AnimationContext';
 export const useHeroAnimation = () => {
   const ref = useRef(null);
   const { settings, loaded } = useContext(AnimationContext);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || !loaded || !settings.enabled) return;
+    if (!element || !loaded) return;
+
+    // If animations are disabled, ensure element is visible
+    if (!settings.enabled) {
+      element.style.opacity = '1';
+      element.style.transform = 'none';
+      return;
+    }
 
     // Apply animation duration dynamically
     const duration = settings.heroDuration || 800;
     element.style.setProperty('--hero-duration', `${duration}ms`);
 
+    // Reset animation state when settings change
+    element.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+    setHasAnimated(false);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          // Apply the correct animation class based on style setting
-          const animClass = `animate-${settings.heroStyle || 'slideUp'}`;
-          element.classList.add(animClass);
-        } else {
-          // Remove all possible animation classes when out of view
-          element.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
+        if (entry.isIntersecting && !hasAnimated) {
+          // Small delay to ensure styles are applied
+          setTimeout(() => {
+            const animClass = `animate-${settings.heroStyle || 'slideUp'}`;
+            element.classList.add(animClass);
+            setHasAnimated(true);
+          }, 50);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      // Don't remove classes on unmount - let them persist
+    };
   }, [loaded, settings.enabled, settings.heroStyle, settings.heroDuration]);
 
   return ref;

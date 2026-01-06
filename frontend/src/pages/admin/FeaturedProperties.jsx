@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Save, Trash2, Star, Loader2, GripVertical } from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../components/layout/AdminLayout';
 import api from '../../config/api';
@@ -10,6 +9,7 @@ const FeaturedProperties = () => {
   const [featuredIds, setFeaturedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -48,14 +48,25 @@ const FeaturedProperties = () => {
     }
   };
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+  const handleDragStart = (index) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
     
     const items = Array.from(featuredIds);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const draggedItem = items[draggedIndex];
+    items.splice(draggedIndex, 1);
+    items.splice(index, 0, draggedItem);
     
     setFeaturedIds(items);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   const addProperty = (id) => {
@@ -121,53 +132,41 @@ const FeaturedProperties = () => {
                 <p className="text-sm">Add properties from the right panel</p>
               </div>
             ) : (
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="featured">
-                  {(provided) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="space-y-3"
-                    >
-                      {featuredProperties.map((property, index) => (
-                        <Draggable
-                          key={property.id}
-                          draggableId={property.id}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-primary-300"
-                            >
-                              <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                                <GripVertical className="w-5 h-5 text-gray-400" />
-                              </div>
-                              <img
-                                src={property.images?.[0] || 'https://via.placeholder.com/100'}
-                                alt={property.title}
-                                className="w-16 h-16 object-cover rounded"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-gray-900 truncate">{property.title}</p>
-                                <p className="text-sm text-gray-500">{property.location}</p>
-                              </div>
-                              <button
-                                onClick={() => removeProperty(property.id)}
-                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
+              <div className="space-y-3">
+                {featuredProperties.map((property, index) => (
+                  <div
+                    key={property.id}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg border-2 transition-all ${
+                      draggedIndex === index 
+                        ? 'border-primary-500 opacity-50' 
+                        : 'border-gray-200 hover:border-primary-300'
+                    }`}
+                  >
+                    <div className="cursor-grab active:cursor-grabbing">
+                      <GripVertical className="w-5 h-5 text-gray-400" />
                     </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
+                    <img
+                      src={property.images?.[0] || 'https://via.placeholder.com/100'}
+                      alt={property.title}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{property.title}</p>
+                      <p className="text-sm text-gray-500">{property.location}</p>
+                    </div>
+                    <button
+                      onClick={() => removeProperty(property.id)}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
