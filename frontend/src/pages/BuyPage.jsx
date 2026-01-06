@@ -92,11 +92,11 @@ const BuyPage = () => {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold">
+            <h1 ref={heroTitleRef} className="text-4xl md:text-5xl lg:text-6xl font-bold">
               {content.hero.title}
             </h1>
           </div>
-          <p ref={heroRef2} className="text-white/80 max-w-2xl mx-auto">
+          <p ref={heroDescRef} className="text-white/80 max-w-2xl mx-auto">
             {content.hero.subtitle}
           </p>
         </div>

@@ -63,14 +63,14 @@ const ServicesPage = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <h1 
-              ref={heroRef}
+              ref={heroTitleRef}
               className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6`}
             >
               {content.hero.title}
             </h1>
           </div>
           <p 
-            ref={heroRef2}
+            ref={heroDescRef}
             className="text-white/80 max-w-2xl mx-auto"
             style={{ color: colors[100] }}
           >
