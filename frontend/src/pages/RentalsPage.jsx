@@ -156,12 +156,10 @@ const RentalsPage = () => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 ref={heroTitleRef} className={`text-4xl md:text-5xl font-bold text-white mb-4`}>
-              Find Your Perfect Rental
-            </h1>
-          </div>
-          <p ref={heroDescRef} className="text-white/80 max-w-2xl mx-auto">
+          <h1 ref={heroTitleRef} className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Find Your Perfect Rental
+          </h1>
+          <p ref={heroDescRef} className="text-white/80 max-w-2xl mx-auto mb-8">
             Discover quality rental properties in Nakuru and Nyahururu
           </p>
           

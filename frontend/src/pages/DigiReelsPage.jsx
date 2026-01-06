@@ -93,10 +93,10 @@ const DigiReelsPage = () => {
             <Play className="w-4 h-4" />
             Featured Content
           </div>
-          <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          <h1 ref={heroRef} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
             Digi Reels
           </h1>
-          <p ref={heroRef2} className={`text-xl text-white/80 max-w-2xl mx-auto`}>
+          <p ref={heroRef2} className="text-xl text-white/80 max-w-2xl mx-auto">
             Explore our latest property showcases, announcements, and updates
           </p>
         </div>
@@ -173,13 +173,15 @@ const DigiReelsPage = () => {
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); navigateReel('prev'); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all animate-pulse-nav"
+                style={{ animation: 'pulseNav 2s ease-in-out infinite' }}
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); navigateReel('next'); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all animate-pulse-nav"
+                style={{ animation: 'pulseNav 2s ease-in-out infinite 1s' }}
               >
                 <ChevronRight className="w-6 h-6" />
               </button>

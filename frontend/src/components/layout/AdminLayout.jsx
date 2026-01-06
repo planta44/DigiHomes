@@ -24,6 +24,7 @@ const AdminLayout = ({ children }) => {
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/houses', label: 'Manage Properties', icon: Building },
+    { path: '/admin/featured', label: 'Featured Properties', icon: Settings },
     { path: '/admin/reels', label: 'Digi Reels', icon: Play },
     { path: '/admin/pages', label: 'Manage Pages', icon: FileText },
     { path: '/admin/subscribers', label: 'Subscribers', icon: Users },

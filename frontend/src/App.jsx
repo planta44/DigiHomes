@@ -23,6 +23,7 @@ import Subscribers from './pages/admin/Subscribers';
 import SiteSettings from './pages/admin/SiteSettings';
 import ManagePages from './pages/admin/ManagePages';
 import ManageReels from './pages/admin/ManageReels';
+import FeaturedProperties from './pages/admin/FeaturedProperties';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -99,6 +100,11 @@ function App() {
           <Route path="/admin/reels" element={
             <ProtectedRoute>
               <ManageReels />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/featured" element={
+            <ProtectedRoute>
+              <FeaturedProperties />
             </ProtectedRoute>
           } />
         </Routes>
