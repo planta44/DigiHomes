@@ -48,8 +48,8 @@ const AdminDashboard = () => {
       if (savedFeaturedIds.length > 0) {
         setFeaturedIds(savedFeaturedIds);
       } else {
-        // Default to first 6 featured properties
-        const defaultFeatured = houses.filter(h => h.featured).slice(0, 6).map(h => h.id);
+        // Default to first 9 featured properties
+        const defaultFeatured = houses.filter(h => h.featured).slice(0, 9).map(h => h.id);
         setFeaturedIds(defaultFeatured);
       }
     } catch (error) {
@@ -60,8 +60,8 @@ const AdminDashboard = () => {
   };
 
   const addToFeatured = (houseId) => {
-    if (featuredIds.length >= 6) {
-      toast.error('Maximum 6 featured properties allowed');
+    if (featuredIds.length >= 9) {
+      toast.error('Maximum 9 featured properties allowed');
       return;
     }
     if (!featuredIds.includes(houseId)) {
@@ -223,11 +223,11 @@ const AdminDashboard = () => {
               Save Order
             </button>
           </div>
-          <p className="text-gray-500 text-sm mb-4">Select up to 6 properties to display on the homepage. Drag to reorder.</p>
+          <p className="text-gray-500 text-sm mb-4">Select up to 9 properties to display on the homepage. Drag to reorder.</p>
           
           {/* Selected Featured Properties */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Featured ({featuredIds.length}/6)</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Featured ({featuredIds.length}/9)</h3>
             {getFeaturedHouses().length > 0 ? (
               <div className="space-y-2">
                 {getFeaturedHouses().map((house, index) => (
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
                       </div>
                       <button
                         onClick={() => addToFeatured(house.id)}
-                        disabled={featuredIds.length >= 6}
+                        disabled={featuredIds.length >= 9}
                         className="ml-2 px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 disabled:opacity-50"
                       >
                         Add
