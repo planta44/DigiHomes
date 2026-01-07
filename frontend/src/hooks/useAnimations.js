@@ -303,31 +303,31 @@ export const useLineByLine = (sectionName = 'about') => {
         observerRef.current.disconnect();
       }
 
-      // Observe container, but stagger lines individually
+      // Observe each line individually for scroll-based animation
       observerRef.current = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            lines.forEach((line, index) => {
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const line = entry.target;
               line.style.setProperty('--card-duration', `${duration}ms`);
               
-              setTimeout(() => {
-                line.classList.add(animClass);
-                line.style.opacity = '1';
-                line.style.transform = 'translateY(0)';
-              }, index * stagger);
-            });
-          } else {
-            lines.forEach(line => {
+              // Animate immediately when in view
+              line.classList.add(animClass);
+              line.style.opacity = '1';
+              line.style.transform = 'translateY(0)';
+            } else {
+              const line = entry.target;
               line.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
               line.style.opacity = '0';
               line.style.transform = 'translateY(20px)';
-            });
-          }
+            }
+          });
         },
-        { threshold: 0.1 }
+        { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
       );
 
-      observerRef.current.observe(container);
+      // Observe each line individually
+      lines.forEach(line => observerRef.current.observe(line));
     };
 
     // Initial setup
