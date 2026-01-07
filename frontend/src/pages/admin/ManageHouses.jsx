@@ -18,7 +18,6 @@ const ManageHouses = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLocation, setFilterLocation] = useState('');
-  const [filterTown, setFilterTown] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterPropertyType, setFilterPropertyType] = useState('');
   const [filterListingType, setFilterListingType] = useState('');
@@ -74,20 +73,14 @@ const ManageHouses = () => {
     }).format(price);
   };
 
-  const getTownsForLocation = () => {
-    if (!filterLocation) return [];
-    return [...new Set(houses.filter(h => h.location === filterLocation && h.town).map(h => h.town))];
-  };
-
   const filteredHouses = houses.filter(house => {
     const matchesSearch = house.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          house.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLocation = !filterLocation || house.location === filterLocation;
-    const matchesTown = !filterTown || house.town === filterTown;
     const matchesStatus = !filterStatus || house.vacancy_status === filterStatus;
     const matchesPropertyType = !filterPropertyType || house.property_type === filterPropertyType;
     const matchesListingType = !filterListingType || house.listing_type === filterListingType;
-    return matchesSearch && matchesLocation && matchesTown && matchesStatus && matchesPropertyType && matchesListingType;
+    return matchesSearch && matchesLocation && matchesStatus && matchesPropertyType && matchesListingType;
   });
 
   const getImageUrl = (house) => {
@@ -117,7 +110,7 @@ const ManageHouses = () => {
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="relative sm:col-span-2 lg:col-span-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -130,26 +123,12 @@ const ManageHouses = () => {
             </div>
             <select
               value={filterLocation}
-              onChange={(e) => {
-                setFilterLocation(e.target.value);
-                setFilterTown('');
-              }}
+              onChange={(e) => setFilterLocation(e.target.value)}
               className="input-field"
             >
               <option value="">All Locations</option>
               <option value="Nakuru">Nakuru</option>
               <option value="Nyahururu">Nyahururu</option>
-            </select>
-            <select
-              value={filterTown}
-              onChange={(e) => setFilterTown(e.target.value)}
-              className="input-field"
-              disabled={!filterLocation}
-            >
-              <option value="">All Towns</option>
-              {getTownsForLocation().map(town => (
-                <option key={town} value={town}>{town}</option>
-              ))}
             </select>
             <select
               value={filterPropertyType}
