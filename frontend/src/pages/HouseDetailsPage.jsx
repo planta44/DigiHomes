@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
+import { useCardStagger, useLineByLine } from '../hooks/useAnimations';
 import api from '../config/api';
 
 const HouseDetailsPage = () => {
@@ -22,63 +23,15 @@ const HouseDetailsPage = () => {
   const [similarProperties, setSimilarProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [animationSettings, setAnimationSettings] = useState({
-    type: 'fade-up',
-    duration: 600
-  });
+  
+  // Use scroll-based animations like other pages
+  const detailsRef = useLineByLine('propertyDetails');
+  const similarPropertiesRef = useCardStagger('similarProperties');
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchHouse();
-    fetchAnimationSettings();
   }, [id]);
-
-  const fetchAnimationSettings = async () => {
-    try {
-      const response = await api.get('/settings');
-      if (response.data?.animation_settings) {
-        setAnimationSettings(response.data.animation_settings);
-      }
-    } catch (error) {
-      console.error('Error fetching animation settings:', error);
-    }
-  };
-
-  // Apply animations on mount and when settings change
-  useEffect(() => {
-    if (!house) return;
-    
-    const elements = document.querySelectorAll('[data-aos]');
-    elements.forEach((el, index) => {
-      // Reset animation
-      el.style.opacity = '0';
-      el.style.transform = getInitialTransform(animationSettings.type);
-      
-      // Trigger animation with stagger
-      setTimeout(() => {
-        el.style.transition = `opacity ${animationSettings.duration}ms ease-out, transform ${animationSettings.duration}ms ease-out`;
-        el.style.opacity = '1';
-        el.style.transform = 'translate3d(0, 0, 0) scale(1)';
-      }, index * 100);
-    });
-  }, [house, animationSettings]);
-
-  const getInitialTransform = (type) => {
-    const transforms = {
-      'fade': 'translate3d(0, 0, 0) scale(1)',
-      'fade-up': 'translate3d(0, 30px, 0) scale(1)',
-      'fade-down': 'translate3d(0, -30px, 0) scale(1)',
-      'fade-left': 'translate3d(30px, 0, 0) scale(1)',
-      'fade-right': 'translate3d(-30px, 0, 0) scale(1)',
-      'zoom-in': 'translate3d(0, 0, 0) scale(0.8)',
-      'zoom-out': 'translate3d(0, 0, 0) scale(1.2)',
-      'slide-up': 'translate3d(0, 50px, 0) scale(1)',
-      'slide-down': 'translate3d(0, -50px, 0) scale(1)',
-      'slide-left': 'translate3d(50px, 0, 0) scale(1)',
-      'slide-right': 'translate3d(-50px, 0, 0) scale(1)'
-    };
-    return transforms[type] || transforms['fade-up'];
-  };
 
   const fetchHouse = async () => {
     try {
@@ -200,10 +153,10 @@ const HouseDetailsPage = () => {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Images & Description (Desktop) / Images Only (Mobile) */}
-          <div className="lg:col-span-2 space-y-6 order-1">
+          {/* Left Column - Images and Description (shows first on mobile) */}
+          <div ref={detailsRef} className="space-y-6 order-1 lg:order-2">
             {/* Image Gallery */}
-            <div data-aos className="relative rounded-2xl overflow-hidden bg-gray-100">
+            <div data-animate-line className="relative rounded-2xl overflow-hidden bg-gray-100">
               <img
                 src={getImageUrl(images[currentImageIndex])}
                 alt={house.title}
@@ -271,7 +224,7 @@ const HouseDetailsPage = () => {
             )}
 
             {/* Description - Hidden on mobile, shown on desktop */}
-            <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+            <div data-animate-line className="hidden lg:block bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {house.description || 'No description available for this property.'}
@@ -280,7 +233,7 @@ const HouseDetailsPage = () => {
 
             {/* Internal Features - Hidden on mobile */}
             {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
-              <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+              <div data-animate-line className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.internal_features.map((feature, index) => (
@@ -295,7 +248,7 @@ const HouseDetailsPage = () => {
 
             {/* External Features - Hidden on mobile */}
             {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
-              <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+              <div data-animate-line className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.external_features.map((feature, index) => (
@@ -310,7 +263,7 @@ const HouseDetailsPage = () => {
 
             {/* Land Features - Hidden on mobile */}
             {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
-              <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+              <div data-animate-line className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.land_features.map((feature, index) => (
@@ -327,7 +280,7 @@ const HouseDetailsPage = () => {
           {/* Right Column - Details (shows second on mobile, first on desktop via order) */}
           <div className="space-y-6 order-2 lg:order-3">
             {/* Main Info Card */}
-            <div data-aos className="bg-white rounded-xl shadow-md p-6">
+            <div data-animate-line className="bg-white rounded-xl shadow-md p-6">
               {/* Listing Type Banner */}
               {house.listing_type !== 'rent' && (
                 <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-3 ${
@@ -403,7 +356,7 @@ const HouseDetailsPage = () => {
             </div>
 
             {/* Contact Card */}
-            <div data-aos className="bg-white rounded-xl shadow-md p-6">
+            <div data-animate-line className="bg-white rounded-xl shadow-md p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Interested in this property?</h3>
               <div className="space-y-3">
                 <a
@@ -429,7 +382,7 @@ const HouseDetailsPage = () => {
           {/* Mobile only - Description and Features shown after details */}
           <div className="lg:hidden space-y-6 order-3">
             {/* Description - Mobile */}
-            <div data-aos className="bg-white rounded-xl shadow-md p-6">
+            <div data-animate-line className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {house.description || 'No description available for this property.'}
@@ -438,7 +391,7 @@ const HouseDetailsPage = () => {
 
             {/* Internal Features - Mobile */}
             {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
-              <div data-aos className="bg-white rounded-xl shadow-md p-6">
+              <div data-animate-line className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   {house.internal_features.map((feature, index) => (
@@ -453,7 +406,7 @@ const HouseDetailsPage = () => {
 
             {/* External Features - Mobile */}
             {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
-              <div data-aos className="bg-white rounded-xl shadow-md p-6">
+              <div data-animate-line className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   {house.external_features.map((feature, index) => (
@@ -468,7 +421,7 @@ const HouseDetailsPage = () => {
 
             {/* Land Features - Mobile */}
             {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
-              <div data-aos className="bg-white rounded-xl shadow-md p-6">
+              <div data-animate-line className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   {house.land_features.map((feature, index) => (
@@ -484,7 +437,7 @@ const HouseDetailsPage = () => {
         </div>
 
         {/* Agency Info - Above Similar Properties */}
-        <div data-aos className="mt-16 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
+        <div data-animate-line className="mt-16 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
           <p className="text-gray-600 text-sm mb-4">
             Your trusted housing agency in Nakuru and Nyahururu, Kenya.
@@ -499,9 +452,11 @@ const HouseDetailsPage = () => {
         {similarProperties.length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Properties</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div ref={similarPropertiesRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {similarProperties.map(property => (
-                <HouseCard key={property.id} house={property} />
+                <div key={property.id} data-animate-card>
+                  <HouseCard house={property} />
+                </div>
               ))}
             </div>
           </div>

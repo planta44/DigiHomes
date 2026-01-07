@@ -99,6 +99,33 @@ const AdminDashboard = () => {
     }
   };
 
+  const moveFeaturedBuy = (index, direction) => {
+    const newIds = [...featuredBuyIds];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newIds.length) {
+      [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
+      setFeaturedBuyIds(newIds);
+    }
+  };
+
+  const moveFeaturedRent = (index, direction) => {
+    const newIds = [...featuredRentIds];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newIds.length) {
+      [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
+      setFeaturedRentIds(newIds);
+    }
+  };
+
+  const moveFeaturedHouses = (index, direction) => {
+    const newIds = [...featuredHousesIds];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newIds.length) {
+      [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
+      setFeaturedHousesIds(newIds);
+    }
+  };
+
   const saveFeaturedProperties = async () => {
     setSavingFeatured(true);
     try {
@@ -408,7 +435,17 @@ const AdminDashboard = () => {
 
         {/* Featured for Buy Page */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Featured Properties - Buy Page</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Buy Page</h2>
+            <button
+              onClick={saveFeaturedProperties}
+              disabled={savingFeatured}
+              className="btn-primary text-sm"
+            >
+              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+          </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Buy page ({featuredBuyIds.length}/10)</p>
           <div className="space-y-2">
             {featuredBuyIds.map((id, idx) => {
@@ -417,7 +454,25 @@ const AdminDashboard = () => {
                 <div key={id} className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
                   <span className="font-bold w-6">{idx + 1}</span>
                   <span className="flex-1 text-sm">{house.title}</span>
-                  <button onClick={() => setFeaturedBuyIds(prev => prev.filter(i => i !== id))} className="text-red-500">×</button>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => moveFeaturedBuy(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveFeaturedBuy(idx, 'down')}
+                      disabled={idx === featuredBuyIds.length - 1}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setFeaturedBuyIds(prev => prev.filter(i => i !== id))} className="p-1 text-red-500 hover:text-red-700">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ) : null;
             })}
@@ -437,7 +492,17 @@ const AdminDashboard = () => {
 
         {/* Featured for Rent Page */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Featured Properties - Rent Page</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Rent Page</h2>
+            <button
+              onClick={saveFeaturedProperties}
+              disabled={savingFeatured}
+              className="btn-primary text-sm"
+            >
+              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+          </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Rent page ({featuredRentIds.length}/10)</p>
           <div className="space-y-2">
             {featuredRentIds.map((id, idx) => {
@@ -446,7 +511,25 @@ const AdminDashboard = () => {
                 <div key={id} className="flex items-center gap-2 p-2 bg-purple-50 border border-purple-200 rounded">
                   <span className="font-bold w-6">{idx + 1}</span>
                   <span className="flex-1 text-sm">{house.title}</span>
-                  <button onClick={() => setFeaturedRentIds(prev => prev.filter(i => i !== id))} className="text-red-500">×</button>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => moveFeaturedRent(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveFeaturedRent(idx, 'down')}
+                      disabled={idx === featuredRentIds.length - 1}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setFeaturedRentIds(prev => prev.filter(i => i !== id))} className="p-1 text-red-500 hover:text-red-700">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ) : null;
             })}
@@ -466,7 +549,17 @@ const AdminDashboard = () => {
 
         {/* Featured for Houses Page */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Featured Properties - Available Houses Page</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Available Houses Page</h2>
+            <button
+              onClick={saveFeaturedProperties}
+              disabled={savingFeatured}
+              className="btn-primary text-sm"
+            >
+              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+          </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Houses page ({featuredHousesIds.length}/10)</p>
           <div className="space-y-2">
             {featuredHousesIds.map((id, idx) => {
@@ -475,7 +568,25 @@ const AdminDashboard = () => {
                 <div key={id} className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
                   <span className="font-bold w-6">{idx + 1}</span>
                   <span className="flex-1 text-sm">{house.title}</span>
-                  <button onClick={() => setFeaturedHousesIds(prev => prev.filter(i => i !== id))} className="text-red-500">×</button>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => moveFeaturedHouses(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveFeaturedHouses(idx, 'down')}
+                      disabled={idx === featuredHousesIds.length - 1}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setFeaturedHousesIds(prev => prev.filter(i => i !== id))} className="p-1 text-red-500 hover:text-red-700">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ) : null;
             })}
