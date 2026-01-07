@@ -140,15 +140,51 @@ const AdminDashboard = () => {
   const saveFeaturedProperties = async () => {
     setSavingFeatured(true);
     try {
-      await Promise.all([
-        api.put('/settings/featured_properties', { value: featuredIds }),
-        api.put('/settings/featured_buy', { value: featuredBuyIds }),
-        api.put('/settings/featured_rent', { value: featuredRentIds }),
-        api.put('/settings/featured_houses', { value: featuredHousesIds })
-      ]);
-      toast.success('All featured properties saved!');
+      await api.put('/settings/featured_properties', { value: featuredIds });
+      toast.success('Homepage featured properties saved!');
     } catch (error) {
+      console.error('Save error:', error);
       toast.error('Failed to save featured properties');
+    } finally {
+      setSavingFeatured(false);
+    }
+  };
+
+  const saveFeaturedBuy = async () => {
+    setSavingFeatured(true);
+    try {
+      await api.put('/settings/featured_buy', { value: featuredBuyIds });
+      toast.success('Buy page featured properties saved!');
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to save Buy featured properties');
+    } finally {
+      setSavingFeatured(false);
+    }
+  };
+
+  const saveFeaturedRent = async () => {
+    setSavingFeatured(true);
+    try {
+      await api.put('/settings/featured_rent', { value: featuredRentIds });
+      console.log('Saving Rent featured IDs:', featuredRentIds);
+      toast.success('Rent page featured properties saved!');
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to save Rent featured properties');
+    } finally {
+      setSavingFeatured(false);
+    }
+  };
+
+  const saveFeaturedHouses = async () => {
+    setSavingFeatured(true);
+    try {
+      await api.put('/settings/featured_houses', { value: featuredHousesIds });
+      toast.success('Houses page featured properties saved!');
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error('Failed to save Houses featured properties');
     } finally {
       setSavingFeatured(false);
     }
@@ -481,12 +517,12 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Buy Page</h2>
             <button
-              onClick={saveFeaturedProperties}
+              onClick={saveFeaturedBuy}
               disabled={savingFeatured}
               className="btn-primary text-sm"
             >
               {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Save
+              Save Buy Featured
             </button>
           </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Buy page ({featuredBuyIds.length}/10)</p>
@@ -561,12 +597,12 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Rent Page</h2>
             <button
-              onClick={saveFeaturedProperties}
+              onClick={saveFeaturedRent}
               disabled={savingFeatured}
               className="btn-primary text-sm"
             >
               {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Save
+              Save Rent Featured
             </button>
           </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Rent page ({featuredRentIds.length}/10)</p>
@@ -641,12 +677,12 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Available Houses Page</h2>
             <button
-              onClick={saveFeaturedProperties}
+              onClick={saveFeaturedHouses}
               disabled={savingFeatured}
               className="btn-primary text-sm"
             >
               {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Save
+              Save Houses Featured
             </button>
           </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Houses page ({featuredHousesIds.length}/10)</p>
