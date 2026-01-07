@@ -46,6 +46,12 @@ const AddEditHouse = () => {
     land_features: []
   });
 
+  const [customFeatureInputs, setCustomFeatureInputs] = useState({
+    internal_features: '',
+    external_features: '',
+    land_features: ''
+  });
+
   const [locations, setLocations] = useState([]);
   const [houseTypes, setHouseTypes] = useState([]);
 
@@ -133,6 +139,27 @@ const AddEditHouse = () => {
           : [...features, feature]
       };
     });
+  };
+
+  const addCustomFeature = (category) => {
+    const customFeature = customFeatureInputs[category].trim();
+    if (customFeature && !formData[category].includes(customFeature)) {
+      setFormData(prev => ({
+        ...prev,
+        [category]: [...prev[category], customFeature]
+      }));
+      setCustomFeatureInputs(prev => ({
+        ...prev,
+        [category]: ''
+      }));
+    }
+  };
+
+  const removeFeature = (category, feature) => {
+    setFormData(prev => ({
+      ...prev,
+      [category]: prev[category].filter(f => f !== feature)
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -552,7 +579,9 @@ const AddEditHouse = () => {
               {/* Internal Features */}
               <div className="mb-6">
                 <h3 className="text-md font-medium text-gray-800 mb-3">Internal Features</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                
+                {/* Preset checkboxes */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
                   {['En Suite', 'Walk In Closet', 'Alarm', 'Fibre Internet', 'Built-in Wardrobes', 'Kitchen Pantry', 'Laundry Room', 'Study Room'].map(feature => (
                     <label key={feature} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
                       <input
@@ -565,12 +594,54 @@ const AddEditHouse = () => {
                     </label>
                   ))}
                 </div>
+
+                {/* Selected/Custom features display */}
+                {formData.internal_features.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-500 mb-2">Selected Features:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.internal_features.map((feature, index) => (
+                        <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                          {feature}
+                          <button
+                            type="button"
+                            onClick={() => removeFeature('internal_features', feature)}
+                            className="hover:bg-primary-200 rounded-full p-0.5"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add custom internal feature..."
+                    value={customFeatureInputs.internal_features}
+                    onChange={(e) => setCustomFeatureInputs(prev => ({ ...prev, internal_features: e.target.value }))}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomFeature('internal_features'))}
+                    className="input-field flex-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => addCustomFeature('internal_features')}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
 
               {/* External Features */}
               <div>
                 <h3 className="text-md font-medium text-gray-800 mb-3">External Features</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                
+                {/* Preset checkboxes */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
                   {['Electric Fence', 'Parking', 'Balcony', 'Wheel Chair Access', 'Garden', 'Swimming Pool', 'Borehole', 'Backup Generator'].map(feature => (
                     <label key={feature} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
                       <input
@@ -583,6 +654,46 @@ const AddEditHouse = () => {
                     </label>
                   ))}
                 </div>
+
+                {/* Selected/Custom features display */}
+                {formData.external_features.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-500 mb-2">Selected Features:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.external_features.map((feature, index) => (
+                        <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                          {feature}
+                          <button
+                            type="button"
+                            onClick={() => removeFeature('external_features', feature)}
+                            className="hover:bg-green-200 rounded-full p-0.5"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add custom external feature..."
+                    value={customFeatureInputs.external_features}
+                    onChange={(e) => setCustomFeatureInputs(prev => ({ ...prev, external_features: e.target.value }))}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomFeature('external_features'))}
+                    className="input-field flex-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => addCustomFeature('external_features')}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -591,7 +702,9 @@ const AddEditHouse = () => {
           {formData.property_type === 'land' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Land Features</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              
+              {/* Preset checkboxes */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
                 {['Gated Community', 'Title Deed Ready', 'Water Available', 'Electricity Available', 'Road Access', 'Perimeter Wall', 'Controlled Development', 'Near Schools'].map(feature => (
                   <label key={feature} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
                     <input
@@ -603,6 +716,46 @@ const AddEditHouse = () => {
                     <span className="text-sm text-gray-700">{feature}</span>
                   </label>
                 ))}
+              </div>
+
+              {/* Selected/Custom features display */}
+              {formData.land_features.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-500 mb-2">Selected Features:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.land_features.map((feature, index) => (
+                      <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm">
+                        {feature}
+                        <button
+                          type="button"
+                          onClick={() => removeFeature('land_features', feature)}
+                          className="hover:bg-amber-200 rounded-full p-0.5"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Manual input */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add custom land feature..."
+                  value={customFeatureInputs.land_features}
+                  onChange={(e) => setCustomFeatureInputs(prev => ({ ...prev, land_features: e.target.value }))}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomFeature('land_features'))}
+                  className="input-field flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => addCustomFeature('land_features')}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                >
+                  Add
+                </button>
               </div>
             </div>
           )}

@@ -16,7 +16,11 @@ const HousesPage = () => {
   const [filters, setFilters] = useState({
     search: '',
     location: searchParams.get('location') || '',
+    town: '',
     house_type: '',
+    min_price: '',
+    max_price: '',
+    listing_type: '',
     status: ''
   });
 
@@ -95,6 +99,7 @@ const HousesPage = () => {
           setFilters={setFilters} 
           houseTypes={houseTypes}
           locations={locations}
+          houses={houses}
         />
 
         {/* Results Info */}

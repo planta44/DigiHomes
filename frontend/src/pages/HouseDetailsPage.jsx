@@ -34,15 +34,35 @@ const HouseDetailsPage = () => {
       const houseData = response.data;
       setHouse(houseData);
       
-      // Fetch similar properties
+      // Fetch similar properties with improved logic
       const allPropertiesRes = await api.get('/houses');
-      const similar = allPropertiesRes.data
-        .filter(p => 
-          p.id !== parseInt(id) && 
-          p.vacancy_status === 'available' &&
-          (p.location === houseData.location || p.house_type === houseData.house_type)
-        )
-        .slice(0, 3);
+      let similar = [];
+      
+      if (houseData.property_type === 'house') {
+        // For houses: same location, similar bedrooms, same listing_type, only houses
+        similar = allPropertiesRes.data
+          .filter(p => 
+            p.id !== parseInt(id) && 
+            p.vacancy_status === 'available' &&
+            p.property_type === 'house' &&
+            p.listing_type === houseData.listing_type &&
+            p.location === houseData.location &&
+            p.bedrooms === houseData.bedrooms
+          )
+          .slice(0, 3);
+      } else if (houseData.property_type === 'land') {
+        // For land: same location, same listing_type, only land
+        similar = allPropertiesRes.data
+          .filter(p => 
+            p.id !== parseInt(id) && 
+            p.vacancy_status === 'available' &&
+            p.property_type === 'land' &&
+            p.listing_type === houseData.listing_type &&
+            p.location === houseData.location
+          )
+          .slice(0, 3);
+      }
+      
       setSimilarProperties(similar);
     } catch (error) {
       console.error('Error fetching house:', error);
@@ -128,8 +148,8 @@ const HouseDetailsPage = () => {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Images & Description */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Left Column - Images & Description (Desktop) / Images Only (Mobile) */}
+          <div className="lg:col-span-2 space-y-6 order-1">
             {/* Image Gallery */}
             <div className="relative rounded-2xl overflow-hidden bg-gray-100">
               <img
@@ -198,17 +218,17 @@ const HouseDetailsPage = () => {
               </div>
             )}
 
-            {/* Description */}
-            <div className="bg-white rounded-xl shadow-md p-6">
+            {/* Description - Hidden on mobile, shown on desktop */}
+            <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {house.description || 'No description available for this property.'}
               </p>
             </div>
 
-            {/* Internal Features */}
+            {/* Internal Features - Hidden on mobile */}
             {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.internal_features.map((feature, index) => (
@@ -221,9 +241,9 @@ const HouseDetailsPage = () => {
               </div>
             )}
 
-            {/* External Features */}
+            {/* External Features - Hidden on mobile */}
             {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.external_features.map((feature, index) => (
@@ -236,9 +256,9 @@ const HouseDetailsPage = () => {
               </div>
             )}
 
-            {/* Land Features */}
+            {/* Land Features - Hidden on mobile */}
             {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.land_features.map((feature, index) => (
@@ -252,8 +272,8 @@ const HouseDetailsPage = () => {
             )}
           </div>
 
-          {/* Right Column - Details */}
-          <div className="space-y-6">
+          {/* Right Column - Details (shows second on mobile, first on desktop via order) */}
+          <div className="space-y-6 order-2 lg:order-3">
             {/* Main Info Card */}
             <div className="bg-white rounded-xl shadow-md p-6">
               <div className="mb-4">
@@ -270,23 +290,26 @@ const HouseDetailsPage = () => {
                 {house.location}{house.town ? `, ${house.town}` : ''}
               </div>
 
-              <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-100">
-                <div className="text-center">
-                  <Bed className="w-6 h-6 mx-auto mb-1 text-gray-400" />
-                  <div className="font-semibold text-gray-900">{house.bedrooms}</div>
-                  <div className="text-xs text-gray-500">Bedroom{house.bedrooms > 1 ? 's' : ''}</div>
+              {/* Property Details - Only show for houses, not land */}
+              {house.property_type !== 'land' && (
+                <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-100">
+                  <div className="text-center">
+                    <Bed className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                    <div className="font-semibold text-gray-900">{house.bedrooms}</div>
+                    <div className="text-xs text-gray-500">Bedroom{house.bedrooms > 1 ? 's' : ''}</div>
+                  </div>
+                  <div className="text-center">
+                    <Bath className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                    <div className="font-semibold text-gray-900">{house.bathrooms}</div>
+                    <div className="text-xs text-gray-500">Bathroom{house.bathrooms > 1 ? 's' : ''}</div>
+                  </div>
+                  <div className="text-center">
+                    <Home className="w-6 h-6 mx-auto mb-1 text-gray-400" />
+                    <div className="font-semibold text-gray-900 text-sm">{house.house_type}</div>
+                    <div className="text-xs text-gray-500">Type</div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <Bath className="w-6 h-6 mx-auto mb-1 text-gray-400" />
-                  <div className="font-semibold text-gray-900">{house.bathrooms}</div>
-                  <div className="text-xs text-gray-500">Bathroom{house.bathrooms > 1 ? 's' : ''}</div>
-                </div>
-                <div className="text-center">
-                  <Home className="w-6 h-6 mx-auto mb-1 text-gray-400" />
-                  <div className="font-semibold text-gray-900 text-sm">{house.house_type}</div>
-                  <div className="text-xs text-gray-500">Type</div>
-                </div>
-              </div>
+              )}
 
               <div className="flex items-center text-sm text-gray-500 mt-4">
                 <Calendar className="w-4 h-4 mr-2" />
@@ -328,6 +351,62 @@ const HouseDetailsPage = () => {
                 <p>📞 +254 700 000 000</p>
               </div>
             </div>
+          </div>
+
+          {/* Mobile only - Description and Features shown after details */}
+          <div className="lg:hidden space-y-6 order-3">
+            {/* Description - Mobile */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                {house.description || 'No description available for this property.'}
+              </p>
+            </div>
+
+            {/* Internal Features - Mobile */}
+            {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {house.internal_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 rounded-full bg-primary-600"></div>
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* External Features - Mobile */}
+            {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {house.external_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 rounded-full bg-green-600"></div>
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Land Features - Mobile */}
+            {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {house.land_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 rounded-full bg-amber-600"></div>
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
