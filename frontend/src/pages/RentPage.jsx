@@ -48,7 +48,9 @@ const RentPage = () => {
         );
         
         // Apply featured properties order if saved
-        const featuredIds = settingsRes.data?.featured_rent || [];
+        const featuredIds = Array.isArray(settingsRes.data?.featured_rent) ? settingsRes.data.featured_rent : [];
+        console.log('Rent Page - Featured IDs from settings:', featuredIds);
+        console.log('Rent Page - Total rent properties:', rentProperties.length);
         if (featuredIds.length > 0) {
           const featuredProps = [];
           const nonFeaturedProps = [];

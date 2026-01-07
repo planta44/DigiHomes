@@ -50,7 +50,7 @@ const BuyPage = () => {
         );
         
         // Apply featured properties order if saved
-        const featuredIds = settingsRes.data?.featured_buy || [];
+        const featuredIds = Array.isArray(settingsRes.data?.featured_buy) ? settingsRes.data.featured_buy : [];
         if (featuredIds.length > 0) {
           const featuredProps = [];
           const nonFeaturedProps = [];

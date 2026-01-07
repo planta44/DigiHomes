@@ -85,7 +85,7 @@ const HousesPage = () => {
 
       // Apply featured properties order if saved and no filters are active
       const hasActiveFilters = filters.search || filters.location || filters.house_type || filters.town || filters.min_price || filters.max_price || filters.listing_type;
-      const featuredIds = settingsRes.data?.featured_houses || [];
+      const featuredIds = Array.isArray(settingsRes.data?.featured_houses) ? settingsRes.data.featured_houses : [];
       
       if (featuredIds.length > 0 && !hasActiveFilters) {
         const featuredProps = [];
