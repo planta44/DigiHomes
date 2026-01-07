@@ -177,7 +177,7 @@ const ManageHouses = () => {
             >
               <option value="">All Status</option>
               <option value="available">Available</option>
-              <option value="occupied">Occupied</option>
+              <option value="occupied">Occupied/Sold</option>
             </select>
           </div>
         </div>
@@ -230,7 +230,7 @@ const ManageHouses = () => {
                           onClick={() => toggleStatus(house)}
                           className={`badge cursor-pointer ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}
                         >
-                          {house.vacancy_status}
+                          {house.vacancy_status === 'occupied' && house.listing_type === 'buy' ? 'Sold' : house.vacancy_status}
                         </button>
                       </td>
                       <td className="py-4 px-4">

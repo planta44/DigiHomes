@@ -146,10 +146,6 @@ const BuyPage = () => {
       {/* Properties For Sale Section */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Properties For Sale</h2>
-            <p className="text-gray-600">Browse available properties for purchase</p>
-          </div>
 
           {/* Filters - Similar to Rent page with More Filters toggle */}
           <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-8">

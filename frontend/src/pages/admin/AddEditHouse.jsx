@@ -541,7 +541,7 @@ const AddEditHouse = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Vacancy Status
                   </label>
                   <select
@@ -551,7 +551,7 @@ const AddEditHouse = () => {
                     className="input-field"
                   >
                     <option value="available">Available</option>
-                    <option value="occupied">Occupied</option>
+                    <option value="occupied">{formData.listing_type === 'buy' ? 'Sold' : 'Occupied'}</option>
                   </select>
                 </div>
 

@@ -33,7 +33,10 @@ const AdminDashboard = () => {
   const [featuredRentSearch, setFeaturedRentSearch] = useState('');
   const [featuredHousesSearch, setFeaturedHousesSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [savingFeatured, setSavingFeatured] = useState(false);
+  const [savingHomepage, setSavingHomepage] = useState(false);
+  const [savingBuy, setSavingBuy] = useState(false);
+  const [savingRent, setSavingRent] = useState(false);
+  const [savingHouses, setSavingHouses] = useState(false);
   const [animationSettings, setAnimationSettings] = useState({
     type: 'fade-up',
     duration: 600
@@ -138,55 +141,62 @@ const AdminDashboard = () => {
   };
 
   const saveFeaturedProperties = async () => {
-    setSavingFeatured(true);
+    setSavingHomepage(true);
     try {
-      await api.put('/settings/featured_properties', { value: featuredIds });
+      console.log('Saving Homepage featured IDs:', featuredIds);
+      const response = await api.put('/settings/featured_properties', { value: featuredIds });
+      console.log('Save response:', response);
       toast.success('Homepage featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save featured properties');
     } finally {
-      setSavingFeatured(false);
+      setSavingHomepage(false);
     }
   };
 
   const saveFeaturedBuy = async () => {
-    setSavingFeatured(true);
+    setSavingBuy(true);
     try {
-      await api.put('/settings/featured_buy', { value: featuredBuyIds });
+      console.log('Saving Buy featured IDs:', featuredBuyIds);
+      const response = await api.put('/settings/featured_buy', { value: featuredBuyIds });
+      console.log('Save response:', response);
       toast.success('Buy page featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save Buy featured properties');
     } finally {
-      setSavingFeatured(false);
+      setSavingBuy(false);
     }
   };
 
   const saveFeaturedRent = async () => {
-    setSavingFeatured(true);
+    setSavingRent(true);
     try {
-      await api.put('/settings/featured_rent', { value: featuredRentIds });
       console.log('Saving Rent featured IDs:', featuredRentIds);
+      const response = await api.put('/settings/featured_rent', { value: featuredRentIds });
+      console.log('Save response:', response);
       toast.success('Rent page featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save Rent featured properties');
     } finally {
-      setSavingFeatured(false);
+      setSavingRent(false);
     }
   };
 
   const saveFeaturedHouses = async () => {
-    setSavingFeatured(true);
+    setSavingHouses(true);
     try {
-      await api.put('/settings/featured_houses', { value: featuredHousesIds });
+      console.log('Saving Houses featured IDs:', featuredHousesIds);
+      const response = await api.put('/settings/featured_houses', { value: featuredHousesIds });
+      console.log('Save response:', response);
       toast.success('Houses page featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save Houses featured properties');
     } finally {
-      setSavingFeatured(false);
+      setSavingHouses(false);
     }
   };
 
@@ -273,7 +283,7 @@ const AdminDashboard = () => {
       bgColor: 'bg-green-50'
     },
     {
-      title: 'Occupied',
+      title: 'Occupied/Sold',
       value: stats.occupiedHouses,
       icon: XCircle,
       color: 'bg-red-500',
@@ -425,11 +435,11 @@ const AdminDashboard = () => {
             </div>
             <button
               onClick={saveFeaturedProperties}
-              disabled={savingFeatured}
+              disabled={savingHomepage}
               className="btn-primary text-sm"
             >
-              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Save Order
+              {savingHomepage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Homepage
             </button>
           </div>
           <p className="text-gray-500 text-sm mb-4">Select up to 9 properties to display on the homepage. Drag to reorder.</p>
@@ -518,10 +528,10 @@ const AdminDashboard = () => {
             <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Buy Page</h2>
             <button
               onClick={saveFeaturedBuy}
-              disabled={savingFeatured}
+              disabled={savingBuy}
               className="btn-primary text-sm"
             >
-              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {savingBuy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Save Buy Featured
             </button>
           </div>
@@ -598,10 +608,10 @@ const AdminDashboard = () => {
             <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Rent Page</h2>
             <button
               onClick={saveFeaturedRent}
-              disabled={savingFeatured}
+              disabled={savingRent}
               className="btn-primary text-sm"
             >
-              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {savingRent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Save Rent Featured
             </button>
           </div>
@@ -678,10 +688,10 @@ const AdminDashboard = () => {
             <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Available Houses Page</h2>
             <button
               onClick={saveFeaturedHouses}
-              disabled={savingFeatured}
+              disabled={savingHouses}
               className="btn-primary text-sm"
             >
-              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {savingHouses ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Save Houses Featured
             </button>
           </div>
@@ -820,7 +830,7 @@ const AdminDashboard = () => {
                         <td className="py-3 text-gray-900 font-medium">{formatPrice(house.rent_price)}</td>
                         <td className="py-3">
                           <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
-                            {house.vacancy_status}
+                            {house.vacancy_status === 'occupied' && house.listing_type === 'buy' ? 'Sold' : house.vacancy_status}
                           </span>
                         </td>
                       </tr>
