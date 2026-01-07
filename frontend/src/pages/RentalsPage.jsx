@@ -24,6 +24,7 @@ const RentalsPage = () => {
   const [filters, setFilters] = useState({
     search: '',
     location: '',
+    town: '',
     house_type: '',
     property_type: '',
     min_price: '',
@@ -103,6 +104,10 @@ const RentalsPage = () => {
       result = result.filter(p => p.bathrooms >= parseInt(filters.bathrooms));
     }
     
+    if (filters.town) {
+      result = result.filter(p => p.town?.toLowerCase().includes(filters.town.toLowerCase()));
+    }
+    
     setFilteredProperties(result);
   }, [filters, properties]);
 
@@ -120,6 +125,7 @@ const RentalsPage = () => {
     setFilters({
       search: '',
       location: '',
+      town: '',
       house_type: '',
       property_type: '',
       min_price: '',
@@ -127,6 +133,18 @@ const RentalsPage = () => {
       bedrooms: '',
       bathrooms: ''
     });
+  };
+
+  // Get unique towns for selected location
+  const getAvailableTowns = () => {
+    if (!filters.location) return [];
+    const townsSet = new Set();
+    properties.forEach(p => {
+      if (p.location === filters.location && p.town) {
+        townsSet.add(p.town);
+      }
+    });
+    return Array.from(townsSet).sort();
   };
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== '').length;
@@ -180,7 +198,7 @@ const RentalsPage = () => {
               </div>
               <select
                 value={filters.location}
-                onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value, town: '' }))}
                 className="px-4 py-3 rounded-xl border-0 bg-gray-50 focus:ring-2 focus:ring-primary-500 min-w-[150px]"
               >
                 <option value="">All Locations</option>
@@ -188,6 +206,18 @@ const RentalsPage = () => {
                   <option key={loc.id} value={loc.name}>{loc.name}</option>
                 ))}
               </select>
+              {filters.location && getAvailableTowns().length > 0 && (
+                <select
+                  value={filters.town}
+                  onChange={(e) => setFilters(prev => ({ ...prev, town: e.target.value }))}
+                  className="px-4 py-3 rounded-xl border-0 bg-gray-50 focus:ring-2 focus:ring-primary-500 min-w-[150px]"
+                >
+                  <option value="">All Towns</option>
+                  {getAvailableTowns().map(town => (
+                    <option key={town} value={town}>{town}</option>
+                  ))}
+                </select>
+              )}
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-medium transition-all hover:opacity-90"
@@ -265,33 +295,38 @@ const RentalsPage = () => {
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Bedrooms</label>
-                <select
-                  value={filters.bedrooms}
-                  onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">Any</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Bathrooms</label>
-                <select
-                  value={filters.bathrooms}
-                  onChange={(e) => setFilters(prev => ({ ...prev, bathrooms: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">Any</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                </select>
-              </div>
+              {/* Hide Bedrooms/Bathrooms when Land is selected */}
+              {filters.property_type !== 'land' && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Bedrooms</label>
+                    <select
+                      value={filters.bedrooms}
+                      onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Bathrooms</label>
+                    <select
+                      value={filters.bathrooms}
+                      onChange={(e) => setFilters(prev => ({ ...prev, bathrooms: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

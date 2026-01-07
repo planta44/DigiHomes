@@ -28,6 +28,7 @@ const AddEditHouse = () => {
     title: '',
     description: '',
     location: '',
+    town: '',
     property_type: 'house',
     listing_type: 'rent',
     house_type: '',
@@ -39,7 +40,10 @@ const AddEditHouse = () => {
     vacancy_status: 'available',
     featured: false,
     lease_duration_type: 'months',
-    lease_duration: ''
+    lease_duration: '',
+    internal_features: [],
+    external_features: [],
+    land_features: []
   });
 
   const [locations, setLocations] = useState([]);
@@ -84,6 +88,7 @@ const AddEditHouse = () => {
         title: house.title,
         description: house.description || '',
         location: house.location,
+        town: house.town || '',
         property_type: house.property_type || 'house',
         listing_type: house.listing_type || 'rent',
         house_type: house.house_type || '',
@@ -95,7 +100,10 @@ const AddEditHouse = () => {
         vacancy_status: house.vacancy_status,
         featured: house.featured,
         lease_duration_type: house.lease_duration_type || 'months',
-        lease_duration: house.lease_duration || ''
+        lease_duration: house.lease_duration || '',
+        internal_features: house.internal_features || [],
+        external_features: house.external_features || [],
+        land_features: house.land_features || []
       });
       setImages(house.images || []);
     } catch (error) {
@@ -112,6 +120,19 @@ const AddEditHouse = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const toggleFeature = (category, feature) => {
+    setFormData(prev => {
+      const features = prev[category];
+      const exists = features.includes(feature);
+      return {
+        ...prev,
+        [category]: exists 
+          ? features.filter(f => f !== feature)
+          : [...features, feature]
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -316,25 +337,40 @@ const AddEditHouse = () => {
                     options={locations}
                     placeholder="Select or type location..."
                   />
-                  <p className="text-xs text-gray-500 mt-1">Choose from list or type a custom location</p>
+                  <p className="text-xs text-gray-500 mt-1">e.g., Nakuru, Nyahururu</p>
                 </div>
 
-                {formData.property_type === 'house' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Property Type (House)
-                    </label>
-                    <ComboInput
-                      name="house_type"
-                      value={formData.house_type}
-                      onChange={handleChange}
-                      options={houseTypes}
-                      placeholder="Select or type house type..."
-                    />
-                    <p className="text-xs text-gray-500 mt-1">e.g., 1 Bedroom, 2 Bedroom, Apartment</p>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Town/Area
+                  </label>
+                  <input
+                    type="text"
+                    name="town"
+                    value={formData.town}
+                    onChange={handleChange}
+                    placeholder="e.g., Lanet, Pipeline, Milimani"
+                    className="input-field"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Specific area or neighborhood</p>
+                </div>
               </div>
+
+              {formData.property_type === 'house' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Property Type (House)
+                  </label>
+                  <ComboInput
+                    name="house_type"
+                    value={formData.house_type}
+                    onChange={handleChange}
+                    options={houseTypes}
+                    placeholder="Select or type house type..."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">e.g., 1 Bedroom, 2 Bedroom, Apartment</p>
+                </div>
+              )}
 
               {/* House-specific fields */}
               {formData.property_type === 'house' && (
@@ -507,6 +543,69 @@ const AddEditHouse = () => {
               </div>
             </div>
           </div>
+
+          {/* Property Features */}
+          {formData.property_type === 'house' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Property Features</h2>
+              
+              {/* Internal Features */}
+              <div className="mb-6">
+                <h3 className="text-md font-medium text-gray-800 mb-3">Internal Features</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {['En Suite', 'Walk In Closet', 'Alarm', 'Fibre Internet', 'Built-in Wardrobes', 'Kitchen Pantry', 'Laundry Room', 'Study Room'].map(feature => (
+                    <label key={feature} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={formData.internal_features.includes(feature)}
+                        onChange={() => toggleFeature('internal_features', feature)}
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">{feature}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* External Features */}
+              <div>
+                <h3 className="text-md font-medium text-gray-800 mb-3">External Features</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {['Electric Fence', 'Parking', 'Balcony', 'Wheel Chair Access', 'Garden', 'Swimming Pool', 'Borehole', 'Backup Generator'].map(feature => (
+                    <label key={feature} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={formData.external_features.includes(feature)}
+                        onChange={() => toggleFeature('external_features', feature)}
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">{feature}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Land Features */}
+          {formData.property_type === 'land' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Land Features</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {['Gated Community', 'Title Deed Ready', 'Water Available', 'Electricity Available', 'Road Access', 'Perimeter Wall', 'Controlled Development', 'Near Schools'].map(feature => (
+                  <label key={feature} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.land_features.includes(feature)}
+                      onChange={() => toggleFeature('land_features', feature)}
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">{feature}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Images */}
           <div className="bg-white rounded-xl shadow-sm p-6">

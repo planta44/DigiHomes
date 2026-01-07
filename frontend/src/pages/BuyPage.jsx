@@ -16,7 +16,8 @@ const BuyPage = () => {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [filters, setFilters] = useState({ 
     search: '',
-    location: '', 
+    location: '',
+    town: '',
     property_type: '',
     house_type: '',
     listing_type: '', // 'buy' or 'lease'
@@ -56,19 +57,32 @@ const BuyPage = () => {
     fetchData();
   }, []);
 
+  // Get unique towns for selected location
+  const getAvailableTowns = () => {
+    if (!filters.location) return [];
+    const townsSet = new Set();
+    properties.forEach(p => {
+      if (p.location === filters.location && p.town) {
+        townsSet.add(p.town);
+      }
+    });
+    return Array.from(townsSet).sort();
+  };
+
   // Filter properties based on selected filters
   const filteredProperties = properties.filter(p => {
     const matchesSearch = !filters.search || 
       p.title?.toLowerCase().includes(filters.search.toLowerCase()) ||
       p.description?.toLowerCase().includes(filters.search.toLowerCase());
     const matchesLocation = !filters.location || p.location === filters.location;
+    const matchesTown = !filters.town || p.town?.toLowerCase().includes(filters.town.toLowerCase());
     const matchesPropertyType = !filters.property_type || p.property_type === filters.property_type;
     const matchesHouseType = !filters.house_type || p.house_type === filters.house_type;
     const matchesListingType = !filters.listing_type || p.listing_type === filters.listing_type;
     const matchesMinPrice = !filters.min_price || p.rent_price >= parseFloat(filters.min_price);
     const matchesMaxPrice = !filters.max_price || p.rent_price <= parseFloat(filters.max_price);
     const matchesBedrooms = !filters.bedrooms || p.bedrooms >= parseInt(filters.bedrooms);
-    return matchesSearch && matchesLocation && matchesPropertyType && matchesHouseType && matchesListingType && matchesMinPrice && matchesMaxPrice && matchesBedrooms;
+    return matchesSearch && matchesLocation && matchesTown && matchesPropertyType && matchesHouseType && matchesListingType && matchesMinPrice && matchesMaxPrice && matchesBedrooms;
   });
 
   const content = pageData?.content || {
@@ -136,7 +150,7 @@ const BuyPage = () => {
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <select
                     value={filters.location}
-                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value, town: '' }))}
                     className="input-field pl-10 appearance-none cursor-pointer"
                   >
                     <option value="">All Locations</option>
@@ -147,16 +161,32 @@ const BuyPage = () => {
                 </div>
               </div>
 
-              {/* More Filters Button */}
+              {/* More Filters Button OR Town Filter */}
               <div className="flex items-end">
-                <button
-                  onClick={() => setShowMoreFilters(!showMoreFilters)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:border-gray-400 hover:bg-gray-50 transition-colors"
-                >
-                  <SlidersHorizontal className="w-5 h-5" />
-                  More Filters
-                  {showMoreFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
+                {filters.location && getAvailableTowns().length > 0 ? (
+                  <div className="w-full">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Town</label>
+                    <select
+                      value={filters.town}
+                      onChange={(e) => setFilters(prev => ({ ...prev, town: e.target.value }))}
+                      className="input-field appearance-none cursor-pointer"
+                    >
+                      <option value="">All Towns</option>
+                      {getAvailableTowns().map(town => (
+                        <option key={town} value={town}>{town}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowMoreFilters(!showMoreFilters)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                  >
+                    <SlidersHorizontal className="w-5 h-5" />
+                    More Filters
+                    {showMoreFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                )}
               </div>
             </div>
 

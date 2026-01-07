@@ -20,6 +20,7 @@ const initDatabase = async () => {
         title VARCHAR(255) NOT NULL,
         description TEXT,
         location VARCHAR(100) NOT NULL,
+        town VARCHAR(100),
         house_type VARCHAR(100) NOT NULL,
         property_type VARCHAR(20) DEFAULT 'house',
         listing_type VARCHAR(20) DEFAULT 'rent',
@@ -29,6 +30,9 @@ const initDatabase = async () => {
         rent_price DECIMAL(10, 2) NOT NULL,
         vacancy_status VARCHAR(20) DEFAULT 'available',
         featured BOOLEAN DEFAULT false,
+        internal_features JSONB DEFAULT '[]',
+        external_features JSONB DEFAULT '[]',
+        land_features JSONB DEFAULT '[]',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -119,6 +123,10 @@ const initDatabase = async () => {
       await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS dimensions VARCHAR(50)`);
       await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS lease_duration_type VARCHAR(20) DEFAULT 'months'`);
       await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS lease_duration INTEGER`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS town VARCHAR(100)`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS internal_features JSONB DEFAULT '[]'`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS external_features JSONB DEFAULT '[]'`);
+      await db.query(`ALTER TABLE houses ADD COLUMN IF NOT EXISTS land_features JSONB DEFAULT '[]'`);
       console.log('✅ Property columns migration complete');
     } catch (err) {
       console.log('Migration note:', err.message);

@@ -102,7 +102,7 @@ const getHouseById = async (req, res) => {
 // Create house (admin only)
 const createHouse = async (req, res) => {
   try {
-    const { title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, lease_duration_type, lease_duration } = req.body;
+    const { title, description, location, town, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, lease_duration_type, lease_duration, internal_features, external_features, land_features } = req.body;
 
     if (!title || !location || !rent_price) {
       return res.status(400).json({ error: 'Title, location, and price are required' });
@@ -119,11 +119,15 @@ const createHouse = async (req, res) => {
     const cleanLeaseDurationType = lease_duration_type || 'months';
     const cleanLeaseDuration = lease_duration === '' || lease_duration === undefined ? null : parseInt(lease_duration) || null;
 
+    const cleanInternalFeatures = internal_features ? JSON.stringify(internal_features) : '[]';
+    const cleanExternalFeatures = external_features ? JSON.stringify(external_features) : '[]';
+    const cleanLandFeatures = land_features ? JSON.stringify(land_features) : '[]';
+
     const result = await db.query(
-      `INSERT INTO houses (title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, lease_duration_type, lease_duration)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      `INSERT INTO houses (title, description, location, town, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, lease_duration_type, lease_duration, internal_features, external_features, land_features)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        RETURNING *`,
-      [title, description, location, house_type || '', cleanPropertyType, cleanListingType, cleanBedrooms, cleanBathrooms, cleanSizeAcres, cleanDimensions, cleanRentPrice, vacancy_status || 'available', featured || false, cleanLeaseDurationType, cleanLeaseDuration]
+      [title, description, location, town || '', house_type || '', cleanPropertyType, cleanListingType, cleanBedrooms, cleanBathrooms, cleanSizeAcres, cleanDimensions, cleanRentPrice, vacancy_status || 'available', featured || false, cleanLeaseDurationType, cleanLeaseDuration, cleanInternalFeatures, cleanExternalFeatures, cleanLandFeatures]
     );
     return res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -136,7 +140,7 @@ const createHouse = async (req, res) => {
 const updateHouse = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, location, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, lease_duration_type, lease_duration } = req.body;
+    const { title, description, location, town, house_type, property_type, listing_type, bedrooms, bathrooms, size_acres, dimensions, rent_price, vacancy_status, featured, lease_duration_type, lease_duration, internal_features, external_features, land_features } = req.body;
 
     const existingHouse = await db.query('SELECT * FROM houses WHERE id = $1', [id]);
     if (existingHouse.rows.length === 0) {
@@ -154,27 +158,35 @@ const updateHouse = async (req, res) => {
     const cleanLeaseDurationType = lease_duration_type || 'months';
     const cleanLeaseDuration = lease_duration === '' || lease_duration === undefined ? null : parseInt(lease_duration) || null;
 
+    const cleanInternalFeatures = internal_features ? JSON.stringify(internal_features) : '[]';
+    const cleanExternalFeatures = external_features ? JSON.stringify(external_features) : '[]';
+    const cleanLandFeatures = land_features ? JSON.stringify(land_features) : '[]';
+
     const result = await db.query(
       `UPDATE houses 
        SET title = COALESCE($1, title),
            description = COALESCE($2, description),
            location = COALESCE($3, location),
-           house_type = COALESCE($4, house_type),
-           property_type = $5,
-           listing_type = $6,
-           bedrooms = $7,
-           bathrooms = $8,
-           size_acres = $9,
-           dimensions = $10,
-           rent_price = COALESCE($11, rent_price),
-           vacancy_status = COALESCE($12, vacancy_status),
-           featured = COALESCE($13, featured),
-           lease_duration_type = $14,
-           lease_duration = $15,
+           town = $4,
+           house_type = COALESCE($5, house_type),
+           property_type = $6,
+           listing_type = $7,
+           bedrooms = $8,
+           bathrooms = $9,
+           size_acres = $10,
+           dimensions = $11,
+           rent_price = COALESCE($12, rent_price),
+           vacancy_status = COALESCE($13, vacancy_status),
+           featured = COALESCE($14, featured),
+           lease_duration_type = $15,
+           lease_duration = $16,
+           internal_features = $17,
+           external_features = $18,
+           land_features = $19,
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $16
+       WHERE id = $20
        RETURNING *`,
-      [title, description, location, house_type, cleanPropertyType, cleanListingType, cleanBedrooms, cleanBathrooms, cleanSizeAcres, cleanDimensions, cleanRentPrice, vacancy_status, featured, cleanLeaseDurationType, cleanLeaseDuration, id]
+      [title, description, location, town || '', house_type, cleanPropertyType, cleanListingType, cleanBedrooms, cleanBathrooms, cleanSizeAcres, cleanDimensions, cleanRentPrice, vacancy_status, featured, cleanLeaseDurationType, cleanLeaseDuration, cleanInternalFeatures, cleanExternalFeatures, cleanLandFeatures, id]
     );
     return res.json(result.rows[0]);
   } catch (error) {

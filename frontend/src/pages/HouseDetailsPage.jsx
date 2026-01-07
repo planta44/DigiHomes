@@ -13,11 +13,13 @@ import {
   Calendar
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
+import HouseCard from '../components/HouseCard';
 import api from '../config/api';
 
 const HouseDetailsPage = () => {
   const { id } = useParams();
   const [house, setHouse] = useState(null);
+  const [similarProperties, setSimilarProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -29,7 +31,19 @@ const HouseDetailsPage = () => {
   const fetchHouse = async () => {
     try {
       const response = await api.get(`/houses/${id}`);
-      setHouse(response.data);
+      const houseData = response.data;
+      setHouse(houseData);
+      
+      // Fetch similar properties
+      const allPropertiesRes = await api.get('/houses');
+      const similar = allPropertiesRes.data
+        .filter(p => 
+          p.id !== parseInt(id) && 
+          p.vacancy_status === 'available' &&
+          (p.location === houseData.location || p.house_type === houseData.house_type)
+        )
+        .slice(0, 3);
+      setSimilarProperties(similar);
     } catch (error) {
       console.error('Error fetching house:', error);
     } finally {
@@ -191,6 +205,51 @@ const HouseDetailsPage = () => {
                 {house.description || 'No description available for this property.'}
               </p>
             </div>
+
+            {/* Internal Features */}
+            {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {house.internal_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 rounded-full bg-primary-600"></div>
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* External Features */}
+            {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {house.external_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 rounded-full bg-green-600"></div>
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Land Features */}
+            {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {house.land_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-gray-700">
+                      <div className="w-2 h-2 rounded-full bg-amber-600"></div>
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column - Details */}
@@ -208,7 +267,7 @@ const HouseDetailsPage = () => {
 
               <div className="flex items-center text-gray-600 mb-4">
                 <MapPin className="w-5 h-5 mr-2 text-primary-600" />
-                {house.location}, Kenya
+                {house.location}{house.town ? `, ${house.town}` : ''}
               </div>
 
               <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-100">
@@ -271,6 +330,18 @@ const HouseDetailsPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Similar Properties Section */}
+        {similarProperties.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Properties</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {similarProperties.map(property => (
+                <HouseCard key={property.id} house={property} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </PublicLayout>
   );

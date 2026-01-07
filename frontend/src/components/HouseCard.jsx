@@ -81,7 +81,9 @@ const HouseCard = ({ house }) => {
         
         <div className="flex items-center text-gray-500 text-sm mb-3">
           <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-          <span className="truncate">{house.location}, Kenya</span>
+          <span className="truncate">
+            {house.location}{house.town ? `, ${house.town}` : ''}
+          </span>
         </div>
 
         {/* Property Details */}
