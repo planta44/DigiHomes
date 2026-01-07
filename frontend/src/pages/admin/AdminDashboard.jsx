@@ -23,6 +23,9 @@ const AdminDashboard = () => {
   const [recentHouses, setRecentHouses] = useState([]);
   const [allHouses, setAllHouses] = useState([]);
   const [featuredIds, setFeaturedIds] = useState([]);
+  const [featuredBuyIds, setFeaturedBuyIds] = useState([]);
+  const [featuredRentIds, setFeaturedRentIds] = useState([]);
+  const [featuredHousesIds, setFeaturedHousesIds] = useState([]);
   const [featuredSearch, setFeaturedSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [savingFeatured, setSavingFeatured] = useState(false);
@@ -58,6 +61,11 @@ const AdminDashboard = () => {
         setFeaturedIds(defaultFeatured);
       }
 
+      // Load featured properties for Buy, Rent, and Houses pages
+      setFeaturedBuyIds(settingsRes.data?.featured_buy || []);
+      setFeaturedRentIds(settingsRes.data?.featured_rent || []);
+      setFeaturedHousesIds(settingsRes.data?.featured_houses || []);
+
       // Load animation settings
       if (settingsRes.data?.animation_settings) {
         setAnimationSettings(settingsRes.data.animation_settings);
@@ -92,11 +100,43 @@ const AdminDashboard = () => {
     }
   };
 
+  const moveFeaturedBuy = (index, direction) => {
+    const newIds = [...featuredBuyIds];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newIds.length) {
+      [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
+      setFeaturedBuyIds(newIds);
+    }
+  };
+
+  const moveFeaturedRent = (index, direction) => {
+    const newIds = [...featuredRentIds];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newIds.length) {
+      [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
+      setFeaturedRentIds(newIds);
+    }
+  };
+
+  const moveFeaturedHouses = (index, direction) => {
+    const newIds = [...featuredHousesIds];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex < newIds.length) {
+      [newIds[index], newIds[newIndex]] = [newIds[newIndex], newIds[index]];
+      setFeaturedHousesIds(newIds);
+    }
+  };
+
   const saveFeaturedProperties = async () => {
     setSavingFeatured(true);
     try {
-      await api.put('/settings/featured_properties', { value: featuredIds });
-      toast.success('Featured properties saved!');
+      await Promise.all([
+        api.put('/settings/featured_properties', { value: featuredIds }),
+        api.put('/settings/featured_buy', { value: featuredBuyIds }),
+        api.put('/settings/featured_rent', { value: featuredRentIds }),
+        api.put('/settings/featured_houses', { value: featuredHousesIds })
+      ]);
+      toast.success('All featured properties saved!');
     } catch (error) {
       toast.error('Failed to save featured properties');
     } finally {
@@ -391,6 +431,177 @@ const AdminDashboard = () => {
                 <p className="text-gray-400 text-sm py-4 text-center">All available properties are featured</p>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Featured for Buy Page */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Buy Page</h2>
+            <button
+              onClick={saveFeaturedProperties}
+              disabled={savingFeatured}
+              className="btn-primary text-sm"
+            >
+              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+          </div>
+          <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Buy page ({featuredBuyIds.length}/10)</p>
+          <div className="space-y-2">
+            {featuredBuyIds.map((id, idx) => {
+              const house = allHouses.find(h => h.id === id);
+              return house ? (
+                <div key={id} className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                  <span className="font-bold w-6">{idx + 1}</span>
+                  <span className="flex-1 text-sm">{house.title}</span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => moveFeaturedBuy(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveFeaturedBuy(idx, 'down')}
+                      disabled={idx === featuredBuyIds.length - 1}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setFeaturedBuyIds(prev => prev.filter(i => i !== id))} className="p-1 text-red-500 hover:text-red-700">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : null;
+            })}
+            <select onChange={(e) => {
+              if (e.target.value && featuredBuyIds.length < 10 && !featuredBuyIds.includes(parseInt(e.target.value))) {
+                setFeaturedBuyIds([...featuredBuyIds, parseInt(e.target.value)]);
+              }
+              e.target.value = '';
+            }} className="input-field">
+              <option value="">Add property...</option>
+              {allHouses.filter(h => h.listing_type === 'buy').map(h => (
+                <option key={h.id} value={h.id}>{h.title}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Featured for Rent Page */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Rent Page</h2>
+            <button
+              onClick={saveFeaturedProperties}
+              disabled={savingFeatured}
+              className="btn-primary text-sm"
+            >
+              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+          </div>
+          <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Rent page ({featuredRentIds.length}/10)</p>
+          <div className="space-y-2">
+            {featuredRentIds.map((id, idx) => {
+              const house = allHouses.find(h => h.id === id);
+              return house ? (
+                <div key={id} className="flex items-center gap-2 p-2 bg-purple-50 border border-purple-200 rounded">
+                  <span className="font-bold w-6">{idx + 1}</span>
+                  <span className="flex-1 text-sm">{house.title}</span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => moveFeaturedRent(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveFeaturedRent(idx, 'down')}
+                      disabled={idx === featuredRentIds.length - 1}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setFeaturedRentIds(prev => prev.filter(i => i !== id))} className="p-1 text-red-500 hover:text-red-700">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : null;
+            })}
+            <select onChange={(e) => {
+              if (e.target.value && featuredRentIds.length < 10 && !featuredRentIds.includes(parseInt(e.target.value))) {
+                setFeaturedRentIds([...featuredRentIds, parseInt(e.target.value)]);
+              }
+              e.target.value = '';
+            }} className="input-field">
+              <option value="">Add property...</option>
+              {allHouses.filter(h => h.listing_type === 'rent').map(h => (
+                <option key={h.id} value={h.id}>{h.title}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Featured for Houses Page */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-gray-900">Featured Properties - Available Houses Page</h2>
+            <button
+              onClick={saveFeaturedProperties}
+              disabled={savingFeatured}
+              className="btn-primary text-sm"
+            >
+              {savingFeatured ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+          </div>
+          <p className="text-gray-500 text-sm mb-4">Select up to 10 properties for Houses page ({featuredHousesIds.length}/10)</p>
+          <div className="space-y-2">
+            {featuredHousesIds.map((id, idx) => {
+              const house = allHouses.find(h => h.id === id);
+              return house ? (
+                <div key={id} className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
+                  <span className="font-bold w-6">{idx + 1}</span>
+                  <span className="flex-1 text-sm">{house.title}</span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => moveFeaturedHouses(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => moveFeaturedHouses(idx, 'down')}
+                      disabled={idx === featuredHousesIds.length - 1}
+                      className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-30"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setFeaturedHousesIds(prev => prev.filter(i => i !== id))} className="p-1 text-red-500 hover:text-red-700">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : null;
+            })}
+            <select onChange={(e) => {
+              if (e.target.value && featuredHousesIds.length < 10 && !featuredHousesIds.includes(parseInt(e.target.value))) {
+                setFeaturedHousesIds([...featuredHousesIds, parseInt(e.target.value)]);
+              }
+              e.target.value = '';
+            }} className="input-field">
+              <option value="">Add property...</option>
+              {allHouses.filter(h => h.property_type === 'house' && h.listing_type !== 'buy').map(h => (
+                <option key={h.id} value={h.id}>{h.title}</option>
+              ))}
+            </select>
           </div>
         </div>
 
