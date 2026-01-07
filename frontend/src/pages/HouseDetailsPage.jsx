@@ -436,13 +436,14 @@ const HouseDetailsPage = () => {
           </div>
           {/* Agency Info - Full width below all content */}
           <div data-animate-line className="col-span-1 lg:col-span-3 mt-8 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
-          <p className="text-gray-600 text-sm mb-4">
-            Your trusted housing agency in Nakuru and Nyahururu, Kenya.
-          </p>
-          <div className="text-sm text-gray-500 space-y-1">
-            <p>📧 info@digihomes.co.ke</p>
-            <p>📞 +254 700 000 000</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Your trusted housing agency in Nakuru and Nyahururu, Kenya.
+            </p>
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>📧 info@digihomes.co.ke</p>
+              <p>📞 +254 700 000 000</p>
+            </div>
           </div>
         </div>
 
