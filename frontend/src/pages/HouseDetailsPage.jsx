@@ -152,9 +152,9 @@ const HouseDetailsPage = () => {
           {house.property_type === 'land' ? 'Back to Lands' : 'Back to Houses'}
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div ref={detailsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Images & Description (Desktop) / Images Only (Mobile) */}
-          <div ref={detailsRef} className="lg:col-span-2 space-y-6 order-1">
+          <div className="lg:col-span-2 space-y-6 order-1">
             {/* Image Gallery */}
             <div data-animate-line className="relative rounded-2xl overflow-hidden bg-gray-100">
               <img
@@ -434,10 +434,8 @@ const HouseDetailsPage = () => {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Agency Info - Above Similar Properties */}
-        <div data-animate-line className="mt-16 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
+          {/* Agency Info - Full width below all content */}
+          <div data-animate-line className="col-span-1 lg:col-span-3 mt-8 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
           <p className="text-gray-600 text-sm mb-4">
             Your trusted housing agency in Nakuru and Nyahururu, Kenya.

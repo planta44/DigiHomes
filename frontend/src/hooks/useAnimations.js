@@ -295,12 +295,20 @@ export const useLineByLine = (sectionName = 'about') => {
         if (!line.classList.contains(animClass)) {
           line.style.opacity = '0';
           line.style.transform = 'translateY(20px)';
+          line.style.visibility = 'hidden'; // Explicitly hide on mobile
           line.style.transition = 'none'; // Prevent flash on initial load
         }
       });
       
-      // Force reflow to ensure styles are applied
+      // Force reflow to ensure styles are applied immediately
       void container.offsetHeight;
+      
+      // Re-enable transitions after initial hide
+      setTimeout(() => {
+        lines.forEach(line => {
+          line.style.transition = '';
+        });
+      }, 10);
 
       // Clean up old observer if exists
       if (observerRef.current) {
@@ -316,6 +324,7 @@ export const useLineByLine = (sectionName = 'about') => {
               line.style.setProperty('--card-duration', `${duration}ms`);
               
               // Animate immediately when in view
+              line.style.visibility = 'visible';
               line.classList.add(animClass);
               line.style.opacity = '1';
               line.style.transform = 'translateY(0)';
@@ -324,6 +333,7 @@ export const useLineByLine = (sectionName = 'about') => {
               line.classList.remove('animate-slideUp', 'animate-fadeIn', 'animate-slideInLeft');
               line.style.opacity = '0';
               line.style.transform = 'translateY(20px)';
+              line.style.visibility = 'hidden';
             }
           });
         },
