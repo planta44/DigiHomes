@@ -29,6 +29,9 @@ const AdminDashboard = () => {
   const [featuredRentIds, setFeaturedRentIds] = useState([]);
   const [featuredHousesIds, setFeaturedHousesIds] = useState([]);
   const [featuredSearch, setFeaturedSearch] = useState('');
+  const [featuredBuySearch, setFeaturedBuySearch] = useState('');
+  const [featuredRentSearch, setFeaturedRentSearch] = useState('');
+  const [featuredHousesSearch, setFeaturedHousesSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [savingFeatured, setSavingFeatured] = useState(false);
   const [animationSettings, setAnimationSettings] = useState({
@@ -170,11 +173,43 @@ const AdminDashboard = () => {
   const getAvailableHouses = () => {
     return allHouses.filter(h => {
       const notFeatured = !featuredIds.includes(h.id);
-      const isAvailable = h.vacancy_status === 'available';
       const matchesSearch = !featuredSearch || 
         h.title?.toLowerCase().includes(featuredSearch.toLowerCase()) ||
         h.location?.toLowerCase().includes(featuredSearch.toLowerCase());
-      return notFeatured && isAvailable && matchesSearch;
+      return notFeatured && matchesSearch;
+    });
+  };
+
+  const getAvailableBuy = () => {
+    return allHouses.filter(h => {
+      const notFeatured = !featuredBuyIds.includes(h.id);
+      const isBuyOrLease = h.listing_type === 'buy' || h.listing_type === 'lease';
+      const matchesSearch = !featuredBuySearch || 
+        h.title?.toLowerCase().includes(featuredBuySearch.toLowerCase()) ||
+        h.location?.toLowerCase().includes(featuredBuySearch.toLowerCase());
+      return notFeatured && isBuyOrLease && matchesSearch;
+    });
+  };
+
+  const getAvailableRent = () => {
+    return allHouses.filter(h => {
+      const notFeatured = !featuredRentIds.includes(h.id);
+      const isRentOrLease = h.listing_type === 'rent' || h.listing_type === 'lease' || !h.listing_type;
+      const matchesSearch = !featuredRentSearch || 
+        h.title?.toLowerCase().includes(featuredRentSearch.toLowerCase()) ||
+        h.location?.toLowerCase().includes(featuredRentSearch.toLowerCase());
+      return notFeatured && isRentOrLease && matchesSearch;
+    });
+  };
+
+  const getAvailableHousesPage = () => {
+    return allHouses.filter(h => {
+      const notFeatured = !featuredHousesIds.includes(h.id);
+      const isHouseForRent = h.property_type === 'house' && h.listing_type !== 'buy';
+      const matchesSearch = !featuredHousesSearch || 
+        h.title?.toLowerCase().includes(featuredHousesSearch.toLowerCase()) ||
+        h.location?.toLowerCase().includes(featuredHousesSearch.toLowerCase());
+      return notFeatured && isHouseForRent && matchesSearch;
     });
   };
 
@@ -484,17 +519,40 @@ const AdminDashboard = () => {
                 </div>
               ) : null;
             })}
-            <select onChange={(e) => {
-              if (e.target.value && featuredBuyIds.length < 10 && !featuredBuyIds.includes(parseInt(e.target.value))) {
-                setFeaturedBuyIds([...featuredBuyIds, parseInt(e.target.value)]);
-              }
-              e.target.value = '';
-            }} className="input-field">
-              <option value="">Add property...</option>
-              {allHouses.filter(h => h.listing_type === 'buy').map(h => (
-                <option key={h.id} value={h.id}>{h.title}</option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Search properties..."
+              value={featuredBuySearch}
+              onChange={(e) => setFeaturedBuySearch(e.target.value)}
+              className="w-full px-3 py-2 mb-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+            <div className="max-h-48 overflow-y-auto border rounded-lg">
+              {getAvailableBuy().length > 0 ? (
+                <div className="divide-y">
+                  {getAvailableBuy().slice(0, 20).map(house => (
+                    <div key={house.id} className="flex items-center justify-between p-3 hover:bg-gray-50">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 truncate">{house.title}</p>
+                        <p className="text-xs text-gray-500">{house.location} • {house.listing_type}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (featuredBuyIds.length < 10 && !featuredBuyIds.includes(house.id)) {
+                            setFeaturedBuyIds([...featuredBuyIds, house.id]);
+                          }
+                        }}
+                        className="btn-sm btn-primary ml-2"
+                        disabled={featuredBuyIds.length >= 10}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-4 text-sm">No properties available</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -541,17 +599,40 @@ const AdminDashboard = () => {
                 </div>
               ) : null;
             })}
-            <select onChange={(e) => {
-              if (e.target.value && featuredRentIds.length < 10 && !featuredRentIds.includes(parseInt(e.target.value))) {
-                setFeaturedRentIds([...featuredRentIds, parseInt(e.target.value)]);
-              }
-              e.target.value = '';
-            }} className="input-field">
-              <option value="">Add property...</option>
-              {allHouses.filter(h => h.listing_type === 'rent').map(h => (
-                <option key={h.id} value={h.id}>{h.title}</option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Search properties..."
+              value={featuredRentSearch}
+              onChange={(e) => setFeaturedRentSearch(e.target.value)}
+              className="w-full px-3 py-2 mb-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+            <div className="max-h-48 overflow-y-auto border rounded-lg">
+              {getAvailableRent().length > 0 ? (
+                <div className="divide-y">
+                  {getAvailableRent().slice(0, 20).map(house => (
+                    <div key={house.id} className="flex items-center justify-between p-3 hover:bg-gray-50">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 truncate">{house.title}</p>
+                        <p className="text-xs text-gray-500">{house.location} • {house.listing_type || 'rent'}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (featuredRentIds.length < 10 && !featuredRentIds.includes(house.id)) {
+                            setFeaturedRentIds([...featuredRentIds, house.id]);
+                          }
+                        }}
+                        className="btn-sm btn-primary ml-2"
+                        disabled={featuredRentIds.length >= 10}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-4 text-sm">No properties available</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -598,17 +679,40 @@ const AdminDashboard = () => {
                 </div>
               ) : null;
             })}
-            <select onChange={(e) => {
-              if (e.target.value && featuredHousesIds.length < 10 && !featuredHousesIds.includes(parseInt(e.target.value))) {
-                setFeaturedHousesIds([...featuredHousesIds, parseInt(e.target.value)]);
-              }
-              e.target.value = '';
-            }} className="input-field">
-              <option value="">Add property...</option>
-              {allHouses.filter(h => h.property_type === 'house' && h.listing_type !== 'buy').map(h => (
-                <option key={h.id} value={h.id}>{h.title}</option>
-              ))}
-            </select>
+            <input
+              type="text"
+              placeholder="Search properties..."
+              value={featuredHousesSearch}
+              onChange={(e) => setFeaturedHousesSearch(e.target.value)}
+              className="w-full px-3 py-2 mb-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+            <div className="max-h-48 overflow-y-auto border rounded-lg">
+              {getAvailableHousesPage().length > 0 ? (
+                <div className="divide-y">
+                  {getAvailableHousesPage().slice(0, 20).map(house => (
+                    <div key={house.id} className="flex items-center justify-between p-3 hover:bg-gray-50">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 truncate">{house.title}</p>
+                        <p className="text-xs text-gray-500">{house.location} • {house.listing_type || 'rent'}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (featuredHousesIds.length < 10 && !featuredHousesIds.includes(house.id)) {
+                            setFeaturedHousesIds([...featuredHousesIds, house.id]);
+                          }
+                        }}
+                        className="btn-sm btn-primary ml-2"
+                        disabled={featuredHousesIds.length >= 10}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-4 text-sm">No properties available</p>
+              )}
+            </div>
           </div>
         </div>
 

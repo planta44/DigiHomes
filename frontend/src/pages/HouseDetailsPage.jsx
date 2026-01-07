@@ -24,6 +24,40 @@ const HouseDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
+  // Determine back link and text based on property type
+  const getBackLink = () => {
+    if (!house) return { path: '/houses', text: 'Back to Houses' };
+    
+    // Land for sale -> Buy page
+    if (house.property_type === 'land' && house.listing_type === 'buy') {
+      return { path: '/buy', text: 'Back to Buy' };
+    }
+    // Land for lease -> Buy page (since Buy includes lease)
+    if (house.property_type === 'land' && house.listing_type === 'lease') {
+      return { path: '/buy', text: 'Back to Buy' };
+    }
+    // House for sale -> Buy page
+    if (house.property_type === 'house' && house.listing_type === 'buy') {
+      return { path: '/buy', text: 'Back to Buy' };
+    }
+    // House for rent -> Rent page
+    if (house.property_type === 'house' && house.listing_type === 'rent') {
+      return { path: '/rent', text: 'Back to Rent' };
+    }
+    // House for lease (rental) -> Rent page
+    if (house.property_type === 'house' && house.listing_type === 'lease') {
+      return { path: '/rent', text: 'Back to Rent' };
+    }
+    // House with no listing_type (default to rent) -> Rent page
+    if (house.property_type === 'house' && !house.listing_type) {
+      return { path: '/rent', text: 'Back to Rent' };
+    }
+    // Default fallback
+    return { path: '/houses', text: 'Back to Houses' };
+  };
+  
+  const backLink = getBackLink();
+  
   // Use scroll-based animations with section-specific controls
   const detailsRef = useLineByLine('propertyDetails');
   const similarPropertiesRef = useCardStagger('similarProperties');
@@ -145,11 +179,11 @@ const HouseDetailsPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Link 
-          to={house.property_type === 'land' ? '/buy' : '/houses'}
+          to={backLink.path}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          {house.property_type === 'land' ? 'Back to Lands' : 'Back to Houses'}
+          {backLink.text}
         </Link>
 
         <div ref={detailsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
