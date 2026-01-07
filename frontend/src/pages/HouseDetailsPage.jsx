@@ -22,11 +22,63 @@ const HouseDetailsPage = () => {
   const [similarProperties, setSimilarProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [animationSettings, setAnimationSettings] = useState({
+    type: 'fade-up',
+    duration: 600
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchHouse();
+    fetchAnimationSettings();
   }, [id]);
+
+  const fetchAnimationSettings = async () => {
+    try {
+      const response = await api.get('/settings');
+      if (response.data?.animation_settings) {
+        setAnimationSettings(response.data.animation_settings);
+      }
+    } catch (error) {
+      console.error('Error fetching animation settings:', error);
+    }
+  };
+
+  // Apply animations on mount and when settings change
+  useEffect(() => {
+    if (!house) return;
+    
+    const elements = document.querySelectorAll('[data-aos]');
+    elements.forEach((el, index) => {
+      // Reset animation
+      el.style.opacity = '0';
+      el.style.transform = getInitialTransform(animationSettings.type);
+      
+      // Trigger animation with stagger
+      setTimeout(() => {
+        el.style.transition = `opacity ${animationSettings.duration}ms ease-out, transform ${animationSettings.duration}ms ease-out`;
+        el.style.opacity = '1';
+        el.style.transform = 'translate3d(0, 0, 0) scale(1)';
+      }, index * 100);
+    });
+  }, [house, animationSettings]);
+
+  const getInitialTransform = (type) => {
+    const transforms = {
+      'fade': 'translate3d(0, 0, 0) scale(1)',
+      'fade-up': 'translate3d(0, 30px, 0) scale(1)',
+      'fade-down': 'translate3d(0, -30px, 0) scale(1)',
+      'fade-left': 'translate3d(30px, 0, 0) scale(1)',
+      'fade-right': 'translate3d(-30px, 0, 0) scale(1)',
+      'zoom-in': 'translate3d(0, 0, 0) scale(0.8)',
+      'zoom-out': 'translate3d(0, 0, 0) scale(1.2)',
+      'slide-up': 'translate3d(0, 50px, 0) scale(1)',
+      'slide-down': 'translate3d(0, -50px, 0) scale(1)',
+      'slide-left': 'translate3d(50px, 0, 0) scale(1)',
+      'slide-right': 'translate3d(-50px, 0, 0) scale(1)'
+    };
+    return transforms[type] || transforms['fade-up'];
+  };
 
   const fetchHouse = async () => {
     try {
@@ -34,12 +86,12 @@ const HouseDetailsPage = () => {
       const houseData = response.data;
       setHouse(houseData);
       
-      // Fetch similar properties with improved logic
+      // Fetch similar properties with loosened logic
       const allPropertiesRes = await api.get('/houses');
       let similar = [];
       
       if (houseData.property_type === 'house') {
-        // For houses: same location, similar bedrooms, same listing_type, only houses
+        // For houses: same location, same house_type OR +/-1 bedrooms, same listing_type
         similar = allPropertiesRes.data
           .filter(p => 
             p.id !== parseInt(id) && 
@@ -47,17 +99,17 @@ const HouseDetailsPage = () => {
             p.property_type === 'house' &&
             p.listing_type === houseData.listing_type &&
             p.location === houseData.location &&
-            p.bedrooms === houseData.bedrooms
+            (p.house_type === houseData.house_type || 
+             Math.abs(p.bedrooms - houseData.bedrooms) <= 1)
           )
           .slice(0, 3);
       } else if (houseData.property_type === 'land') {
-        // For land: same location, same listing_type, only land
+        // For land: same location only, towns and listing_type may vary
         similar = allPropertiesRes.data
           .filter(p => 
             p.id !== parseInt(id) && 
             p.vacancy_status === 'available' &&
             p.property_type === 'land' &&
-            p.listing_type === houseData.listing_type &&
             p.location === houseData.location
           )
           .slice(0, 3);
@@ -151,7 +203,7 @@ const HouseDetailsPage = () => {
           {/* Left Column - Images & Description (Desktop) / Images Only (Mobile) */}
           <div className="lg:col-span-2 space-y-6 order-1">
             {/* Image Gallery */}
-            <div className="relative rounded-2xl overflow-hidden bg-gray-100">
+            <div data-aos className="relative rounded-2xl overflow-hidden bg-gray-100">
               <img
                 src={getImageUrl(images[currentImageIndex])}
                 alt={house.title}
@@ -219,7 +271,7 @@ const HouseDetailsPage = () => {
             )}
 
             {/* Description - Hidden on mobile, shown on desktop */}
-            <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+            <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {house.description || 'No description available for this property.'}
@@ -228,7 +280,7 @@ const HouseDetailsPage = () => {
 
             {/* Internal Features - Hidden on mobile */}
             {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
-              <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+              <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.internal_features.map((feature, index) => (
@@ -243,7 +295,7 @@ const HouseDetailsPage = () => {
 
             {/* External Features - Hidden on mobile */}
             {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
-              <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+              <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.external_features.map((feature, index) => (
@@ -258,7 +310,7 @@ const HouseDetailsPage = () => {
 
             {/* Land Features - Hidden on mobile */}
             {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
-              <div className="hidden lg:block bg-white rounded-xl shadow-md p-6">
+              <div data-aos className="hidden lg:block bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {house.land_features.map((feature, index) => (
@@ -275,12 +327,27 @@ const HouseDetailsPage = () => {
           {/* Right Column - Details (shows second on mobile, first on desktop via order) */}
           <div className="space-y-6 order-2 lg:order-3">
             {/* Main Info Card */}
-            <div className="bg-white rounded-xl shadow-md p-6">
+            <div data-aos className="bg-white rounded-xl shadow-md p-6">
+              {/* Listing Type Banner */}
+              {house.listing_type !== 'rent' && (
+                <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mb-3 ${
+                  house.listing_type === 'buy' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                }`}>
+                  For {house.listing_type === 'buy' ? 'Sale' : 'Lease'}
+                </div>
+              )}
+
               <div className="mb-4">
                 <span className="text-3xl font-bold text-primary-600">
                   {formatPrice(house.rent_price)}
                 </span>
-                <span className="text-gray-500">/month</span>
+                {/* Only show /month for rent, show duration for lease, nothing for buy */}
+                {house.listing_type === 'rent' && (
+                  <span className="text-gray-500">/month</span>
+                )}
+                {house.listing_type === 'lease' && house.lease_duration && (
+                  <span className="text-gray-500">/{house.lease_duration} {house.lease_duration_type === 'months' ? 'mos' : 'yrs'}</span>
+                )}
               </div>
 
               <h1 className="text-2xl font-bold text-gray-900 mb-3">{house.title}</h1>
@@ -289,6 +356,24 @@ const HouseDetailsPage = () => {
                 <MapPin className="w-5 h-5 mr-2 text-primary-600" />
                 {house.location}{house.town ? `, ${house.town}` : ''}
               </div>
+
+              {/* Size and Dimensions for Land */}
+              {house.property_type === 'land' && (
+                <div className="space-y-2 py-4 border-t border-b border-gray-100">
+                  {house.size_acres && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Size:</span>
+                      <span className="font-semibold text-gray-900">{house.size_acres} Acres</span>
+                    </div>
+                  )}
+                  {house.dimensions && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Dimensions:</span>
+                      <span className="font-semibold text-gray-900">{house.dimensions}</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Property Details - Only show for houses, not land */}
               {house.property_type !== 'land' && (
@@ -318,7 +403,7 @@ const HouseDetailsPage = () => {
             </div>
 
             {/* Contact Card */}
-            <div className="bg-white rounded-xl shadow-md p-6">
+            <div data-aos className="bg-white rounded-xl shadow-md p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Interested in this property?</h3>
               <div className="space-y-3">
                 <a
@@ -339,24 +424,12 @@ const HouseDetailsPage = () => {
                 </a>
               </div>
             </div>
-
-            {/* Agency Info */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Your trusted housing agency in Nakuru and Nyahururu, Kenya.
-              </p>
-              <div className="text-sm text-gray-500 space-y-1">
-                <p>📧 info@digihomes.co.ke</p>
-                <p>📞 +254 700 000 000</p>
-              </div>
-            </div>
           </div>
 
           {/* Mobile only - Description and Features shown after details */}
           <div className="lg:hidden space-y-6 order-3">
             {/* Description - Mobile */}
-            <div className="bg-white rounded-xl shadow-md p-6">
+            <div data-aos className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {house.description || 'No description available for this property.'}
@@ -365,7 +438,7 @@ const HouseDetailsPage = () => {
 
             {/* Internal Features - Mobile */}
             {house.property_type === 'house' && house.internal_features && house.internal_features.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div data-aos className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Internal Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   {house.internal_features.map((feature, index) => (
@@ -380,7 +453,7 @@ const HouseDetailsPage = () => {
 
             {/* External Features - Mobile */}
             {house.property_type === 'house' && house.external_features && house.external_features.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div data-aos className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">External Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   {house.external_features.map((feature, index) => (
@@ -395,7 +468,7 @@ const HouseDetailsPage = () => {
 
             {/* Land Features - Mobile */}
             {house.property_type === 'land' && house.land_features && house.land_features.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div data-aos className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Land Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   {house.land_features.map((feature, index) => (
@@ -410,9 +483,21 @@ const HouseDetailsPage = () => {
           </div>
         </div>
 
+        {/* Agency Info - Above Similar Properties */}
+        <div data-aos className="mt-16 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
+          <p className="text-gray-600 text-sm mb-4">
+            Your trusted housing agency in Nakuru and Nyahururu, Kenya.
+          </p>
+          <div className="text-sm text-gray-500 space-y-1">
+            <p>📧 info@digihomes.co.ke</p>
+            <p>📞 +254 700 000 000</p>
+          </div>
+        </div>
+
         {/* Similar Properties Section */}
         {similarProperties.length > 0 && (
-          <div className="mt-16">
+          <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Properties</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {similarProperties.map(property => (

@@ -61,9 +61,24 @@ const HousesPage = () => {
 
       const response = await api.get(`/houses?${params.toString()}`);
       // Exclude Land and houses for sale from Available Houses - only show rental properties
-      const rentalHouses = (response.data || []).filter(h => 
+      let rentalHouses = (response.data || []).filter(h => 
         h.property_type !== 'land' && h.listing_type !== 'buy'
       );
+
+      // Client-side filtering for additional filters
+      if (filters.town) {
+        rentalHouses = rentalHouses.filter(h => h.town === filters.town);
+      }
+      if (filters.min_price) {
+        rentalHouses = rentalHouses.filter(h => h.rent_price >= parseFloat(filters.min_price));
+      }
+      if (filters.max_price) {
+        rentalHouses = rentalHouses.filter(h => h.rent_price <= parseFloat(filters.max_price));
+      }
+      if (filters.listing_type) {
+        rentalHouses = rentalHouses.filter(h => h.listing_type === filters.listing_type);
+      }
+
       setHouses(rentalHouses);
     } catch (error) {
       console.error('Error fetching houses:', error);

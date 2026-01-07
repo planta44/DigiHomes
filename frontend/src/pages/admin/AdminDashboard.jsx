@@ -26,6 +26,11 @@ const AdminDashboard = () => {
   const [featuredSearch, setFeaturedSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [savingFeatured, setSavingFeatured] = useState(false);
+  const [animationSettings, setAnimationSettings] = useState({
+    type: 'fade-up',
+    duration: 600
+  });
+  const [savingAnimations, setSavingAnimations] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -51,6 +56,11 @@ const AdminDashboard = () => {
         // Default to first 9 featured properties
         const defaultFeatured = houses.filter(h => h.featured).slice(0, 9).map(h => h.id);
         setFeaturedIds(defaultFeatured);
+      }
+
+      // Load animation settings
+      if (settingsRes.data?.animation_settings) {
+        setAnimationSettings(settingsRes.data.animation_settings);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -91,6 +101,18 @@ const AdminDashboard = () => {
       toast.error('Failed to save featured properties');
     } finally {
       setSavingFeatured(false);
+    }
+  };
+
+  const saveAnimationSettings = async () => {
+    setSavingAnimations(true);
+    try {
+      await api.put('/settings/animation_settings', { value: animationSettings });
+      toast.success('Animation settings saved!');
+    } catch (error) {
+      toast.error('Failed to save animation settings');
+    } finally {
+      setSavingAnimations(false);
     }
   };
 
@@ -206,6 +228,75 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
+
+        {/* Animation Settings */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Page Animation Settings</h2>
+            <button
+              onClick={saveAnimationSettings}
+              disabled={savingAnimations}
+              className="btn-primary text-sm"
+            >
+              {savingAnimations ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Settings
+            </button>
+          </div>
+          <p className="text-gray-500 text-sm mb-4">Configure animations for property detail pages</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Animation Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Animation Type
+              </label>
+              <select
+                value={animationSettings.type}
+                onChange={(e) => setAnimationSettings(prev => ({ ...prev, type: e.target.value }))}
+                className="input-field"
+              >
+                <option value="fade">Fade In</option>
+                <option value="fade-up">Fade Up</option>
+                <option value="fade-down">Fade Down</option>
+                <option value="fade-left">Fade Left</option>
+                <option value="fade-right">Fade Right</option>
+                <option value="zoom-in">Zoom In</option>
+                <option value="zoom-out">Zoom Out</option>
+                <option value="slide-up">Slide Up</option>
+                <option value="slide-down">Slide Down</option>
+                <option value="slide-left">Slide Left</option>
+                <option value="slide-right">Slide Right</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Choose how elements appear on the page</p>
+            </div>
+
+            {/* Animation Duration */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Animation Duration (ms)
+              </label>
+              <input
+                type="number"
+                min="100"
+                max="2000"
+                step="100"
+                value={animationSettings.duration}
+                onChange={(e) => setAnimationSettings(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                className="input-field"
+              />
+              <p className="text-xs text-gray-500 mt-1">Duration in milliseconds (100-2000ms)</p>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+            <div className="text-xs text-gray-600">
+              Animation: <span className="font-semibold">{animationSettings.type}</span> • 
+              Duration: <span className="font-semibold">{animationSettings.duration}ms</span>
+            </div>
+          </div>
+        </div>
 
         {/* Featured Properties Selector */}
         <div className="bg-white rounded-xl shadow-sm p-6">
