@@ -6,7 +6,13 @@ const getSettings = async (req, res) => {
     const result = await db.query('SELECT setting_key, setting_value FROM site_settings');
     const settings = {};
     result.rows.forEach(row => {
-      settings[row.setting_key] = row.setting_value;
+      try {
+        // Parse JSON string values back to objects/arrays
+        settings[row.setting_key] = JSON.parse(row.setting_value);
+      } catch (e) {
+        // If parsing fails, return as-is
+        settings[row.setting_key] = row.setting_value;
+      }
     });
     res.json(settings);
   } catch (error) {
