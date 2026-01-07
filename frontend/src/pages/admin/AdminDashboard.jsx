@@ -64,9 +64,14 @@ const AdminDashboard = () => {
       }
 
       // Load featured properties for Buy, Rent, and Houses pages
-      setFeaturedBuyIds(settingsRes.data?.featured_buy || []);
-      setFeaturedRentIds(settingsRes.data?.featured_rent || []);
-      setFeaturedHousesIds(settingsRes.data?.featured_houses || []);
+      // Ensure they are always arrays even if data is malformed
+      const buyIds = settingsRes.data?.featured_buy;
+      const rentIds = settingsRes.data?.featured_rent;
+      const housesIds = settingsRes.data?.featured_houses;
+      
+      setFeaturedBuyIds(Array.isArray(buyIds) ? buyIds : []);
+      setFeaturedRentIds(Array.isArray(rentIds) ? rentIds : []);
+      setFeaturedHousesIds(Array.isArray(housesIds) ? housesIds : []);
 
       // Load animation settings
       if (settingsRes.data?.animation_settings) {
