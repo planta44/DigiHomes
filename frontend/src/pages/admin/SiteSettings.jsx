@@ -1428,6 +1428,8 @@ const SiteSettings = () => {
                     { key: 'locations', label: 'Our Locations', color: 'green' },
                     { key: 'about', label: 'About Us', color: 'orange' },
                     { key: 'properties', label: 'Properties Pages (Buy/Rent/Houses)', color: 'pink' },
+                    { key: 'propertyDetails', label: 'Property Detail Page', color: 'teal' },
+                    { key: 'similarProperties', label: 'Similar Properties Cards', color: 'cyan' },
                     { key: 'contact', label: 'Contact Page Cards', color: 'indigo' }
                   ].map(section => {
                     const sectionSettings = settings.animation_settings?.sections?.[section.key] || {

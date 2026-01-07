@@ -59,7 +59,11 @@ const HousesPage = () => {
       if (filters.house_type) params.append('house_type', filters.house_type);
       if (filters.status) params.append('status', filters.status);
 
-      const response = await api.get(`/houses?${params.toString()}`);
+      const [response, settingsRes] = await Promise.all([
+        api.get(`/houses?${params.toString()}`),
+        api.get('/settings').catch(() => ({ data: {} }))
+      ]);
+      
       // Exclude Land and houses for sale from Available Houses - only show rental properties
       let rentalHouses = (response.data || []).filter(h => 
         h.property_type !== 'land' && h.listing_type !== 'buy'
@@ -79,7 +83,31 @@ const HousesPage = () => {
         rentalHouses = rentalHouses.filter(h => h.listing_type === filters.listing_type);
       }
 
-      setHouses(rentalHouses);
+      // Apply featured properties order if saved and no filters are active
+      const hasActiveFilters = filters.search || filters.location || filters.house_type || filters.town || filters.min_price || filters.max_price || filters.listing_type;
+      const featuredIds = settingsRes.data?.featured_houses || [];
+      
+      if (featuredIds.length > 0 && !hasActiveFilters) {
+        const featuredProps = [];
+        const nonFeaturedProps = [];
+        
+        // Separate featured from non-featured
+        rentalHouses.forEach(prop => {
+          if (featuredIds.includes(prop.id)) {
+            featuredProps.push(prop);
+          } else {
+            nonFeaturedProps.push(prop);
+          }
+        });
+        
+        // Sort featured by saved order
+        featuredProps.sort((a, b) => featuredIds.indexOf(a.id) - featuredIds.indexOf(b.id));
+        
+        // Combine: featured first, then non-featured
+        setHouses([...featuredProps, ...nonFeaturedProps]);
+      } else {
+        setHouses(rentalHouses);
+      }
     } catch (error) {
       console.error('Error fetching houses:', error);
     } finally {

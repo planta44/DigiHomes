@@ -34,18 +34,45 @@ const BuyPage = () => {
     window.scrollTo(0, 0);
     const fetchData = async () => {
       try {
-        const [pageRes, propertiesRes, locationsRes, typesRes] = await Promise.all([
+        const [pageRes, propertiesRes, locationsRes, typesRes, settingsRes] = await Promise.all([
           api.get('/pages/buy').catch(() => ({ data: null })),
           api.get('/houses').catch(() => ({ data: [] })),
           api.get('/settings/locations').catch(() => ({ data: [] })),
-          api.get('/settings/house-types').catch(() => ({ data: [] }))
+          api.get('/settings/house-types').catch(() => ({ data: [] })),
+          api.get('/settings').catch(() => ({ data: {} }))
         ]);
         setPageData(pageRes.data);
+        
         // Filter to show properties for sale AND lease
         const allProperties = propertiesRes.data || [];
-        setProperties(allProperties.filter(p => 
+        const buyProperties = allProperties.filter(p => 
           (p.listing_type === 'buy' || p.listing_type === 'lease') && p.vacancy_status === 'available'
-        ));
+        );
+        
+        // Apply featured properties order if saved
+        const featuredIds = settingsRes.data?.featured_buy || [];
+        if (featuredIds.length > 0) {
+          const featuredProps = [];
+          const nonFeaturedProps = [];
+          
+          // Separate featured from non-featured
+          buyProperties.forEach(prop => {
+            if (featuredIds.includes(prop.id)) {
+              featuredProps.push(prop);
+            } else {
+              nonFeaturedProps.push(prop);
+            }
+          });
+          
+          // Sort featured by saved order
+          featuredProps.sort((a, b) => featuredIds.indexOf(a.id) - featuredIds.indexOf(b.id));
+          
+          // Combine: featured first, then non-featured
+          setProperties([...featuredProps, ...nonFeaturedProps]);
+        } else {
+          setProperties(buyProperties);
+        }
+        
         setLocations(locationsRes.data);
         setHouseTypes(typesRes.data);
       } catch (error) {

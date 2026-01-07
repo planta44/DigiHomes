@@ -290,13 +290,17 @@ export const useLineByLine = (sectionName = 'about') => {
         return;
       }
 
-      // Initially hide lines
+      // Initially hide lines - ensure this works on mobile too
       lines.forEach(line => {
         if (!line.classList.contains(animClass)) {
           line.style.opacity = '0';
           line.style.transform = 'translateY(20px)';
+          line.style.transition = 'none'; // Prevent flash on initial load
         }
       });
+      
+      // Force reflow to ensure styles are applied
+      void container.offsetHeight;
 
       // Clean up old observer if exists
       if (observerRef.current) {

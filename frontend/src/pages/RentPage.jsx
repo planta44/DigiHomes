@@ -31,19 +31,46 @@ const RentPage = () => {
     window.scrollTo(0, 0);
     const fetchData = async () => {
       try {
-        const [pageRes, housesRes, locationsRes, typesRes] = await Promise.all([
+        const [pageRes, housesRes, locationsRes, typesRes, settingsRes] = await Promise.all([
           api.get('/pages/rent').catch(() => ({ data: null })),
           api.get('/houses').catch(() => ({ data: [] })),
           api.get('/settings/locations').catch(() => ({ data: [] })),
-          api.get('/settings/house-types').catch(() => ({ data: [] }))
+          api.get('/settings/house-types').catch(() => ({ data: [] })),
+          api.get('/settings').catch(() => ({ data: {} }))
         ]);
         setPageData(pageRes.data);
+        
         // Filter to only show available rental/lease properties (not buy)
         const allHouses = housesRes.data || [];
-        setHouses(allHouses.filter(h => 
+        const rentProperties = allHouses.filter(h => 
           h.vacancy_status === 'available' && 
           (h.listing_type === 'rent' || h.listing_type === 'lease' || !h.listing_type)
-        ));
+        );
+        
+        // Apply featured properties order if saved
+        const featuredIds = settingsRes.data?.featured_rent || [];
+        if (featuredIds.length > 0) {
+          const featuredProps = [];
+          const nonFeaturedProps = [];
+          
+          // Separate featured from non-featured
+          rentProperties.forEach(prop => {
+            if (featuredIds.includes(prop.id)) {
+              featuredProps.push(prop);
+            } else {
+              nonFeaturedProps.push(prop);
+            }
+          });
+          
+          // Sort featured by saved order
+          featuredProps.sort((a, b) => featuredIds.indexOf(a.id) - featuredIds.indexOf(b.id));
+          
+          // Combine: featured first, then non-featured
+          setHouses([...featuredProps, ...nonFeaturedProps]);
+        } else {
+          setHouses(rentProperties);
+        }
+        
         setLocations(locationsRes.data);
         setHouseTypes(typesRes.data);
       } catch (error) {
