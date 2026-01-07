@@ -191,12 +191,12 @@ const HouseDetailsPage = () => {
     <PublicLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
-        <Link 
-          to="/houses" 
+        <Link
+          to={house.property_type === 'land' ? '/buy' : '/houses'}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Houses
+          {house.property_type === 'land' ? 'Back to Lands' : 'Back to Houses'}
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
