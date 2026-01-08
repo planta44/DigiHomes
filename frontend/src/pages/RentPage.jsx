@@ -7,7 +7,7 @@ import { useHeroAnimation, useCardStagger } from '../hooks/useAnimations';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
 
-const RentalsPage = () => {
+const RentPage = () => {
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [locations, setLocations] = useState([]);
