@@ -134,13 +134,16 @@ const AdminDashboard = () => {
     setSavingHomepage(true);
     try {
       console.log('Saving Homepage featured IDs:', featuredIds);
+      console.log('Type:', typeof featuredIds, 'Is Array:', Array.isArray(featuredIds));
       // Always send array even if empty or single item
-      const idsToSave = Array.isArray(featuredIds) ? featuredIds : [];
+      const idsToSave = Array.isArray(featuredIds) ? [...featuredIds] : [];
+      console.log('IDs to save:', idsToSave, 'Length:', idsToSave.length);
       const response = await api.put('/settings/featured_properties', { value: idsToSave });
-      console.log('Save response:', response);
+      console.log('Save response:', response.data);
       toast.success('Homepage featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
+      console.error('Error details:', error.response?.data);
       toast.error('Failed to save featured properties');
     } finally {
       setSavingHomepage(false);
@@ -151,13 +154,16 @@ const AdminDashboard = () => {
     setSavingBuy(true);
     try {
       console.log('Saving Buy featured IDs:', featuredBuyIds);
+      console.log('Type:', typeof featuredBuyIds, 'Is Array:', Array.isArray(featuredBuyIds));
       // Always send array even if empty or single item
-      const idsToSave = Array.isArray(featuredBuyIds) ? featuredBuyIds : [];
+      const idsToSave = Array.isArray(featuredBuyIds) ? [...featuredBuyIds] : [];
+      console.log('IDs to save:', idsToSave, 'Length:', idsToSave.length);
       const response = await api.put('/settings/featured_buy', { value: idsToSave });
-      console.log('Save response:', response);
+      console.log('Save response:', response.data);
       toast.success('Buy page featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
+      console.error('Error details:', error.response?.data);
       toast.error('Failed to save Buy featured properties');
     } finally {
       setSavingBuy(false);
@@ -168,13 +174,16 @@ const AdminDashboard = () => {
     setSavingRent(true);
     try {
       console.log('Saving Rent featured IDs:', featuredRentIds);
+      console.log('Type:', typeof featuredRentIds, 'Is Array:', Array.isArray(featuredRentIds));
       // Always send array even if empty or single item
-      const idsToSave = Array.isArray(featuredRentIds) ? featuredRentIds : [];
+      const idsToSave = Array.isArray(featuredRentIds) ? [...featuredRentIds] : [];
+      console.log('IDs to save:', idsToSave, 'Length:', idsToSave.length);
       const response = await api.put('/settings/featured_rent', { value: idsToSave });
-      console.log('Save response:', response);
+      console.log('Save response:', response.data);
       toast.success('Rent page featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
+      console.error('Error details:', error.response?.data);
       toast.error('Failed to save Rent featured properties');
     } finally {
       setSavingRent(false);
@@ -185,13 +194,16 @@ const AdminDashboard = () => {
     setSavingHouses(true);
     try {
       console.log('Saving Houses featured IDs:', featuredHousesIds);
+      console.log('Type:', typeof featuredHousesIds, 'Is Array:', Array.isArray(featuredHousesIds));
       // Always send array even if empty or single item
-      const idsToSave = Array.isArray(featuredHousesIds) ? featuredHousesIds : [];
+      const idsToSave = Array.isArray(featuredHousesIds) ? [...featuredHousesIds] : [];
+      console.log('IDs to save:', idsToSave, 'Length:', idsToSave.length);
       const response = await api.put('/settings/featured_houses', { value: idsToSave });
-      console.log('Save response:', response);
+      console.log('Save response:', response.data);
       toast.success('Houses page featured properties saved!');
     } catch (error) {
       console.error('Save error:', error);
+      console.error('Error details:', error.response?.data);
       toast.error('Failed to save Houses featured properties');
     } finally {
       setSavingHouses(false);

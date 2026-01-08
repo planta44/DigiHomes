@@ -76,7 +76,7 @@ const HomePage = () => {
   const fetchData = async () => {
     try {
       const [housesRes, settingsRes] = await Promise.all([
-        api.get('/houses?status=available'),
+        api.get('/houses'),
         api.get('/settings').catch(() => ({ data: {} }))
       ]);
       

@@ -40,10 +40,13 @@ const HouseDetailsPage = () => {
     if (house.property_type === 'house' && house.listing_type === 'buy') {
       return { path: '/buy', text: 'Back to Buy' };
     }
-    // Houses for rent/lease (not buy) -> Available Houses page
-    // All rental properties are shown on /houses page
-    if (house.property_type === 'house' && house.listing_type !== 'buy') {
-      return { path: '/houses', text: 'Back to Houses' };
+    // Houses for rent (not lease) -> Rentals page
+    if (house.property_type === 'house' && house.listing_type === 'rent') {
+      return { path: '/rentals', text: 'Back to Rentals' };
+    }
+    // Houses for lease -> Rentals page
+    if (house.property_type === 'house' && house.listing_type === 'lease') {
+      return { path: '/rentals', text: 'Back to Rentals' };
     }
     // House with no listing_type (defaults to available houses)
     if (house.property_type === 'house' && !house.listing_type) {

@@ -47,9 +47,9 @@ const RentalsPage = () => {
         api.get('/settings').catch(() => ({ data: {} }))
       ]);
       
-      // Filter for rental properties only (including occupied)
+      // Filter for rental properties only (including occupied), exclude land
       const rentalProperties = (propertiesRes.data || []).filter(p => 
-        p.listing_type === 'rent' || p.listing_type === 'lease' || !p.listing_type
+        p.property_type !== 'land' && (p.listing_type === 'rent' || p.listing_type === 'lease' || !p.listing_type)
       );
       
       // Apply featured properties order if saved

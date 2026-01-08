@@ -57,7 +57,7 @@ const HouseCard = ({ house }) => {
         />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
-            {house.vacancy_status === 'available' ? 'Available' : 'Occupied'}
+            {house.vacancy_status === 'available' ? 'Available' : (house.property_type === 'land' && house.listing_type === 'buy' ? 'Sold' : 'Occupied')}
           </span>
           {house.featured && (
             <span className="badge bg-yellow-100 text-yellow-800">Featured</span>
