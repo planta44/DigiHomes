@@ -68,7 +68,7 @@ const Navbar = () => {
     { path: '/houses', label: 'Houses', icon: Building },
     { path: '/services', label: 'Services', icon: Briefcase },
     { path: '/buy', label: 'Buy', icon: ShoppingBag },
-    { path: '/rent', label: 'Rent', icon: Key },
+    { path: '/rent', label: 'Rentals', icon: Key },
     { path: '/reels', label: 'Reels', icon: Play },
     { path: '/contact', label: 'Contact', icon: Phone },
   ];

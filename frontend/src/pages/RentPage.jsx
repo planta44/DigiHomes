@@ -187,8 +187,8 @@ const RentPage = () => {
 
   const content = pageData?.content || {
     hero: { 
-      title: 'Find Your Perfect Rental', 
-      subtitle: 'Discover quality rental properties in Nakuru and Nyahururu',
+      title: '', 
+      subtitle: '',
       backgroundImage: '' 
     }
   };

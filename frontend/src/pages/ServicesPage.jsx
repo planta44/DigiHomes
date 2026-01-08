@@ -11,7 +11,7 @@ const defaultContent = {
   hero: { 
     title: 'Our Services', 
     subtitle: 'Professional property services tailored to your needs', 
-    backgroundImage: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&auto=format&fit=crop&q=60' 
+    backgroundImage: '' 
   },
   sections: [
     { title: 'Property Management', description: 'Complete property management services for landlords. We handle everything from tenant screening to maintenance.', icon: 'Building', items: ['Tenant screening & background checks', 'Rent collection & accounting', 'Property maintenance coordination', 'Regular property inspections'] },

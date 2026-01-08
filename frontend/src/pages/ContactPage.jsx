@@ -59,7 +59,7 @@ const ContactPage = () => {
           </>
         ) : (
           <>
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&auto=format&fit=crop&q=60')` }}></div>
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('')` }}></div>
             <div className="absolute inset-0 bg-black/50"></div>
           </>
         )}
