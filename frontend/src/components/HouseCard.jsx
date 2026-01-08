@@ -128,6 +128,7 @@ const HouseCard = ({ house }) => {
         <div className="mt-auto">
           <Link
             to={`/houses/${house.id}`}
+            state={{ from: window.location.pathname }}
             className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-600 hover:text-white transition-colors"
           >
             View Details

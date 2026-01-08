@@ -194,8 +194,8 @@ const initDatabase = async () => {
           }
         },
         {
-          slug: 'rentals',
-          title: 'Rentals',
+          slug: 'rent',
+          title: 'Rent',
           content: {
             hero: { title: 'Find Your Perfect Rental', subtitle: 'Quality rental properties in Nakuru & Nyahururu', backgroundImage: '' },
             sections: []

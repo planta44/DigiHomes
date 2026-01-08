@@ -64,7 +64,7 @@ const ManagePages = () => {
   const [pages, setPages] = useState({
     services: { content: { hero: { title: '', subtitle: '', backgroundImage: '' }, sections: [] } },
     buy: { content: { hero: { title: '', subtitle: '', backgroundImage: '' }, sections: [], callToAction: { title: '', description: '', buttonText: '', buttonLink: '' } } },
-    rentals: { content: { hero: { title: '', subtitle: '', backgroundImage: '' }, sections: [] } }
+    rent: { content: { hero: { title: '', subtitle: '', backgroundImage: '' }, sections: [] } }
   });
   const [activeTab, setActiveTab] = useState('services');
   const [saving, setSaving] = useState(false);
@@ -76,16 +76,16 @@ const ManagePages = () => {
 
   const fetchPages = async () => {
     try {
-      const [servicesRes, buyRes, rentalsRes] = await Promise.all([
+      const [servicesRes, buyRes, rentRes] = await Promise.all([
         api.get('/pages/services').catch(() => ({ data: null })),
         api.get('/pages/buy').catch(() => ({ data: null })),
-        api.get('/pages/rentals').catch(() => ({ data: null }))
+        api.get('/pages/rent').catch(() => ({ data: null }))
       ]);
       
       setPages(prev => ({
         services: servicesRes.data || prev.services,
         buy: buyRes.data || prev.buy,
-        rentals: rentalsRes.data || prev.rentals
+        rent: rentRes.data || prev.rent
       }));
     } catch (error) {
       console.error('Error fetching pages:', error);
@@ -188,14 +188,14 @@ const ManagePages = () => {
     <AdminLayout>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Manage Pages</h1>
-        <p className="text-gray-600">Edit content for Services, Buy, and Rentals pages</p>
+        <p className="text-gray-600">Edit content for Services, Buy, and Rent pages</p>
       </div>
 
       {/* Tabs */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="border-b overflow-x-auto">
           <div className="flex min-w-max">
-            {['services', 'buy', 'rentals'].map(tab => (
+            {['services', 'buy', 'rent'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -248,7 +248,7 @@ const ManagePages = () => {
           </div>
 
           {/* Sections */}
-          {(activeTab === 'services' || activeTab === 'buy' || activeTab === 'rentals') && (
+          {(activeTab === 'services' || activeTab === 'buy' || activeTab === 'rent') && (
             <div className="space-y-4 border-t pt-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-lg">Content Sections</h3>

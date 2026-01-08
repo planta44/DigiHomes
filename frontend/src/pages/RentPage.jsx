@@ -175,7 +175,7 @@ const RentalsPage = () => {
         <div className="min-h-screen flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: colors[200], borderTopColor: 'transparent' }}></div>
-            <p className="text-gray-500">Loading rentals...</p>
+            <p className="text-gray-500">Loading properties...</p>
           </div>
         </div>
       </PublicLayout>
@@ -412,4 +412,4 @@ const RentalsPage = () => {
   );
 };
 
-export default RentalsPage;
+export default RentPage;

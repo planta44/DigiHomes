@@ -12,7 +12,7 @@ import ContactPage from './pages/ContactPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import ServicesPage from './pages/ServicesPage';
 import BuyPage from './pages/BuyPage';
-import RentalsPage from './pages/RentalsPage';
+import RentPage from './pages/RentPage';
 import DigiReelsPage from './pages/DigiReelsPage';
 
 // Admin Pages
@@ -55,7 +55,7 @@ function App() {
           <Route path="/houses/:id" element={<HouseDetailsPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/buy" element={<BuyPage />} />
-          <Route path="/rentals" element={<RentalsPage />} />
+          <Route path="/rent" element={<RentPage />} />
           <Route path="/reels" element={<DigiReelsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />

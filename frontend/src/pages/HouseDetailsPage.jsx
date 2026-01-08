@@ -29,11 +29,16 @@ const HouseDetailsPage = () => {
     if (!house) return { path: '/houses', text: 'Back to Houses' };
 
     // Check if we have referrer information from navigation state
-    const referrer = location.state?.from;
+    const referrer = window.history.state?.usr?.from;
     
-    // If explicitly from rentals page
-    if (referrer === '/rentals') {
-      return { path: '/rentals', text: 'Back to Rentals' };
+    // If explicitly from rent page
+    if (referrer === '/rent') {
+      return { path: '/rent', text: 'Back to Rent' };
+    }
+    
+    // If explicitly from houses page
+    if (referrer === '/houses') {
+      return { path: '/houses', text: 'Back to Houses' };
     }
     
     // If explicitly from buy page
