@@ -40,11 +40,10 @@ const RentPage = () => {
         ]);
         setPageData(pageRes.data);
         
-        // Filter to only show available rental/lease properties (not buy)
+        // Filter to show rental/lease properties (including occupied)
         const allHouses = housesRes.data || [];
         const rentProperties = allHouses.filter(h => 
-          h.vacancy_status === 'available' && 
-          (h.listing_type === 'rent' || h.listing_type === 'lease' || !h.listing_type)
+          h.listing_type === 'rent' || h.listing_type === 'lease' || !h.listing_type
         );
         
         // Apply featured properties order if saved

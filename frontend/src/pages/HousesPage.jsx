@@ -65,8 +65,9 @@ const HousesPage = () => {
       ]);
       
       // Exclude Land and houses for sale from Available Houses - only show rental properties
-      let rentalHouses = (response.data || []).filter(h => 
-        h.property_type !== 'land' && h.listing_type !== 'buy'
+      const rentalHouses = response.data.filter(house => 
+        house.property_type === 'house' && 
+        house.listing_type !== 'buy'
       );
 
       // Client-side filtering for additional filters

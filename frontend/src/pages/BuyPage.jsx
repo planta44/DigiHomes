@@ -43,10 +43,10 @@ const BuyPage = () => {
         ]);
         setPageData(pageRes.data);
         
-        // Filter to show properties for sale AND lease
+        // Filter to show properties for sale AND lease (including sold/occupied)
         const allProperties = propertiesRes.data || [];
         const buyProperties = allProperties.filter(p => 
-          (p.listing_type === 'buy' || p.listing_type === 'lease') && p.vacancy_status === 'available'
+          p.listing_type === 'buy' || p.listing_type === 'lease'
         );
         
         // Apply featured properties order if saved
