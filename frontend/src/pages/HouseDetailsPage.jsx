@@ -27,7 +27,20 @@ const HouseDetailsPage = () => {
   // Determine back link and text based on property type
   const getBackLink = () => {
     if (!house) return { path: '/houses', text: 'Back to Houses' };
+
+    // Check if we have referrer information from navigation state
+    const referrer = location.state?.from;
     
+    // If explicitly from rentals page
+    if (referrer === '/rentals') {
+      return { path: '/rentals', text: 'Back to Rentals' };
+    }
+    
+    // If explicitly from buy page
+    if (referrer === '/buy') {
+      return { path: '/buy', text: 'Back to Buy' };
+    }
+
     // Land for sale -> Buy page
     if (house.property_type === 'land' && house.listing_type === 'buy') {
       return { path: '/buy', text: 'Back to Buy' };
@@ -40,19 +53,8 @@ const HouseDetailsPage = () => {
     if (house.property_type === 'house' && house.listing_type === 'buy') {
       return { path: '/buy', text: 'Back to Buy' };
     }
-    // Houses for rent (not lease) -> Rentals page
-    if (house.property_type === 'house' && house.listing_type === 'rent') {
-      return { path: '/rentals', text: 'Back to Rentals' };
-    }
-    // Houses for lease -> Rentals page
-    if (house.property_type === 'house' && house.listing_type === 'lease') {
-      return { path: '/rentals', text: 'Back to Rentals' };
-    }
-    // House with no listing_type (defaults to available houses)
-    if (house.property_type === 'house' && !house.listing_type) {
-      return { path: '/houses', text: 'Back to Houses' };
-    }
-    // Default fallback
+    // All other houses default to Houses page (Available Houses)
+    // This includes rent, lease, and no listing_type
     return { path: '/houses', text: 'Back to Houses' };
   };
   
