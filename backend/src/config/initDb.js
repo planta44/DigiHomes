@@ -194,12 +194,11 @@ const initDatabase = async () => {
           }
         },
         {
-          slug: 'rent',
-          title: 'Rent Property',
+          slug: 'rentals',
+          title: 'Rentals',
           content: {
             hero: { title: 'Find Your Perfect Rental', subtitle: 'Quality rental properties in Nakuru & Nyahururu', backgroundImage: '' },
-            sections: [],
-            filterOptions: { locations: ['Nakuru', 'Nyahururu'], types: ['Bedsitter', '1 Bedroom', '2 Bedroom', '3 Bedroom'] }
+            sections: []
           }
         }
       ];
