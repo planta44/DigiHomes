@@ -36,6 +36,9 @@ const HouseCard = ({ house }) => {
   };
 
   const getListingBadge = () => {
+    // Hide listing badges if property is occupied or sold
+    if (house.vacancy_status === 'occupied') return null;
+    
     if (isForLease) return { bg: 'bg-purple-600', text: 'Lease' };
     if (isForSale) return { bg: 'bg-green-600', text: 'For Sale' };
     return null;

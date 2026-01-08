@@ -134,7 +134,9 @@ const AdminDashboard = () => {
     setSavingHomepage(true);
     try {
       console.log('Saving Homepage featured IDs:', featuredIds);
-      const response = await api.put('/settings/featured_properties', { value: featuredIds });
+      // Always send array even if empty or single item
+      const idsToSave = Array.isArray(featuredIds) ? featuredIds : [];
+      const response = await api.put('/settings/featured_properties', { value: idsToSave });
       console.log('Save response:', response);
       toast.success('Homepage featured properties saved!');
     } catch (error) {
@@ -149,7 +151,9 @@ const AdminDashboard = () => {
     setSavingBuy(true);
     try {
       console.log('Saving Buy featured IDs:', featuredBuyIds);
-      const response = await api.put('/settings/featured_buy', { value: featuredBuyIds });
+      // Always send array even if empty or single item
+      const idsToSave = Array.isArray(featuredBuyIds) ? featuredBuyIds : [];
+      const response = await api.put('/settings/featured_buy', { value: idsToSave });
       console.log('Save response:', response);
       toast.success('Buy page featured properties saved!');
     } catch (error) {
@@ -164,7 +168,9 @@ const AdminDashboard = () => {
     setSavingRent(true);
     try {
       console.log('Saving Rent featured IDs:', featuredRentIds);
-      const response = await api.put('/settings/featured_rent', { value: featuredRentIds });
+      // Always send array even if empty or single item
+      const idsToSave = Array.isArray(featuredRentIds) ? featuredRentIds : [];
+      const response = await api.put('/settings/featured_rent', { value: idsToSave });
       console.log('Save response:', response);
       toast.success('Rent page featured properties saved!');
     } catch (error) {
@@ -179,7 +185,9 @@ const AdminDashboard = () => {
     setSavingHouses(true);
     try {
       console.log('Saving Houses featured IDs:', featuredHousesIds);
-      const response = await api.put('/settings/featured_houses', { value: featuredHousesIds });
+      // Always send array even if empty or single item
+      const idsToSave = Array.isArray(featuredHousesIds) ? featuredHousesIds : [];
+      const response = await api.put('/settings/featured_houses', { value: idsToSave });
       console.log('Save response:', response);
       toast.success('Houses page featured properties saved!');
     } catch (error) {
