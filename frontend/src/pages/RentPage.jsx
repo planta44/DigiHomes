@@ -424,6 +424,18 @@ const RentPage = () => {
             </button>
           </div>
         )}
+
+        {/* Agency Info Footer */}
+        <div className="mt-16 bg-gray-50 rounded-xl p-6 max-w-3xl mx-auto">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">DIGI Homes Agencies</h3>
+          <p className="text-gray-600 text-sm mb-4">
+            Your trusted housing agency in Nakuru and Nyahururu, Kenya.
+          </p>
+          <div className="text-sm text-gray-500 space-y-1">
+            <p>📧 info@digihomes.co.ke</p>
+            <p>📞 +254 707 805 283</p>
+          </div>
+        </div>
       </div>
     </PublicLayout>
   );

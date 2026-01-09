@@ -255,9 +255,12 @@ const broadcastEmail = async (req, res) => {
         if (response.ok) {
           successCount++;
         } else {
+          const errorData = await response.json().catch(() => ({}));
+          console.error(`Failed to send to ${subscriber.email}:`, response.status, errorData);
           failCount++;
         }
       } catch (error) {
+        console.error(`Error sending to ${subscriber.email}:`, error.message);
         failCount++;
       }
     }
