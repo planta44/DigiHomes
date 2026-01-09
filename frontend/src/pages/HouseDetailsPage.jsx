@@ -485,7 +485,7 @@ const HouseDetailsPage = () => {
           </p>
           <div className="text-sm text-gray-500 space-y-1">
             <p>📧 info@digihomes.co.ke</p>
-            <p>📞 +254 700 000 000</p>
+            <p>📞 +254 707 805 283</p>
           </div>
         </div>
 
