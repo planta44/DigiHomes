@@ -408,7 +408,7 @@ const HouseDetailsPage = () => {
                   Call Now
                 </a>
                 <a
-                  href={`https://wa.me/254700000000?text=Hi, I'm interested in the property: ${house.title} (${formatPrice(house.rent_price)}/month) in ${house.location}`}
+                  href={`https://wa.me/254781877454?text=Hi, I'm interested in the property: ${house.title} (${formatPrice(house.rent_price)}/month) in ${house.location}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary w-full bg-green-500 hover:bg-green-600 text-white"
