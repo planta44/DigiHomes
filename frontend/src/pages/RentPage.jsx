@@ -295,6 +295,7 @@ const RentPage = () => {
                   <option value="house">House</option>
                   <option value="property">Property</option>
                   <option value="land">Land</option>
+                  <option value="airbnb">Airbnb</option>
                 </select>
               </div>
               {/* Hide House Type when Land is selected */}

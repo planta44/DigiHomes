@@ -21,8 +21,12 @@ const HouseCard = ({ house }) => {
   const isProperty = house.property_type === 'property';
   const isForSale = house.listing_type === 'buy';
   const isForLease = house.listing_type === 'lease';
+<<<<<<< HEAD
   const isHouse = !house.property_type || house.property_type === 'house';
   const isAirbnb = isHouse && (house.house_type || '').toLowerCase() === 'airbnb';
+=======
+  const isAirbnb = String(house.property_type || '').toLowerCase() === 'airbnb';
+>>>>>>> bee2e09c60d632f996d3d012a0b2241255bfc00e
 
   const getPriceLabel = () => {
     if (isForSale) return '';
@@ -35,7 +39,12 @@ const HouseCard = ({ house }) => {
       }
       return '';
     }
+<<<<<<< HEAD
     return isAirbnb ? '/day' : '/mo';
+=======
+    if (isAirbnb) return '/day';
+    return '/mo';
+>>>>>>> bee2e09c60d632f996d3d012a0b2241255bfc00e
   };
 
   const getListingBadge = () => {

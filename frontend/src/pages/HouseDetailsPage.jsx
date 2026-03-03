@@ -369,7 +369,11 @@ const HouseDetailsPage = () => {
                 </span>
                 {/* Only show /month for rent, show duration for lease, nothing for buy */}
                 {house.listing_type === 'rent' && (
+<<<<<<< HEAD
                   <span className="text-gray-500">{isAirbnb ? '/day' : '/month'}</span>
+=======
+                  <span className="text-gray-500">{String(house.property_type || '').toLowerCase() === 'airbnb' ? '/day' : '/month'}</span>
+>>>>>>> bee2e09c60d632f996d3d012a0b2241255bfc00e
                 )}
                 {house.listing_type === 'lease' && house.lease_duration && (
                   <span className="text-gray-500">/{house.lease_duration} {house.lease_duration_type === 'months' ? 'mos' : 'yrs'}</span>

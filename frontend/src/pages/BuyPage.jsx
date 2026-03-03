@@ -230,6 +230,7 @@ const BuyPage = () => {
                       <option value="house">Houses</option>
                       <option value="property">Property</option>
                       <option value="land">Land</option>
+                      <option value="airbnb">Airbnb</option>
                     </select>
                   </div>
                 </div>
