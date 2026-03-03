@@ -20,6 +20,7 @@ const HouseCard = ({ house }) => {
   const isLand = house.property_type === 'land';
   const isForSale = house.listing_type === 'buy';
   const isForLease = house.listing_type === 'lease';
+  const isAirbnb = String(house.property_type || '').toLowerCase() === 'airbnb';
 
   const getPriceLabel = () => {
     if (isForSale) return '';
@@ -32,6 +33,7 @@ const HouseCard = ({ house }) => {
       }
       return '';
     }
+    if (isAirbnb) return '/day';
     return '/mo';
   };
 

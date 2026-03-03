@@ -229,6 +229,7 @@ const BuyPage = () => {
                       <option value="">All Types</option>
                       <option value="house">Houses</option>
                       <option value="land">Land</option>
+                      <option value="airbnb">Airbnb</option>
                     </select>
                   </div>
                 </div>

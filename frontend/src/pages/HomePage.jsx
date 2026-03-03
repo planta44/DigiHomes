@@ -347,7 +347,7 @@ const HomePage = () => {
               to="/houses" 
               className="mt-4 md:mt-0 inline-flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700"
             >
-              View All Housesxxxxxx
+              View All Houses
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
