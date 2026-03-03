@@ -103,7 +103,7 @@ const BuyPage = () => {
       p.description?.toLowerCase().includes(filters.search.toLowerCase());
     const matchesLocation = !filters.location || p.location === filters.location;
     const matchesTown = !filters.town || p.town?.toLowerCase().includes(filters.town.toLowerCase());
-    const matchesPropertyType = !filters.property_type || p.property_type === filters.property_type;
+    const matchesPropertyType = !filters.property_type || (p.property_type || 'house') === filters.property_type;
     const matchesHouseType = !filters.house_type || p.house_type === filters.house_type;
     const matchesListingType = !filters.listing_type || p.listing_type === filters.listing_type;
     const matchesMinPrice = !filters.min_price || p.rent_price >= parseFloat(filters.min_price);
@@ -223,11 +223,12 @@ const BuyPage = () => {
                     <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <select
                       value={filters.property_type}
-                      onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value }))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value, house_type: '', bedrooms: '' }))}
                       className="input-field pl-10 appearance-none cursor-pointer"
                     >
                       <option value="">All Types</option>
                       <option value="house">Houses</option>
+                      <option value="property">Property</option>
                       <option value="land">Land</option>
                     </select>
                   </div>
@@ -250,7 +251,7 @@ const BuyPage = () => {
                 {/* House Type - Only show if property_type is house or empty */}
                 {filters.property_type !== 'land' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">House Type</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{filters.property_type === 'property' ? 'Property Category' : 'House Type'}</label>
                     <div className="relative">
                       <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <select
@@ -258,7 +259,7 @@ const BuyPage = () => {
                         onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
                         className="input-field pl-10 appearance-none cursor-pointer"
                       >
-                        <option value="">All House Types</option>
+                        <option value="">{filters.property_type === 'property' ? 'All Categories' : 'All House Types'}</option>
                         {houseTypes.map(type => (
                           <option key={type.id} value={type.name}>{type.name}</option>
                         ))}
@@ -268,7 +269,7 @@ const BuyPage = () => {
                 )}
 
                 {/* Bedrooms - Only show if property_type is house or empty */}
-                {filters.property_type !== 'land' && (
+                {filters.property_type !== 'land' && filters.property_type !== 'property' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
                     <select

@@ -1,11 +1,19 @@
 import { useState } from 'react';
-import { Search, MapPin, Home, CheckCircle, DollarSign, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, MapPin, Home, CheckCircle, DollarSign, SlidersHorizontal, ChevronDown, ChevronUp, Building } from 'lucide-react';
 
 const HouseFilters = ({ filters, setFilters, houseTypes, locations = [], houses = [] }) => {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   const handleChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters(prev => {
+      const next = { ...prev, [key]: value };
+
+      if (key === 'property_type') {
+        next.house_type = '';
+      }
+
+      return next;
+    });
   };
 
   // Get unique towns for selected location
@@ -81,7 +89,7 @@ const HouseFilters = ({ filters, setFilters, houseTypes, locations = [], houses 
         ) : (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              House Type
+              {filters.property_type === 'property' ? 'Property Category' : 'House Type'}
             </label>
             <div className="relative">
               <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -115,11 +123,29 @@ const HouseFilters = ({ filters, setFilters, houseTypes, locations = [], houses 
       {/* More Filters - Collapsible */}
       {showMoreFilters && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Property Type
+            </label>
+            <div className="relative">
+              <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select
+                value={filters.property_type || ''}
+                onChange={(e) => handleChange('property_type', e.target.value)}
+                className="input-field pl-10 appearance-none cursor-pointer"
+              >
+                <option value="">All Types</option>
+                <option value="house">House</option>
+                <option value="property">Property</option>
+              </select>
+            </div>
+          </div>
+
           {/* House Type (if not already showing) */}
-          {filters.location && getAvailableTowns().length > 0 && (
+          {filters.property_type !== 'land' && filters.location && getAvailableTowns().length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                House Type
+                {filters.property_type === 'property' ? 'Property Category' : 'House Type'}
               </label>
               <div className="relative">
                 <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

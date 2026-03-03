@@ -10,7 +10,8 @@ import {
   MessageCircle,
   ChevronLeft,
   ChevronRight,
-  Calendar
+  Calendar,
+  Building
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import HouseCard from '../components/HouseCard';
@@ -55,7 +56,13 @@ const HouseDetailsPage = () => {
       return { path: '/buy', text: 'Back to Buy' };
     }
     // House for sale -> Buy page
-    if (house.property_type === 'house' && house.listing_type === 'buy') {
+    if (house.property_type === 'property' && house.listing_type === 'buy') {
+      return { path: '/buy', text: 'Back to Buy' };
+    }
+    if (house.property_type === 'property' && house.listing_type === 'lease') {
+      return { path: '/buy', text: 'Back to Buy' };
+    }
+    if ((!house.property_type || house.property_type === 'house') && house.listing_type === 'buy') {
       return { path: '/buy', text: 'Back to Buy' };
     }
     // All other houses default to Houses page (Available Houses)
@@ -84,7 +91,7 @@ const HouseDetailsPage = () => {
       const allPropertiesRes = await api.get('/houses');
       let similar = [];
       
-      if (houseData.property_type === 'house') {
+      if (!houseData.property_type || houseData.property_type === 'house') {
         // For houses: same location, same house_type OR +/-1 bedrooms, same listing_type
         similar = allPropertiesRes.data
           .filter(p => 
@@ -104,6 +111,16 @@ const HouseDetailsPage = () => {
             p.id !== parseInt(id) && 
             p.vacancy_status === 'available' &&
             p.property_type === 'land' &&
+            p.location === houseData.location
+          )
+          .slice(0, 3);
+      } else if (houseData.property_type === 'property') {
+        similar = allPropertiesRes.data
+          .filter(p => 
+            p.id !== parseInt(id) && 
+            p.vacancy_status === 'available' &&
+            p.property_type === 'property' &&
+            p.listing_type === houseData.listing_type &&
             p.location === houseData.location
           )
           .slice(0, 3);
@@ -180,6 +197,21 @@ const HouseDetailsPage = () => {
   }
 
   const images = house.images?.length > 0 ? house.images : [null];
+  const isHouse = !house.property_type || house.property_type === 'house';
+  const isProperty = house.property_type === 'property';
+  const isAirbnb = isHouse && (house.house_type || '').toLowerCase() === 'airbnb';
+
+  const getPriceSuffix = () => {
+    if (house.listing_type === 'rent') return isAirbnb ? '/day' : '/month';
+    if (house.listing_type === 'lease' && house.lease_duration) {
+      return `/${house.lease_duration} ${house.lease_duration_type === 'months' ? 'mos' : 'yrs'}`;
+    }
+    return '';
+  };
+
+  const whatsappLink = `https://wa.me/254707805283?text=${encodeURIComponent(
+    `Hi, I'm interested in the property: ${house.title} (${formatPrice(house.rent_price)}${getPriceSuffix()}) in ${house.location}`
+  )}`;
 
   return (
     <PublicLayout>
@@ -235,7 +267,7 @@ const HouseDetailsPage = () => {
               {/* Status Badge */}
               <div className="absolute top-4 left-4 flex gap-2">
                 <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
-                  {house.vacancy_status === 'available' ? 'Available' : 'Occupied'}
+                  {house.vacancy_status === 'available' ? 'Available' : (house.listing_type === 'buy' ? 'Sold' : 'Occupied')}
                 </span>
                 {house.featured && (
                   <span className="badge bg-yellow-100 text-yellow-800">Featured</span>
@@ -337,7 +369,7 @@ const HouseDetailsPage = () => {
                 </span>
                 {/* Only show /month for rent, show duration for lease, nothing for buy */}
                 {house.listing_type === 'rent' && (
-                  <span className="text-gray-500">/month</span>
+                  <span className="text-gray-500">{isAirbnb ? '/day' : '/month'}</span>
                 )}
                 {house.listing_type === 'lease' && house.lease_duration && (
                   <span className="text-gray-500">/{house.lease_duration} {house.lease_duration_type === 'months' ? 'mos' : 'yrs'}</span>
@@ -370,7 +402,7 @@ const HouseDetailsPage = () => {
               )}
 
               {/* Property Details - Only show for houses, not land */}
-              {house.property_type !== 'land' && (
+              {isHouse && (
                 <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-100">
                   <div className="text-center">
                     <Bed className="w-6 h-6 mx-auto mb-1 text-gray-400" />
@@ -386,6 +418,18 @@ const HouseDetailsPage = () => {
                     <Home className="w-6 h-6 mx-auto mb-1 text-gray-400" />
                     <div className="font-semibold text-gray-900 text-sm">{house.house_type}</div>
                     <div className="text-xs text-gray-500">Type</div>
+                  </div>
+                </div>
+              )}
+
+              {isProperty && (
+                <div className="py-4 border-t border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <Building className="w-6 h-6 text-gray-400" />
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">{house.house_type || 'Property'}</div>
+                      <div className="text-xs text-gray-500">Category</div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -408,7 +452,7 @@ const HouseDetailsPage = () => {
                   Call Now
                 </a>
                 <a
-                  href={`https://wa.me/254707805283?text=Hi, I'm interested in the property: ${house.title} (${formatPrice(house.rent_price)}/month) in ${house.location}`}
+                  href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary w-full bg-green-500 hover:bg-green-600 text-white"

@@ -108,7 +108,7 @@ const RentPage = () => {
     }
     
     if (filters.property_type) {
-      result = result.filter(p => p.property_type === filters.property_type);
+      result = result.filter(p => (p.property_type || 'house') === filters.property_type);
     }
     
     if (filters.min_price) {
@@ -288,24 +288,25 @@ const RentPage = () => {
                 <label className="block text-xs font-medium text-gray-500 mb-1">Property Type</label>
                 <select
                   value={filters.property_type}
-                  onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value }))}
+                  onChange={(e) => setFilters(prev => ({ ...prev, property_type: e.target.value, house_type: '', bedrooms: '', bathrooms: '' }))}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">All</option>
                   <option value="house">House</option>
+                  <option value="property">Property</option>
                   <option value="land">Land</option>
                 </select>
               </div>
               {/* Hide House Type when Land is selected */}
               {filters.property_type !== 'land' && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">House Type</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">{filters.property_type === 'property' ? 'Property Category' : 'House Type'}</label>
                   <select
                     value={filters.house_type}
                     onChange={(e) => setFilters(prev => ({ ...prev, house_type: e.target.value }))}
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500"
                   >
-                    <option value="">All</option>
+                    <option value="">{filters.property_type === 'property' ? 'All Categories' : 'All'}</option>
                     {houseTypes.map(type => (
                       <option key={type.id} value={type.name}>{type.name}</option>
                     ))}
@@ -333,7 +334,7 @@ const RentPage = () => {
                 />
               </div>
               {/* Hide Bedrooms/Bathrooms when Land is selected */}
-              {filters.property_type !== 'land' && (
+              {filters.property_type !== 'land' && filters.property_type !== 'property' && (
                 <>
                   <div>
                     <label className="block text-xs font-medium text-gray-500 mb-1">Bedrooms</label>

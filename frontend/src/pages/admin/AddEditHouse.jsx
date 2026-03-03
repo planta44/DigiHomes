@@ -122,10 +122,26 @@ const AddEditHouse = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      };
+
+      if (name === 'property_type') {
+        if (value !== 'house') {
+          next.bedrooms = 1;
+          next.bathrooms = 1;
+          next.internal_features = [];
+          next.external_features = [];
+        }
+        if (value === 'land') {
+          next.house_type = '';
+        }
+      }
+
+      return next;
+    });
   };
 
   const toggleFeature = (category, feature) => {
@@ -328,7 +344,8 @@ const AddEditHouse = () => {
                     className="input-field"
                   >
                     <option value="house">House</option>
-                    <option value="land">Land/Property</option>
+                    <option value="land">Land</option>
+                    <option value="property">Property</option>
                   </select>
                 </div>
 
@@ -383,19 +400,21 @@ const AddEditHouse = () => {
                 </div>
               </div>
 
-              {formData.property_type === 'house' && (
+              {formData.property_type !== 'land' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Property Type (House)
+                    {formData.property_type === 'house' ? 'House Type' : 'Property Category'}
                   </label>
                   <ComboInput
                     name="house_type"
                     value={formData.house_type}
                     onChange={handleChange}
                     options={houseTypes}
-                    placeholder="Select or type house type..."
+                    placeholder={formData.property_type === 'house' ? 'Select or type house type...' : 'e.g., Gas Station, Shop, Building'}
                   />
-                  <p className="text-xs text-gray-500 mt-1">e.g., 1 Bedroom, 2 Bedroom, Apartment</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.property_type === 'house' ? 'e.g., 1 Bedroom, 2 Bedroom, Apartment' : 'e.g., Gas Station, Commercial Building'}
+                  </p>
                 </div>
               )}
 
@@ -432,7 +451,7 @@ const AddEditHouse = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {formData.listing_type === 'buy' ? 'Price (KES)' : formData.listing_type === 'lease' ? 'Lease Price (KES)' : 'Rent/Month (KES)'} <span className="text-red-500">*</span>
+                      {formData.listing_type === 'buy' ? 'Price (KES)' : formData.listing_type === 'lease' ? 'Lease Price (KES)' : (formData.house_type === 'Airbnb' ? 'Rent/Day (KES)' : 'Rent/Month (KES)')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -531,6 +550,26 @@ const AddEditHouse = () => {
                       value={formData.rent_price}
                       onChange={handleChange}
                       placeholder={formData.listing_type === 'buy' ? '2000000' : '10000'}
+                      min="0"
+                      className="input-field"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {formData.property_type === 'property' && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {formData.listing_type === 'buy' ? 'Price (KES)' : formData.listing_type === 'lease' ? 'Lease Price (KES)' : 'Rent/Month (KES)'} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="rent_price"
+                      value={formData.rent_price}
+                      onChange={handleChange}
+                      placeholder={formData.listing_type === 'buy' ? '5000000' : formData.listing_type === 'lease' ? '500000' : '15000'}
                       min="0"
                       className="input-field"
                       required

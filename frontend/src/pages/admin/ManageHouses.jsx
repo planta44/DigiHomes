@@ -85,7 +85,7 @@ const ManageHouses = () => {
     const matchesLocation = !filterLocation || house.location === filterLocation;
     const matchesTown = !filterTown || house.town === filterTown;
     const matchesStatus = !filterStatus || house.vacancy_status === filterStatus;
-    const matchesPropertyType = !filterPropertyType || house.property_type === filterPropertyType;
+    const matchesPropertyType = !filterPropertyType || (house.property_type || 'house') === filterPropertyType;
     const matchesListingType = !filterListingType || house.listing_type === filterListingType;
     return matchesSearch && matchesLocation && matchesTown && matchesStatus && matchesPropertyType && matchesListingType;
   });
@@ -158,6 +158,7 @@ const ManageHouses = () => {
             >
               <option value="">All Property Types</option>
               <option value="house">House</option>
+              <option value="property">Property</option>
               <option value="land">Land</option>
             </select>
             <select

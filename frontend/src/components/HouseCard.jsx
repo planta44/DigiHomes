@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Bed, Bath, ArrowRight, Ruler, LandPlot } from 'lucide-react';
+import { MapPin, Bed, Bath, ArrowRight, Ruler, LandPlot, Building } from 'lucide-react';
 
 const HouseCard = ({ house }) => {
   const primaryImage = house.images?.find(img => img.is_primary) || house.images?.[0];
@@ -18,8 +18,11 @@ const HouseCard = ({ house }) => {
   };
 
   const isLand = house.property_type === 'land';
+  const isProperty = house.property_type === 'property';
   const isForSale = house.listing_type === 'buy';
   const isForLease = house.listing_type === 'lease';
+  const isHouse = !house.property_type || house.property_type === 'house';
+  const isAirbnb = isHouse && (house.house_type || '').toLowerCase() === 'airbnb';
 
   const getPriceLabel = () => {
     if (isForSale) return '';
@@ -32,7 +35,7 @@ const HouseCard = ({ house }) => {
       }
       return '';
     }
-    return '/mo';
+    return isAirbnb ? '/day' : '/mo';
   };
 
   const getListingBadge = () => {
@@ -57,13 +60,16 @@ const HouseCard = ({ house }) => {
         />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <span className={`badge ${house.vacancy_status === 'available' ? 'badge-available' : 'badge-occupied'}`}>
-            {house.vacancy_status === 'available' ? 'Available' : (house.property_type === 'land' && house.listing_type === 'buy' ? 'Sold' : 'Occupied')}
+            {house.vacancy_status === 'available' ? 'Available' : (house.listing_type === 'buy' ? 'Sold' : 'Occupied')}
           </span>
           {house.featured && (
             <span className="badge bg-yellow-100 text-yellow-800">Featured</span>
           )}
           {isLand && (
             <span className="badge bg-amber-100 text-amber-800">Land</span>
+          )}
+          {isProperty && (
+            <span className="badge bg-blue-100 text-blue-800">Property</span>
           )}
           {listingBadge && (
             <span className={`badge ${listingBadge.bg} text-white`}>{listingBadge.text}</span>
@@ -105,6 +111,13 @@ const HouseCard = ({ house }) => {
                   <span>{house.dimensions}</span>
                 </div>
               )}
+            </>
+          ) : isProperty ? (
+            <>
+              <div className="flex items-center gap-1">
+                <Building className="w-4 h-4" />
+                <span className="text-primary-600 font-medium">{house.house_type || 'Property'}</span>
+              </div>
             </>
           ) : (
             <>

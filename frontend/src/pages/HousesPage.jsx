@@ -18,6 +18,7 @@ const HousesPage = () => {
     location: searchParams.get('location') || '',
     town: '',
     house_type: '',
+    property_type: '',
     min_price: '',
     max_price: '',
     listing_type: '',
@@ -65,10 +66,14 @@ const HousesPage = () => {
       ]);
       
       // Exclude Land and houses for sale from Available Houses - only show rental properties
-      const rentalHouses = response.data.filter(house => 
-        house.property_type === 'house' && 
+      let rentalHouses = response.data.filter(house => 
+        house.property_type !== 'land' && 
         house.listing_type !== 'buy'
       );
+
+      if (filters.property_type) {
+        rentalHouses = rentalHouses.filter(h => (h.property_type || 'house') === filters.property_type);
+      }
 
       // Client-side filtering for additional filters
       if (filters.town) {
@@ -85,7 +90,7 @@ const HousesPage = () => {
       }
 
       // Apply featured properties order if saved and no filters are active
-      const hasActiveFilters = filters.search || filters.location || filters.house_type || filters.town || filters.min_price || filters.max_price || filters.listing_type;
+      const hasActiveFilters = filters.search || filters.location || filters.house_type || filters.property_type || filters.town || filters.min_price || filters.max_price || filters.listing_type;
       const featuredIds = Array.isArray(settingsRes.data?.featured_houses) ? settingsRes.data.featured_houses : [];
       
       if (featuredIds.length > 0 && !hasActiveFilters) {
